@@ -1,1 +1,4 @@
-This is the location of common scripts for the MT project
+This is the location of common scripts for the MT project:
+
+- nextflow-start contains notes from online tutorials
+- 2019-11-20-traits-phylogeny-test.Rmd contains R code to import species trait csv
