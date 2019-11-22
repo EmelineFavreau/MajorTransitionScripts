@@ -1,0 +1,44 @@
+---
+title: "2019-11-20-traits-phylogeny-test"
+author: "Emeline Favreau"
+date: "20/11/2019"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+# R.Version()$version.string # "R version 3.3.2 (2016-10-31)"
+
+basic_libraries <- c("readr",
+                     "tidyverse",
+                     "ggplot2")
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+
+# import csv
+#de_S_Silva_T_Silveria_2009 <- read_csv("~/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_angiopolybia/de S. Silva & T Silveria 2009.csv")
+
+#test <- read_csv("~/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_agelaia/Giannotti 1998.csv")
+
+# set current path
+mypath <- "~/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_agelaia"
+
+
+tbl <- list.files(path = mypath, 
+                  pattern = "*.csv") %>% map_df(~read_csv(.))
+
+```
+
+## Bee and Wasp Traits 
+
+The aim is to import csv files containing trait information (e.g. colony size) per species, to develop a database of traits.
+
+```{r, eval = TRUE, echo = FALSE}
+summary(cars)
+```
