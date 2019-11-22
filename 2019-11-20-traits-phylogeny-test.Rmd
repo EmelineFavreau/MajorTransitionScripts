@@ -39,6 +39,4 @@ tbl <- list.files(path = mypath,
 
 The aim is to import csv files containing trait information (e.g. colony size) per species, to develop a database of traits.
 
-```{r, eval = TRUE, echo = FALSE}
-summary(cars)
-```
+
