@@ -21,22 +21,72 @@ for (lib in basic_libraries) {
         }
 }
 
-# import csv
-#de_S_Silva_T_Silveria_2009 <- read_csv("~/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_angiopolybia/de S. Silva & T Silveria 2009.csv")
+```
 
-#test <- read_csv("~/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_agelaia/Giannotti 1998.csv")
+The aim is to import csv files containing trait information (e.g. colony size) per species, to develop a database of traits.
 
-# set current path
-mypath <- "~/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_agelaia"
+```{r import data, include = FALSE}
 
 
-tbl <- list.files(path = mypath, 
-                  pattern = "*.csv") %>% map_df(~read_csv(.))
+# set path, here testing with agelaia
+mypath <- "/Users/emeline/Google Drive/Sumner-projects/GOTIT/0.traits_phylogeny/project-wasp-traits-database/wasp database_Liz Rowse_sept2012/Epiponnini/csv_epiponini_2/csv_agelaia"
+
+# set genus name
+genus_name <- "agelaia"
+
+# inspired by https://stackoverflow.com/questions/5319839/read-multiple-csv-files-into-separate-data-frames
+
+## Read files names
+raw_filenames <- list.files(path    = mypath,
+                            pattern = "*.csv")
+
+
+## Create list of df names without special characters
+clean_names <- gsub(pattern = " |-|'|&|.csv",
+                    x = raw_filenames,
+                    replacement = "")
+
+# append all df names with genus
+clean_names <- paste(genus_name, clean_names, sep = "_")
+
+# create an empty list to populate resulting df
+genus_df_list <- list()
+
+### Load all files
+for(i in 1:length(raw_filenames)){
+  # string with file path
+  filepath <- file.path(mypath, raw_filenames[i])
+  
+  # temporary object from reading one path at a time
+  temp_file <- read.delim(filepath,
+                        sep = ",")
+  
+  # name the dataframe with raw name
+  assign(clean_names[i], temp_file) 
+  
+  # save it in a list
+  genus_df_list[[i]] <- assign(clean_names[i], temp_file) 
+    
+}
+
+# give names to each element in list
+names(genus_df_list) <- clean_names
+
 
 ```
 
 ## Bee and Wasp Traits 
 
-The aim is to import csv files containing trait information (e.g. colony size) per species, to develop a database of traits.
+
+```{r compare column names, include = FALSE}
+# check resulting dataframes
+str(genus_df_list)
+
+# list columns - they are not the same
+for(i in genus_df_list){
+  print(colnames(i))
+}
 
 
+
+```
