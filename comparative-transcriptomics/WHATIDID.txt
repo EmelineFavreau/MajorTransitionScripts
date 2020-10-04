@@ -1,0 +1,41 @@
+# 2020-10-04
+## Author: Emeline Favreau
+## Objective: Running QC steps for all transcriptomics datasets
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: TBD
+# Aim 2: TBD
+# Aim 3: TBD
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+mkdir comparative-transcriptomic
+cd comparative-transcriptomic
+
+# create subdirectories for each species
+mkdir Liostenogaster-flavolineata
+mkdir Mischocyttarus-basimacula
+mkdir Polistes-dominula
+mkdir Polistes-canadensis
+mkdir Metapolybia-cingulata
+mkdir Angiopolybia-pallens
+mkdir Polybia-occidentalis
+mkdir Polybia-quadracincta
+mkdir Agelaia-cajennensis
+mkdir Brachygastra-mellifica
+mkdir Vespa-crabro
+mkdir Vespula-vulgaris
+
+###############################################################################
+# In each subdirectory, the follwoing steps will be done:
+
+# copy raw data from RDS to scratch
+
+# create a readme for each dataset
+
+# run Nextflow with default parameters
+
+# with the aims of obtaining raw read counts (for differential expression) and QC plots

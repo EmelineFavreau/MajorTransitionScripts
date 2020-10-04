@@ -1,0 +1,86 @@
+# 2020-10-04
+## Author: Emeline Favreau
+## Objective: Running QC steps for Vespula vulgaris
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: Run Nextflow
+# Aim 2: TBD
+# Aim 3: TBD
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+Genusspecies="Vespula-vulgaris"
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
+
+# set up myriad.config (in the directory where the experiment will run)
+cp ../myriad.config .
+
+# copy input files: RNAseq raw reads, genome fasta, gff
+cd inputOnScratch
+
+scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Queen{1,2,3,4,5}/raw/*{1,2}.fq.gz .
+
+scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Worker{1,2,3,4,5}/raw/*{1,2}.fq .
+
+# the worker reads are not compressed
+# for the sake of simplicity, compress them:
+gzip -c VvulW1_1.fq > VvulW1_1.fq.gz
+gzip -c VvulW2_1.fq  
+gzip -c VvulW3_1.fq  
+gzip -c VvulW4_1.fq  
+gzip -c VvulW5_1.fq
+gzip -c VvulW1_2.fq  
+gzip -c VvulW2_2.fq  
+gzip -c VvulW3_2.fq  
+gzip -c VvulW4_2.fq  
+gzip -c VvulW5_2.fq
+
+# we use the genome from Harrop et al 2020
+wget https://zenodo.org/record/4001020/files/Vvulg.assembly.fna.gz
+
+# which gff is best? this one or the one of Tom Harrop Phil Lester? 
+wget https://zenodo.org/record/4001020/files/Vvulg_23_June_2020.gff3
+
+# scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/genome/Vvulg_final_sorted_annotated.gff3 .
+
+cd ../tmp
+
+###############################################################################
+# Aim 1: Run Nextflow on one sample
+
+mkdir hisat-one-sample
+
+cp myriad.config hisat-one-sample/.
+
+cd hisat-one-sample
+
+tmux new-session
+
+Genusspecies="Vespula-vulgaris"
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	--reads '~/Scratch/comparative-transcriptomics/${Genusspecies}/input/*{1,2}.fq.gz' \
+	--fasta /lustre/scratch/scratch/ucfaeef/nextflow-test/input/V.crabro.RM.hymenoptera.fasta \
+	--gff /lustre/scratch/scratch/ucfaeef/nextflow-test/input/V.crabro.evm.consensus.annotation.v1a.gff3 \
+	--forwardStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/nextflow-test/tmp/STAR-4W-5G-2Q/myriad.config \
+	-with-tower \
+	-bg \
+	-resume \
+	--outdir /lustre/scratch/scratch/ucfaeef/nextflow-test/result/STAR-4W-5G-2Q
+# prickly_woese
