@@ -29,6 +29,9 @@ mkdir Brachygastra-mellifica
 mkdir Vespa-crabro
 mkdir Vespula-vulgaris
 
+# set the config file that will be copied in each subdirectory
+vim myriad.config
+
 ###############################################################################
 # In each subdirectory, the follwoing steps will be done:
 

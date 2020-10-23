@@ -28,39 +28,40 @@ cd inputOnScratch
 
 scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Queen{1,2,3,4,5}/raw/*{1,2}.fq.gz .
 
-scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Worker{1,2,3,4,5}/raw/*{1,2}.fq .
+scp -r ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Worker{1,2,3,4,5}/raw/ .
+
 
 # the worker reads are not compressed
 # for the sake of simplicity, compress them:
-gzip -c VvulW1_1.fq > VvulW1_1.fq.gz
-gzip -c VvulW2_1.fq  
-gzip -c VvulW3_1.fq  
-gzip -c VvulW4_1.fq  
-gzip -c VvulW5_1.fq
-gzip -c VvulW1_2.fq  
-gzip -c VvulW2_2.fq  
-gzip -c VvulW3_2.fq  
-gzip -c VvulW4_2.fq  
-gzip -c VvulW5_2.fq
+
+cd raw
+for sample in Vvul*fq; do
+	gzip -c $sample > ../$sample.gz
+done
+
+# check if the raw reads are ok
+seqtk comp VvulW2_1.fq.gz
+zcat VvulW2_1.fq.gz | tail
 
 # we use the genome from Harrop et al 2020
 wget https://zenodo.org/record/4001020/files/Vvulg.assembly.fna.gz
 
-# which gff is best? this one or the one of Tom Harrop Phil Lester? 
+# we use the gff from  Harrop et al 2020
 wget https://zenodo.org/record/4001020/files/Vvulg_23_June_2020.gff3
+gzip -c Vvulg_23_June_2020.gff3 > Vvulg_23_June_2020.gff.gz
 
 # scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/genome/Vvulg_final_sorted_annotated.gff3 .
 
-cd ../tmp
+cd ..
 
 ###############################################################################
 # Aim 1: Run Nextflow on one sample
 
-mkdir hisat-one-sample
+mkdir tmp/hisat-one-sample
 
-cp myriad.config hisat-one-sample/.
+cp myriad.config tmp/hisat-one-sample/.
 
-cd hisat-one-sample
+cd tmp/hisat-one-sample
 
 tmux new-session
 
@@ -71,16 +72,16 @@ module load blic-modules
 module load nextflow/19.10.0.5170
 
 nextflow run nf-core/rnaseq \
-	--reads '~/Scratch/comparative-transcriptomics/${Genusspecies}/input/*{1,2}.fq.gz' \
-	--fasta /lustre/scratch/scratch/ucfaeef/nextflow-test/input/V.crabro.RM.hymenoptera.fasta \
-	--gff /lustre/scratch/scratch/ucfaeef/nextflow-test/input/V.crabro.evm.consensus.annotation.v1a.gff3 \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/VvulW1_*{1,2}.fq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg.assembly.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg_23_June_2020.gff.gz' \
 	--forwardStranded \
 	--skipBiotypeQC \
 	--fc_group_features gene_id \
 	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/nextflow-test/tmp/STAR-4W-5G-2Q/myriad.config \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/tmp/hisat-one-sample/myriad.config \
 	-with-tower \
 	-bg \
 	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/nextflow-test/result/STAR-4W-5G-2Q
-# prickly_woese
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-one-sample
+# drunk_macclintock this failed, maybe because the file was corrupted. to be re-run with new files
