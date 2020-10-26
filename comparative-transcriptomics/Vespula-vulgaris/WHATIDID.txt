@@ -133,8 +133,6 @@ cd tmp/hisat-all-samples
 
 tmux new-session
 
-Genusspecies="Vespula-vulgaris"
-
 module load blic-modules
 
 module load nextflow/19.10.0.5170
@@ -154,4 +152,4 @@ nextflow run nf-core/rnaseq \
 	-resume \
 	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples
 
-# 
+# adoring_lamport
