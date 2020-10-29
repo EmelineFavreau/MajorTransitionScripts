@@ -1,0 +1,49 @@
+## Raw reads of Vespula vulgaris from Sumner lab
+# Sampling method
+Sampled in different locations (Vyne house, Morden hall 1, 2, 5; RHS Wisley)
+Stored in RNA later 
+
+# Publication linked to these data
+NA
+
+# People's contributions
+David Lee (Raw sequence data)
+Michael Bentley (Raw sequence data)
+Daisy Taylor (sampling, extractions)
+Seirian Sumner (design, sampling, analysis)
+
+# Subfamily 
+Vespinae
+
+# Genus	
+Vespula
+
+# Species
+vulgaris
+	
+# In silico RNA sample type	
+Collected at the nest
+
+# Tissue type
+brain
+	
+# Sample content (individual, or n pooled)
+individual
+
+# Total number of samples
+10 samples
+
+# Number of samples for reproductives
+5 queen samples, with ovary development, evidence of inseminated (250-300 eggs in each)
+MH1Q, MH2Q, MH5Q, RHSQ, VHQ
+
+# Number of samples for non-reproductives
+5 worker samples, with no ovary development, evidence of no egg nor being inseminated
+VvulW1, VvulW2, VvulW3, VvulW4, VvulW5
+
+# Data location
+ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/
+
+# Metadata location
+NERC grant_Daisy/UK 2017/Vespula vulgaris 2017
+

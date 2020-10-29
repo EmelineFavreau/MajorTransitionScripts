@@ -33,7 +33,7 @@ mkdir Vespula-vulgaris
 vim myriad.config
 
 ###############################################################################
-# In each subdirectory, the follwoing steps will be done:
+# In each subdirectory, the following steps will be done:
 
 # copy raw data from RDS to scratch
 
@@ -42,3 +42,6 @@ vim myriad.config
 # run Nextflow with default parameters
 
 # with the aims of obtaining raw read counts (for differential expression) and QC plots
+
+# Scratch space is limited, tidy after failed experiments
+find . -type f -size +1G -exec ls -lhS {} \;
