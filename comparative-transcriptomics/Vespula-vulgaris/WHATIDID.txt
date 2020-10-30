@@ -20,6 +20,8 @@ ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
 
+mkdir -p result
+
 # set up myriad.config (in the directory where the experiment will run)
 cp ../myriad.config .
 
@@ -86,6 +88,9 @@ nextflow run nf-core/rnaseq \
 	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-one-sample
 
 # drunk_macclintock this failed, maybe because the file was corrupted. to be re-run with new files
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-one-sample
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/tmp/hisat-one-sample
+
 
 #########################
 # testing with one sample (hopefully file is not corrupted anymore)
@@ -118,7 +123,7 @@ nextflow run nf-core/rnaseq \
 	-resume \
 	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-VvulW1-only
 
-# elegant_lorenz if this works, I must run all samples
+# elegant_lorenz this works, I must run all samples
 
 
 #########################
@@ -152,4 +157,28 @@ nextflow run nf-core/rnaseq \
 	-resume \
 	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples
 
-# adoring_lamport
+# friendly_bhaskara worked
+
+# list of fastqc before trimming. Visual check looks good.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-before-trim/.
+
+# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-after-trim/.
+
+# Check for quality of mapping to the genome - all above 89%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/uniquely-mapped-reads-percentage.txt
+
+
+# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
+# something to check in R
+mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/mapping
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/mapping/.
+
+# check sample and batch effect:
+mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/sample-batch-effects-plots
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/sample-batch-effects-plots/.
+
+# location of raw read counts (795K)
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
