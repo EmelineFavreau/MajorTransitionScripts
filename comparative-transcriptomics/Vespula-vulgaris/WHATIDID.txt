@@ -159,6 +159,19 @@ nextflow run nf-core/rnaseq \
 
 # friendly_bhaskara worked
 
+
+
+
+# Copy important info to back-up home
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+
+
+
+
 # list of fastqc before trimming. Visual check looks good.
 cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-before-trim/.
 
@@ -182,3 +195,16 @@ cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/
 
 # location of raw read counts (795K)
 cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+
+
+# location of StringTie's RPKM
+mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/FPKM
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/FPKM/.
+
+
+# Double-check all info are backed-up
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result
+
+# delete scratch space (10% of 1Tb)
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/
