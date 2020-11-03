@@ -127,48 +127,52 @@ nextflow run nf-core/rnaseq \
 #######
 # Copy important info to back-up home
 
-# list pipeline information
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+Genusspecies="Liostenogaster-flavolineata"
 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
 
 
 
 
 # list of fastqc before trimming. Visual check looks good.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-before-trim/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/.
 
 # list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-after-trim/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/.
 
 # Check for quality of mapping to the genome - all above 89%
-grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/uniquely-mapped-reads-percentage.txt
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/uniquely-mapped-reads-percentage.txt
 
 
 # Check read distributions over gene features: most reads should be assigned (ie low unassigned)
 # something to check in R
-mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/mapping
 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/mapping/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping/.
 
 # check sample and batch effect:
-mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/sample-batch-effects-plots
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/sample-batch-effects-plots/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots/.
 
 # location of raw read counts (795K)
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
 
 
 # location of StringTie's RPKM
-mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/FPKM
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/FPKM/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM/.
 
 
 # Double-check all info are backed-up
-tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result
 
 # delete scratch space (10% of 1Tb)
-rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
 
