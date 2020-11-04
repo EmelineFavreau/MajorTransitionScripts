@@ -4,8 +4,8 @@
 
 ## Analysis steps:
 # Obtaining data
-# Aim 1: TBD
-# Aim 2: TBD
+# Aim 1: Run Nextflow QC pipeline
+# Aim 2: Calculate basic stats
 # Aim 3: TBD
 
 ###############################################################################
@@ -33,6 +33,7 @@ mkdir Vespula-vulgaris
 vim myriad.config
 
 ###############################################################################
+# Aim 1: Run Nextflow QC pipeline
 # In each subdirectory, the following steps will be done:
 
 # copy raw data from RDS to scratch
@@ -45,3 +46,40 @@ vim myriad.config
 
 # Scratch space is limited, tidy after failed experiments
 find . -type f -size +1G -exec ls -lhS {} \;
+
+###############################################################################
+# Aim 2: Calculate basic stats
+
+# for each species, how many reproductive samples vs worker samples?
+grep --after-context=1 "# Number of samples for reproductives" */*-raw-reads-readme
+
+Agelaia-cajennensis 1
+Angiopolybia-pallens 1
+Brachygastra-mellifica 1
+Liostenogaster-flavolineata 9
+Metapolybia-cingulata 1
+Mischocyttarus-basimacula 1
+Polistes-canadensis 7
+Polistes-dominula 12
+Polybia-occidentalis 5
+Polybia-quadracincta 3
+Vespa-crabro 2
+Vespula-vulgaris 5
+
+grep --after-context=1 "# Number of samples for non-reproductives" */*-raw-reads-readme
+
+Agelaia-cajennensis 1
+Angiopolybia-pallens 1
+Brachygastra-mellifica 1
+Liostenogaster-flavolineata 10
+Metapolybia-cingulata 1
+Mischocyttarus-basimacula 1
+Polistes-canadensis 9
+Polistes-dominula 12
+Polybia-occidentalis 5
+Polybia-quadracincta 3
+Vespa-crabro 10
+Vespula-vulgaris 5
+
+
+# for each species, how many raw sequences per sample
