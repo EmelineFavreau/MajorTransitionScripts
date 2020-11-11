@@ -28,6 +28,7 @@ mkdir Agelaia-cajennensis
 mkdir Brachygastra-mellifica
 mkdir Vespa-crabro
 mkdir Vespula-vulgaris
+mkdir Ceratina-calcarata 
 
 # set the config file that will be copied in each subdirectory
 vim myriad.config
