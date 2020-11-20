@@ -1,0 +1,194 @@
+----------------------------------------------------
+                                        ,--./,-.
+        ___     __   __   __   ___     /,-._.--~\
+  |\ | |__  __ /  ` /  \ |__) |__         }  {
+  | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                        `._,._,'
+  nf-core/rnaseq v1.4.2
+----------------------------------------------------
+
+Run Name: insane_davinci
+
+####################################################
+## nf-core/rnaseq execution completed unsuccessfully! ##
+####################################################
+The exit status of the task that caused the workflow execution to fail was: 140.
+The full error message was:
+
+Error executing process > 'qualimap (SRR1519110_1_cleanedAligned.sortedByCoord.out)'
+
+Caused by:
+  Process `qualimap (SRR1519110_1_cleanedAligned.sortedByCoord.out)` terminated with an error exit status (140)
+
+Command executed:
+
+  unset DISPLAY
+  qualimap --java-mem-size=16G rnaseq strand-specific-forward -pe -s -bam SRR1519110_1_cleanedAligned.sortedByCoord.out.bam -gtf GCF_001313835.1_ASM131383v1_genomic.gtf -outdir SRR1519110_1_cleanedAligned.sortedByCoord.out
+
+Command exit status:
+  140
+
+Command output:
+  Java memory size is set to 16G
+  Launching application...
+  
+  QualiMap v.2.2.2-dev
+  Built on 2018-12-03 16:04
+  
+  Selected tool: rnaseq
+  Initializing regions from GCF_001313835.1_ASM131383v1_genomic.gtf...
+  
+  Initialized 100000 regions...
+  Initialized 200000 regions...
+  Initialized 300000 regions...
+  
+  Initialized 379665 regions it total
+  
+  Starting constructing transcripts for RNA-seq stats...
+  Finished constructing transcripts
+  
+  Starting BAM file analysis
+
+Command wrapper:
+  Java memory size is set to 16G
+  Launching application...
+  
+  QualiMap v.2.2.2-dev
+  Built on 2018-12-03 16:04
+  
+  Selected tool: rnaseq
+  Initializing regions from GCF_001313835.1_ASM131383v1_genomic.gtf...
+  
+  Initialized 100000 regions...
+  Initialized 200000 regions...
+  Initialized 300000 regions...
+  
+  Initialized 379665 regions it total
+  
+  Starting constructing transcripts for RNA-seq stats...
+  Finished constructing transcripts
+  
+  Starting BAM file analysis
+
+Work dir:
+  /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/work/96/4317190f9e69a48cd76f87d04205a0
+
+Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
+
+
+
+####################################################
+## nf-core/rnaseq execution completed unsuccessfully! ##
+####################################################
+The exit status of the task that caused the workflow execution to fail was: 140.
+The full error message was:
+
+Error executing process > 'qualimap (SRR1519110_1_cleanedAligned.sortedByCoord.out)'
+
+Caused by:
+  Process `qualimap (SRR1519110_1_cleanedAligned.sortedByCoord.out)` terminated with an error exit status (140)
+
+Command executed:
+
+  unset DISPLAY
+  qualimap --java-mem-size=16G rnaseq strand-specific-forward -pe -s -bam SRR1519110_1_cleanedAligned.sortedByCoord.out.bam -gtf GCF_001313835.1_ASM131383v1_genomic.gtf -outdir SRR1519110_1_cleanedAligned.sortedByCoord.out
+
+Command exit status:
+  140
+
+Command output:
+  Java memory size is set to 16G
+  Launching application...
+  
+  QualiMap v.2.2.2-dev
+  Built on 2018-12-03 16:04
+  
+  Selected tool: rnaseq
+  Initializing regions from GCF_001313835.1_ASM131383v1_genomic.gtf...
+  
+  Initialized 100000 regions...
+  Initialized 200000 regions...
+  Initialized 300000 regions...
+  
+  Initialized 379665 regions it total
+  
+  Starting constructing transcripts for RNA-seq stats...
+  Finished constructing transcripts
+  
+  Starting BAM file analysis
+
+Command wrapper:
+  Java memory size is set to 16G
+  Launching application...
+  
+  QualiMap v.2.2.2-dev
+  Built on 2018-12-03 16:04
+  
+  Selected tool: rnaseq
+  Initializing regions from GCF_001313835.1_ASM131383v1_genomic.gtf...
+  
+  Initialized 100000 regions...
+  Initialized 200000 regions...
+  Initialized 300000 regions...
+  
+  Initialized 379665 regions it total
+  
+  Starting constructing transcripts for RNA-seq stats...
+  Finished constructing transcripts
+  
+  Starting BAM file analysis
+
+Work dir:
+  /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/work/96/4317190f9e69a48cd76f87d04205a0
+
+Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
+
+
+
+
+
+The workflow was completed at 2020-11-17T16:14:20.210Z (duration: 5h 29m 31s)
+
+The command used to launch the workflow was as follows:
+
+  nextflow run nf-core/rnaseq -profile singularity --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/*{1,2}_cleaned.fastq.gz' --fasta /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.fna.gz --gff /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.gff.gz --forwardStranded --skipBiotypeQC --fc_group_features gene_id -r 1.4.2 -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/myriad.config -with-tower -bg -resume --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/star-all-samples
+
+
+
+Pipeline Configuration:
+-----------------------
+ - Pipeline Release: 1.4.2
+ - Run Name: insane_davinci
+ - Reads: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/*{1,2}_cleaned.fastq.gz
+ - Data Type: Paired-End
+ - Strandedness: Forward
+ - Trimming: 5'R1: 0 / 5'R2: 0 / 3'R1: 0 / 3'R2: 0 / NextSeq Trim: 0
+ - Aligner: STAR
+ - Fasta Ref: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.fna.gz
+ - GFF3 Annotation: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.gff.gz
+ - Remove Ribosomal RNA: false
+ - Biotype GTF field: gene_biotype
+ - Save prefs: Ref Genome: No / Trimmed FastQ: No / Alignment intermediates: No
+ - Max Resources: 128 GB memory, 10 cpus, 3d time per job
+ - Container: singularity - nfcore/rnaseq:1.4.2
+ - Output dir: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/star-all-samples
+ - Launch dir: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples
+ - Working dir: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/work
+ - Script dir: /home/ucfaeef/.nextflow/assets/nf-core/rnaseq
+ - User: ucfaeef
+ - Config Profile: singularity
+ - Date Started: 2020-11-17T10:44:49.326Z
+ - Date Completed: 2020-11-17T16:14:20.210Z
+ - Pipeline script file path: /home/ucfaeef/.nextflow/assets/nf-core/rnaseq/main.nf
+ - Pipeline script hash ID: efd50c97fd77bdc6b6161e3ee76f7ddd
+ - Pipeline repository Git URL: https://github.com/nf-core/rnaseq.git
+ - Pipeline repository Git Commit: 3b6df9bd104927298fcdf69e97cca7ff1f80527c
+ - Pipeline Git branch/tag: 1.4.2
+ - Docker image: nfcore/rnaseq:1.4.2
+ - Nextflow Version: 20.04.1
+ - Nextflow Build: 5335
+ - Nextflow Compile Timestamp: 03-05-2020 19:37 UTC
+
+--
+nf-core/rnaseq
+https://github.com/nf-core/rnaseq
