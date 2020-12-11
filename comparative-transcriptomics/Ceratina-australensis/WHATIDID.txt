@@ -1,0 +1,141 @@
+# 2020-11-17
+## Author: Emeline Favreau
+## Objective: Running QC steps for Ceratina australensis
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: Run Nextflow
+# Aim 2: TBD
+# Aim 3: TBD
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+Genusspecies="Ceratina-australensis"
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
+
+mkdir -p result
+
+# set up myriad.config (in the directory where the experiment will run)
+cp ../myriad.config .
+
+# copy input files: RNAseq raw reads, genome fasta, gff
+
+cd inputOnScratch
+
+# raw files on EBI. SRA from publication
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR291/007/SRR2915407/SRR2915407_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR291/007/SRR2915407/SRR2915407_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR295/006/SRR2954866/SRR2954866_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR295/006/SRR2954866/SRR2954866_2.fastq.gz
+    
+
+# we use the genome from Sandra Rehan
+Ceratina australensis genome: 
+https://drive.google.com/drive/folders/0B1P0qnA-7O3Afm1ieUZKa2VhSGpacWVsNXVWWGZ0eVNJLUFfX0xZTG9YRWs1YUhoZS1qb00?usp=sharing
+
+gzip australensis_DNA.noNUL.fasta
+
+# we use the annotation from Sandra Rehan
+https://drive.google.com/drive/folders/0B1P0qnA-7O3Afm1ieUZKa2VhSGpacWVsNXVWWGZ0eVNJLUFfX0xZTG9YRWs1YUhoZS1qb00?usp=sharing
+
+gzip australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered
+
+
+cd ..
+
+###############################################################################
+# Aim 1: Run Nextflow 
+# running all samples 
+
+mkdir tmp/hisat-all-samples
+
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/hisat-all-samples
+
+cp myriad.config tmp/hisat-all-samples/.
+
+cd tmp/hisat-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	-profile singularity \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/*{1,2}.fastq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis_DNA.noNUL.fasta.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered.gz' \
+	--forwardStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/tmp/hisat-all-samples/myriad.config \
+	-with-tower \
+	-bg \
+	-resume \
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/hisat-all-samples
+
+# desperate_bardeen
+
+
+
+
+#######
+# Copy important info to back-up home
+
+Genusspecies="Ceratina-australensis"
+
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots
+mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+
+
+
+
+# list of fastqc before trimming. Visual check looks good.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/.
+
+# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/.
+
+# Check for quality of mapping to the genome - all above 89%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/uniquely-mapped-reads-percentage.txt
+
+
+# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
+# something to check in R
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping/.
+
+# check sample and batch effect:
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots/.
+
+# location of raw read counts (795K)
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+
+
+# location of StringTie's RPKM
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM/.
+
+
+# Double-check all info are backed-up
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result
+
+# delete scratch space (10% of 1Tb)
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
