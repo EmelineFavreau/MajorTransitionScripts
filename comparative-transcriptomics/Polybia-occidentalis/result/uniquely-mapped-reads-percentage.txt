@@ -1,0 +1,10 @@
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_Q1_1Log.final.out:                        Uniquely mapped reads % |	83.02%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_Q2_1Log.final.out:                        Uniquely mapped reads % |	84.96%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_Q3_1Log.final.out:                        Uniquely mapped reads % |	85.11%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_Q4_1Log.final.out:                        Uniquely mapped reads % |	86.31%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_Q5_1Log.final.out:                        Uniquely mapped reads % |	85.47%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_W1_1Log.final.out:                        Uniquely mapped reads % |	78.72%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_W2_1Log.final.out:                        Uniquely mapped reads % |	81.73%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_W3_1Log.final.out:                        Uniquely mapped reads % |	79.53%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_W4_1Log.final.out:                        Uniquely mapped reads % |	82.04%
+/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polybia-occidentalis/result/star-all-samples/STAR/logs/PO_W5_1Log.final.out:                        Uniquely mapped reads % |	75.43%
