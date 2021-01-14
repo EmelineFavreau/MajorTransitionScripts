@@ -1,7 +1,7 @@
 ## Raw reads of Polybia occidentalis from Sumner lab
 # Sampling method
-Sampled in 
-Stored in ???
+Sampled in Trinidad 2015
+Stored in RNALater
 
 # Publication linked to these data
 NA
@@ -27,21 +27,36 @@ Collected at the nest
 brain
 	
 # Sample content (individual, or n pooled)
-- 5 worker pools: of 3-4 queen brains
-- 5 queen pools: of 3-4 queen brains
+- 5 worker pools: of 5 worker brains, each from a different nest (a total of 4 nests was sampled, each nest gave workers to different pools)
+PO_W1 = 5 brains
+PO_W2 = 5 brains
+PO_W3 = 5 brains
+PO_W4 = 5 brains
+PO_W5 = 5 brains
+
+- 5 queen pools: of 4 or 5 queen brains, each from a different nest (a total of 4 nests was sampled, each nest gave queens to different pools)
+PO_Q1 = 4 brains
+PO_Q2 = 5 brains
+PO_Q3 = 4 brains
+PO_Q4 = 5 brains
+PO_Q5 = 4 brains
 
 # Total number of samples
 10 samples
 
-# Number of samples for reproductives
+# Number of samples for reproductives (inseminated, between 6 and 34 eggs observed)
 5 queen samples
 
-# Number of samples for non-reproductives
+# Number of samples for non-reproductives (non-inseminated, no egg developped)
 5 worker samples
 
 # Data location
 ritd-ag-project-rd00pm-cdrwy41/Polybia_occidentalis/experiment2/data
 
 # Metadata location
+/Users/emelinefavreau/Dropbox/UCL/Multispecies/Methods/RNASeq/Sequenced_Pools_AllSpecies.xlsx
+/Users/emelinefavreau/Dropbox/UCL/NERC grant_Daisy/Trinidad 2015/Polybia 2016 - NON-WORKING FOLDER/Trinidad collections 2015_Polybia_13042016.xlsx
+
+
 
 

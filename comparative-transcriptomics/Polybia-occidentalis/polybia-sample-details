@@ -1,0 +1,48 @@
+Location	Year	Nest	WaspID	Phenotype	Pool	Replicate	Dev. ovaries 	No.eggs	Insemination
+Trinidad	2015	Po-2015-02	FC127	Queen	PoQ1	1	D 	29	Y
+Trinidad	2015	Po-2015-02	FC244	Queen	PoQ1	1	D	33	Y
+Trinidad	2015	Po-2015-03	UWI199	Queen	PoQ1	1	D	15	Y
+Trinidad	2015	Po Indras	IN06	Queen	PoQ1	1	D	13	Y
+Trinidad	2015	Po-2015-01	FC85	Queen	PoQ2	2	C/D	6	Y
+Trinidad	2015	Po-2015-02	FC279	Queen	PoQ2	2	D	31	Y
+Trinidad	2015	Po-2015-03	UWI219	Queen	PoQ2	2	D	14	Y
+Trinidad	2015	Po Indras	IN27	Queen	PoQ2	2	D	12	Y
+Trinidad	2015	Po-2015-03	UWI265	Queen	PoQ2	2	D	22	Y
+Trinidad	2015	Po-2015-01	FC126	Queen	PoQ3	3	D	9	Y
+Trinidad	2015	Po-2015-02	FC251	Queen	PoQ3	3	D	28	Y
+Trinidad	2015	Po-2015-03	UWI236	Queen	PoQ3	3	D	14	Y
+Trinidad	2015	Po Indras	IN47	Queen	PoQ3	3	D	18	Y
+Trinidad	2015	Po-2015-01	FC08	Queen	PoQ4	4	D	6	Y
+Trinidad	2015	Po-2015-02	FC230	Queen	PoQ4	4	D	17	Y
+Trinidad	2015	Po-2015-03	UWI171	Queen	PoQ4	4	D	9	Y
+Trinidad	2015	Po-2015-02	FC297	Queen	PoQ4	4	D	24	Y
+Trinidad	2015	Po-2015-02	FC2160	Queen	PoQ4	4	D	30	Y
+Trinidad	2015	Po-2015-02	FC242	Queen	PoQ5	5	D	23	Y
+Trinidad	2015	Po-2015-03	UWI168	Queen	PoQ5	5	D	16	Y
+Trinidad	2015	Po-2015-02	FC2157	Queen	PoQ5	5	D	34	Y
+Trinidad	2015	Po-2015-02	FC2176	Queen	PoQ5	5	D	16	Y
+Trinidad	2015	Po-2015-01	FC29	Worker	PoW1	1	A	0	N
+Trinidad	2015	Po-2015-02	FC207	Worker	PoW1	1	A	0	N
+Trinidad	2015	Po-2015-03	UWI20	Worker	PoW1	1	A	0	N
+Trinidad	2015	Po Indras	IN35	Worker	PoW1	1	A	0	N
+Trinidad	2015	Po-2015-01	FC61	Worker	PoW1	1	A	0	N
+Trinidad	2015	Po-2015-01	FC48	Worker	PoW2	1	A	0	N
+Trinidad	2015	Po-2015-02	FC234	Worker	PoW2	1	A	0	N
+Trinidad	2015	Po-2015-03	UWI30	Worker	PoW2	1	A	0	N
+Trinidad	2015	Po-2015-01	FC69	Worker	PoW2	1	A	0	N
+Trinidad	2015	Po-2015-03	UWI260	Worker	PoW2	1	A	0	N
+Trinidad	2015	Po-2015-01	FC65	Worker	PoW3	1	A	0	N
+Trinidad	2015	Po-2015-02	FC249	Worker	PoW3	1	A	0	N
+Trinidad	2015	Po-2015-03	UWI64	Worker	PoW3	1	A	0	N
+Trinidad	2015	Po-2015-01	FC40	Worker	PoW3	1	A	0	N
+Trinidad	2015	Po-2015-02	FC2155	Worker	PoW3	1	A	0	N
+Trinidad	2015	Po-2015-01	FC76	Worker	PoW4	1	A	0	N
+Trinidad	2015	Po-2015-02	FC255	Worker	PoW4	1	A	0	N
+Trinidad	2015	Po-2015-02	FC203	Worker	PoW4	1	A	0	N
+Trinidad	2015	Po Indras	IN02	Worker	PoW4	1	A	0	N
+Trinidad	2015	Po-2015-03	UWI220	Worker	PoW4	1	A	0	N
+Trinidad	2015	Po-2015-01	FC94	Worker	PoW5	1	A	0	N
+Trinidad	2015	Po-2015-02	FC274	Worker	PoW5	1	A	0	N
+Trinidad	2015	Po Indras	IN22	Worker	PoW5	1	A	0	N
+Trinidad	2015	Po-2015-02	FC223	Worker	PoW5	1	A	0	N
+Trinidad	2015	Po-2015-03	UWI262	Worker	PoW5	1	A	0	N
