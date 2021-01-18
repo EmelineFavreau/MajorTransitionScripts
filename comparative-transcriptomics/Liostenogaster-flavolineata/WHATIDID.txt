@@ -176,3 +176,52 @@ tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecie
 # delete scratch space (10% of 1Tb)
 rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
 
+
+#####################
+# 2021-01-18 calculate number of reads for each file, and for each sample, and for the whole experiment
+
+# create tmp again
+unlink tmp
+mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Liostenogaster-flavolineata/tmp
+ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Liostenogaster-flavolineata/tmp tmp
+
+# copy the zip files
+cp result/qc-after-trim/*.zip tmp/.
+
+# unzip files
+cd tmp
+ls > sample-file-names
+for filename in `cat sample-file-names`; do
+	unzip ${filename}
+done
+
+
+cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/Liostenogaster-flavolineata
+
+# calculate number of reads for each file
+ls tmp/*_fastqc.zip | cut -d "/" -f 2 | cut -d "_" -f 1,2,3,4 > file-list
+
+# run a loop to do the job
+
+for sample in `cat file-list`; do
+	grep "Total Sequences" tmp/${sample}_fastqc/fastqc_data.txt >> tmp/number-reads-in-file
+done
+
+paste file-list tmp/number-reads-in-file > result/number-reads-in-files
+
+
+# calculate number of reads for each sample
+cat file-list | cut -d "_" -f 1 | uniq > samples-list
+
+# run a loop to do the job
+
+for sample in `cat samples-list`; do
+	grep ${sample} result/number-reads-in-files | awk '{sum+=$4}END{print sum}' >> tmp/number-reads-in-sample
+done
+paste samples-list tmp/number-reads-in-sample > result/number-reads-in-samples
+
+
+
+
+#sum the read number for the whole experiment: 593620808
+awk '{sum+=$2}END{print sum}' result/number-reads-in-sample
