@@ -1,2 +1,0 @@
-/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Metapolybia-cingulata/result/star-all-samples/STAR/logs/MPQ_CCGTCC_L004_R1_001Log.final.out:                        Uniquely mapped reads % |	46.94%
-/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Metapolybia-cingulata/result/star-all-samples/STAR/logs/MPW_ATGTCA_L004_R1_001Log.final.out:                        Uniquely mapped reads % |	48.24%
