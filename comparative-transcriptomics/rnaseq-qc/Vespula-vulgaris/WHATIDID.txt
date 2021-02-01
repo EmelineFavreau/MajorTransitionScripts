@@ -1,0 +1,210 @@
+# 2020-10-04
+## Author: Emeline Favreau
+## Objective: Running QC steps for Vespula vulgaris
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: Run Nextflow
+# Aim 2: TBD
+# Aim 3: TBD
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+Genusspecies="Vespula-vulgaris"
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
+
+mkdir -p result
+
+# set up myriad.config (in the directory where the experiment will run)
+cp ../myriad.config .
+
+# copy input files: RNAseq raw reads, genome fasta, gff
+cd inputOnScratch
+
+scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Queen{1,2,3,4,5}/raw/*{1,2}.fq.gz .
+
+scp -r ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/experiment1/data/Worker{1,2,3,4,5}/raw/ .
+
+
+# the worker reads are not compressed
+# for the sake of simplicity, compress them:
+
+cd raw
+for sample in Vvul*fq; do
+	gzip -c $sample > ../$sample.gz
+done
+
+# check if the raw reads are ok
+seqtk comp VvulW2_1.fq.gz
+zcat VvulW2_1.fq.gz | tail
+
+# we use the genome from Harrop et al 2020
+wget https://zenodo.org/record/4001020/files/Vvulg.assembly.fna.gz
+
+# we use the gff from  Harrop et al 2020
+wget https://zenodo.org/record/4001020/files/Vvulg_23_June_2020.gff3
+gzip -c Vvulg_23_June_2020.gff3 > Vvulg_23_June_2020.gff.gz
+
+# scp ssh.rd.ucl.ac.uk:/rd/live/ritd-ag-project-rd00pm-cdrwy41/Vespula_vulgaris/genome/Vvulg_final_sorted_annotated.gff3 .
+
+cd ..
+
+###############################################################################
+# Aim 1: Run Nextflow on one sample
+
+mkdir tmp/hisat-one-sample
+
+cp myriad.config tmp/hisat-one-sample/.
+
+cd tmp/hisat-one-sample
+
+tmux new-session
+
+Genusspecies="Vespula-vulgaris"
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/VvulW1_*{1,2}.fq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg.assembly.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg_23_June_2020.gff.gz' \
+	--forwardStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/tmp/hisat-one-sample/myriad.config \
+	-with-tower \
+	-bg \
+	-resume \
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-one-sample
+
+# drunk_macclintock this failed, maybe because the file was corrupted. to be re-run with new files
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-one-sample
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/tmp/hisat-one-sample
+
+
+#########################
+# testing with one sample (hopefully file is not corrupted anymore)
+mkdir tmp/hisat-VvulW1-only
+
+cp myriad.config tmp/hisat-VvulW1-only/.
+
+cd tmp/hisat-VvulW1-only
+
+tmux new-session
+
+Genusspecies="Vespula-vulgaris"
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	-profile singularity \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/VvulW1_*{1,2}.fq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg.assembly.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg_23_June_2020.gff.gz' \
+	--forwardStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/tmp/hisat-VvulW1-only/myriad.config \
+	-with-tower \
+	-bg \
+	-resume \
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-VvulW1-only
+
+# elegant_lorenz this works, I must run all samples
+
+
+#########################
+# running all samples 
+mkdir tmp/hisat-all-samples
+
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples
+
+cp myriad.config tmp/hisat-all-samples/.
+
+cd tmp/hisat-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	-profile singularity \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/*{1,2}.fq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg.assembly.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/input/Vvulg_23_June_2020.gff.gz' \
+	--forwardStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/tmp/hisat-all-samples/myriad.config \
+	-with-tower \
+	-bg \
+	-resume \
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples
+
+# friendly_bhaskara worked
+
+
+
+
+# Copy important info to back-up home
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+
+
+
+
+# list of fastqc before trimming. Visual check looks good.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-before-trim/.
+
+# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/qc-after-trim/.
+
+# Check for quality of mapping to the genome - all above 89%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/uniquely-mapped-reads-percentage.txt
+
+
+# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
+# something to check in R
+mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/mapping
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/mapping/.
+
+# check sample and batch effect:
+mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/sample-batch-effects-plots
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/sample-batch-effects-plots/.
+
+# location of raw read counts (795K)
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/.
+
+
+# location of StringTie's RPKM
+mkdir ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/FPKM
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result/FPKM/.
+
+
+# Double-check all info are backed-up
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/Vespula-vulgaris/result
+
+# delete scratch space (10% of 1Tb)
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Vespula-vulgaris/

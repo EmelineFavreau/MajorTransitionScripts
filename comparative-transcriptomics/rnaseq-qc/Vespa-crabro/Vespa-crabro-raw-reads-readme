@@ -1,0 +1,54 @@
+## Raw reads of Vespa crabro from Sumner lab
+# Sampling method
+Sampled in different locations (Wimbledon, RHS, Gloucester, Blaise Castle)
+Stored in ???
+
+# Publication linked to these data
+NA
+
+# People's contributions
+David Lee (Raw sequence data)
+Michael Bentley (Raw sequence data)
+Daisy Taylor (sampling, extractions)
+Seirian Sumner (design, sampling, analysis)
+
+# Subfamily 
+Vespinae
+
+# Genus	
+Vespa
+
+# Species
+crabro
+	
+# In silico RNA sample type	
+Collected at the nest
+
+# Tissue type
+brain
+	
+# Sample content (individual, or n pooled)
+- 10 worker pools: first five (W1-W5) contain 4 brains, second five (W6-W10) contain 3 brains. each brain from unique geographical sampling (ie pools are homogenous in terms of allelic variation)
+- 10 gyne pools: each containing 4 brains, each brain from unique geographical sampling (ie pools are homogenous in terms of allelic variation)
+- 2 queen individual sample
+
+# Total number of samples
+22 samples
+
+# Number of samples for reproductives
+2 queen samples, with ovary development, evidence of inseminated (50-120 eggs in each)
+VcQ1, VcQ2
+
+10 gyne samples, with ovary development, no evidence of being inseminated, 50-100 eggs in eacg
+VcG1, VcG2, ... VcG10
+
+# Number of samples for non-reproductives
+10 worker samples, with no ovary development, evidence of no egg nor being inseminated
+VcW1...VcW10
+
+# Data location
+ritd-ag-project-rd00pm-cdrwy41/Vespa_crabro/RNAseqData
+
+# Metadata location
+/Users/emelinefavreau/Dropbox/UCL/vespa genomes plan/samples and sequencing/Vespa Crabro sequencing.xlsx
+

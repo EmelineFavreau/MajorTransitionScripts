@@ -1,0 +1,51 @@
+# 2020-11-02
+## Author: Emeline Favreau
+## Objective: Running QC steps for Angiopolybia pallens
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: Cannot run nextflow because no genome / annotation
+# Aim 2: TBD
+# Aim 3: TBD
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+Genusspecies="Angiopolybia-pallens"
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
+ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
+
+mkdir -p result
+
+# set up myriad.config (in the directory where the experiment will run)
+cp ../myriad.config .
+
+# copy input files: RNAseq raw reads
+ritd-ag-project-rd00mk-mbent70/Angiopolybia_pallens/experiment1/data
+
+ssh ucfaeef@transfer02
+
+cd projects/MajorTransitionScripts/comparative-transcriptomics/Agelaia-cajennensis/inputOnScratch/ 
+
+# reproductives
+cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Angiopolybia_pallens/experiment1/data/Queen_1/raw/*.gz .
+
+# non-reproductives
+cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Angiopolybia_pallens/experiment1/data/Worker_1/raw/*.gz .
+
+# no genome
+
+# no annotation
+
+exit
+
+cd ..
+
+###############################################################################
+# Aim 1: Cannot run nextflow
+

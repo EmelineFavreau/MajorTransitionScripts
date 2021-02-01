@@ -1,0 +1,53 @@
+## Raw reads of Ceratina australensis from Rehan lab
+# Sampling method
+Sampled in Australia
+flash frozen in liquid nitrogen
+
+# Publication linked to these data
+Rehan et al 2018 
+Conserved Genes Underlie Phenotypic Plasticity in an Incipiently Social Bee
+https://doi.org/10.1093/gbe/evy212
+PRJNA302037
+
+There is also another BioProject PRJNA302035 
+
+# People's contributions
+
+# Subfamily 
+Xylocopinae
+
+# Genus	
+Ceratina
+
+# Species
+australensis
+	
+# In silico RNA sample type	
+Collected at the nest
+
+# Tissue type
+brain
+	
+# Sample content (individual, or n pooled)
+individual
+
+# Total number of samples
+2 samples
+
+# Number of samples for reproductives
+# 6, including:
+3 primary: SRS1161869, SRS1161868, SRS1161072
+3 solitary: SRS1162803, SRS1162784, SRS1162766
+
+# Number of samples for non-reproductives
+# 6, including:
+3 callow: SRS1163414, SRS1162929, SRS1162809
+3 secondary: SRS1162756, SRS1162483, SRS1162475
+
+# Data location
+https://www.ebi.ac.uk/ena/browser/view/SRR2915407
+Raw data have been submitted to the NCBI Sequence Read Archive (SRA) with accession number PRJNA302037.
+
+# Metadata location
+see paper
+
