@@ -1,5 +1,5 @@
 Analyses performed in view of a manuscript about comparative transcriptomics in wasps and bees
 
-rnaseq-qc contains scripts and results for all species' RNA sequences passed through Nextflow rnaseq-qc pipeline
+ * rnaseq-qc contains scripts and results for all species' RNA sequences passed through Nextflow rnaseq-qc pipeline
 
-orthology-analyses contains scripts and results for all species' protein files passed through OrthoFinder
+ * orthology-analysis contains scripts and results for all species' protein files passed through OrthoFinder
