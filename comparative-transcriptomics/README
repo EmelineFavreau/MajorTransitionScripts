@@ -1,5 +1,5 @@
-Each species that has gone through Nextflow QC pipeline has:
-- information about data: Genus-species/Genus-species-raw-reads-readme
-- raw read counts: Genus-species/result/merged_gene_counts.txt 
-- FPKM: Genus-species/result/FPKM
-- various QC plots, pipeline info, etc
+Analyses performed in view of a manuscript about comparative transcriptomics in wasps and bees
+
+rnaseq-qc contains scripts and results for all species' RNA sequences passed through Nextflow rnaseq-qc pipeline
+
+orthology-analyses contains scripts and results for all species' protein files passed through OrthoFinder

@@ -1,0 +1,43 @@
+# 2021-02-01
+## Author: Emeline Favreau
+## Objective: Running OrthoFinder on wasps and bees
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: Run OrthoFinder for wasps
+# Aim 2: Run OrthoFinder for bees
+# Aim 3: TBD
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+mkdir -p ~/Scratch/orthology-analysis/input
+mkdir -p ~/Scratch/orthology-analysis/result
+mkdir -p ~/Scratch/orthology-analysis/tmp
+ln -s ~/Scratch/orthology-analysis/input inputOnScratch
+ln -s ~/Scratch/orthology-analysis/result resultOnScratch
+ln -s ~/Scratch/orthology-analysis/tmp tmp
+mkdir result
+
+# copy input files: protein files
+cd inputOnScratch
+
+# Vespula vulgaris
+
+# Polistes dominula
+
+# Polistes canadensis
+
+# Liostenogaster flavolineata
+
+###############################################################################
+# Aim 1: Running orthofinder for 4 wasp species
+
+
+# find protein fasta files
+
+# ideal is to use a single primary/longest transcript variant for each gene
+# so need to check this and make a new version if needed
+
+# run orthofinder
