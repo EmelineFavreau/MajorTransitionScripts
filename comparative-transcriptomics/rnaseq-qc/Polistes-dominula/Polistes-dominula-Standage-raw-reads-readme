@@ -32,7 +32,8 @@ individual
 24 samples
 
 # Number of samples for reproductives
-6 queen samples, large, fully developed ovaries and substantial wing wear
+# 6 queen samples, large, fully developed ovaries and substantial wing wear
+# queen 4 was dropped out of final analyses in Standage 2016
 Queen_from_colony_1	SRR2133905 SRR2133906
 Queen_from_colony_2 SRR2133907 SRR2133909
 Queen_from_colony_3 SRR2133910 SRR2133911
@@ -41,10 +42,12 @@ Queen_from_colony_5 SRR2133915 SRR2133916
 Queen_from_colony_6 SRR2133917 SRR2133918
 
 # Number of samples for non-reproductives
-6 worker samples, completely undeveloped ovaries (ovary score = 1) and substantial wing wear
+# 6 worker samples, completely undeveloped ovaries (ovary score = 1) and substantial wing wear
+# worker 6 was dropped out of final analyses in Standage 2016
 Worker_from_colony_1 SRR2133892 SRR2133893
+Worker_from_colony_2 SRR2133895 SRR2133896
 Worker_from_colony_3 SRR6780155
-Worker_from_colony_4 SRR2133895 SRR2133896 SRR2133899 SRR2133900
+Worker_from_colony_4 SRR2133899 SRR2133900
 Worker_from_colony_5 SRR2133901 SRR2133902
 Worker_from_colony_6 SRR2133903 SRR2133904
 
