@@ -348,9 +348,20 @@ nextflow run nf-core/rnaseq \
 # modifying config file based on
 # https://github.com/nf-core/rnaseq/issues/82
 vim myriad.config # $markDuplicates.memory = 6.GB
+# elated_varahamihira failed for same issue.
 
-# elated_varahamihira
+# https://github.com/nf-core/rnaseq/issues/115#issuecomment-434482644
+# maybe modify config file to redirect tmp files
+# clever-faynman failed because the tmp folder in config file was not created
 
+# tried another idea from
+# https://github.com/nf-core/chipseq/issues/123
+# suspicious_mendel did not work out, not enough space
+
+# tried another idea from Heather RC support
+# learning about bind mount: first field is the path on the host machine, second field (after colon :) is path on the container
+mkdir -p /scratch/scratch/ucfaeef/tmp
+# wise_wright
 
 
 
@@ -410,50 +421,28 @@ rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecie
 
 
 #####################
-# 2021-01-18 calculate number of reads for each file, and for each sample, and for the whole experiment
+# 2021-02-06 calculate number of reads for each file, and for each sample, and for the whole experiment
+# before and after read cleaning
 
-# create tmp again
+# create tmp
 unlink tmp
 mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-canadensis/tmp
 ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-canadensis/tmp tmp
 
-# copy the zip files
-cp result/Emilys-data/qc-after-trim/*.zip tmp/.
 
-# unzip files
-cd tmp
-ls > sample-file-names
-for filename in `cat sample-file-names`; do
-	unzip ${filename}
-done
+# Sumner lab dataset (Patalano's)
+# obtain sequences numbers from fastqc reports before trimming
+chmod +x count-sequences-before-qc-Patalano.sh
+./count-sequences-before-qc-Patalano.sh
 
+# obtain sequences numbers from fastqc reports after trimming
+chmod +x count-sequences-after-qc-Patalano.sh
+./count-sequences-after-qc-Patalano.sh
 
-cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-canadensis
+# obtain final read counts from FeatureCount (this is input to DESeq2)
+chmod +x count-merged-read-counts-Patalano.sh
+./count-merged-read-counts-Patalano.sh
 
-# calculate number of reads for each file
-ls tmp/*_fastqc.zip | cut -d "/" -f 2 | cut -d "_" -f 1,2,3,4,5 > Emilys-data-file-list
-
-# run a loop to do the job
-
-for sample in `cat file-list`; do
-	grep "Total Sequences" tmp/${sample}_fastqc/fastqc_data.txt >> tmp/number-reads-in-file
-done
-
-paste Emilys-data-file-list tmp/number-reads-in-file > result/Emilys-data/number-reads-in-files
-
-
-# calculate number of reads for each sample
-cat Emilys-data-file-list | cut -d "_" -f 1 | uniq > Emilys-data-samples-list
-
-# run a loop to do the job
-
-for sample in `cat Emilys-data-samples-list`; do
-	grep ${sample} result/Emilys-data/number-reads-in-files | awk '{sum+=$4}END{print sum}' >> tmp/number-reads-in-sample
-done
-
-paste Emilys-data-samples-list tmp/number-reads-in-sample > result/Emilys-data/number-reads-in-samples
-
-
-
-#sum the read number for the whole experiment: 34998690
-awk '{sum+=$2}END{print sum}' result/Emilys-data/number-reads-in-samples
+cat result/Patalano/qc-after-trim/number-reads-in-samples  
+cat result/Patalano/qc-before-trim/number-reads-in-samples
+cat result/Patalano/number-merged-read-counts-in-samples

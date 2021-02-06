@@ -481,51 +481,26 @@ tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecie
 rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
 
 #####################
-# 2021-01-18 calculate number of reads for each file, and for each sample, and for the whole experiment
+# 2021-02-06 calculate number of reads for each file, and for each sample, and for the whole experiment
+# before and after read cleaning
 
-# create tmp again
+# create tmp
 unlink tmp
-mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-dominula/tmp
-ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-dominula/tmp tmp
+mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Megalopta-genalis/tmp
+ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Megalopta-genalis/tmp tmp
 
-# copy the zip files
-cp result/qc-after-trim/*.zip tmp/.
+# obtain sequences numbers from fastqc reports before trimming
+chmod +x count-sequences-before-qc.sh
+./count-sequences-before-qc.sh
 
-# unzip files
-cd tmp
-ls > sample-file-names
-for filename in `cat sample-file-names`; do
-	unzip ${filename}
-done
+# obtain sequences numbers from fastqc reports after trimming
+chmod +x count-sequences-after-qc.sh
+./count-sequences-after-qc.sh
 
+# obtain final read counts from FeatureCount (this is input to DESeq2)
+chmod +x count-merged-read-counts.sh
+./count-merged-read-counts.sh
 
-cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-dominula
-
-# calculate number of reads for each file
-ls tmp/*_fastqc.zip | cut -d "/" -f 2 | cut -d "_" -f 1,2,3,4 > file-list
-
-# run a loop to do the job
-
-for sample in `cat file-list`; do
-	grep "Total Sequences" tmp/${sample}_fastqc/fastqc_data.txt >> tmp/number-reads-in-file
-done
-
-paste file-list tmp/number-reads-in-file > result/number-reads-in-files
-
-
-# calculate number of reads for each sample
-cat file-list | cut -d "_" -f 1 | uniq > samples-list
-
-# run a loop to do the job
-
-for sample in `cat samples-list`; do
-	grep ${sample} result/number-reads-in-files | awk '{sum+=$4}END{print sum}' >> tmp/number-reads-in-sample
-done
-paste samples-list tmp/number-reads-in-sample > result/number-reads-in-samples
-
-
-
-
-#sum the read number for the whole experiment: 593620808
-awk '{sum+=$2}END{print sum}' result/number-reads-in-samples
-
+cat result/thirty-paired/qc-after-trim/number-reads-in-samples  
+cat result/thirty-paired/qc-before-trim/number-reads-in-samples
+cat result/thirty-paired/number-merged-read-counts-in-samples

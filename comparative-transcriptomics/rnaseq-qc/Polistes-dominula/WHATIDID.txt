@@ -480,50 +480,30 @@ exit
 rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/
 
 #####################
-# 2021-01-29 calculate number of reads for each file, and for each sample, and for the whole experiment
+# 2021-02-06 calculate number of reads for each file, and for each sample, and for the whole experiment
+# before and after read cleaning
+
+# create tmp
 unlink tmp
 mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-dominula/tmp
 ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-dominula/tmp tmp
-mkdir tmp/Standage
-
-# copy the zip files
-cp result/Standage/qc-after-trim/*.zip tmp/Standage/.
-
-# unzip files
-cd tmp/Standage
-ls > sample-file-names
-for filename in `cat sample-file-names`; do
-	unzip ${filename}
-done
-
-cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-dominula
-
-# calculate number of reads for each file
-ls tmp/Standage/*_fastqc.zip | cut -d "/" -f 3 | cut -d "_" -f 1,2,3,4 > file-list-Standage
-
-# run a loop to do the job
-
-# looks like there is no fastqc. I think because nextflow rejected the files
-for sample in `cat file-list-Standage`; do
-	grep "Total Sequences" tmp/Standage/${sample}_fastqc/fastqc_data.txt >> tmp/Standage/number-reads-in-file
-done
-
-paste file-list tmp/Standage/number-reads-in-file > result/Standage/number-reads-in-files
 
 
-# calculate number of reads for each sample
-cat file-list-Standage | cut -d "_" -f 1 | uniq > samples-list-Standage
+# Sumner lab dataset (Ben's)
+# obtain sequences numbers from fastqc reports before trimming
+chmod +x count-sequences-before-qc-Taylor.sh
+./count-sequences-before-qc-Taylor.sh
 
-# run a loop to do the job
+# obtain sequences numbers from fastqc reports after trimming
+chmod +x count-sequences-after-qc-Taylor.sh
+./count-sequences-after-qc-Taylor.sh
 
-for sample in `cat samples-list-Standage`; do
-	grep ${sample} result/Standage/number-reads-in-files | awk '{sum+=$4}END{print sum}' >> tmp/Standage/number-reads-in-sample
-done
-paste samples-list-Standage tmp/Standage/number-reads-in-sample > result/Standage/number-reads-in-samples
+# obtain final read counts from FeatureCount (this is input to DESeq2)
+chmod +x count-merged-read-counts-Taylor.sh
+./count-merged-read-counts-Taylor.sh
 
+cat result/Taylor/qc-after-trim/number-reads-in-samples  
+cat result/Taylor/qc-before-trim/number-reads-in-samples
+cat result/Taylor/number-merged-read-counts-in-samples
 
-
-
-#sum the read number for the whole experiment: 593620808
-awk '{sum+=$2}END{print sum}' result/Standage/number-reads-in-samples
 
