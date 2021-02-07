@@ -1,0 +1,372 @@
+---
+title: "Data analysis template"
+author: "Emeline Favreau"
+date: "05/02/2021"
+output: html_document
+---
+#### Copyright 2021 Emeline Favreau, University College London.
+
+
+---
+# Objective of analysis
+Understanding the impact of Nextflow nf-core/rnaseq pipeline on data quantity
+
+## Analysis steps:
+- Obtaining data
+- Aim 1: Comparing species going through Nextflow
+- Aim 2: description
+- Aim 3: description
+- Aim 4: description
+
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "tidyverse")
+
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+
+```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
+# add all the files needed here, with descriptions
+# file obtained by tool/person, containing data description
+# expected format of input files
+
+##### Ceratina australensis
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads passed qc
+c_aust_passed_qc_table <- read.table("Ceratina-australensis/result/twelve-paired/qc-after-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads before qc
+c_aust_before_qc_table <- read.table("Ceratina-australensis/result/twelve-paired/qc-before-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of merged read count
+c_aust_merged_read_count_table <- read.table("Ceratina-australensis/result/twelve-paired/number-merged-read-counts-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+# Ceratina calcarata
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads passed qc
+c_cal_passed_qc_table <- read.table("Ceratina-calcarata/result/thirty-six-paired/qc-after-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)  
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads before qc
+c_cal_before_qc_table <- read.table("Ceratina-calcarata/result/thirty-six-paired/qc-before-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+ 
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of merged read count
+c_cal_merged_read_count_table <- read.table("Ceratina-calcarata/result/thirty-six-paired/number-merged-read-counts-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+# Megalopta genalis
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads passed qc
+m_gena_passed_qc_table <- read.table("Megalopta-genalis/result/thirty-paired/qc-after-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)  
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads before qc
+m_gena_before_qc_table <- read.table("Megalopta-genalis/result/thirty-paired/qc-before-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+ 
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of merged read count
+m_gena_merged_read_count_table <- read.table("Megalopta-genalis/result/thirty-paired/number-merged-read-counts-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+# Polistes dominula (Ben Taylor's data)
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads passed qc
+p_domi_passed_qc_table <- read.table("Polistes-dominula/result/Taylor/qc-after-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)  
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads before qc
+p_domi_before_qc_table <- read.table("Polistes-dominula/result/Taylor/qc-before-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+ 
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of merged read count
+p_domi_merged_read_count_table <- read.table("Polistes-dominula/result/Taylor/number-merged-read-counts-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+
+# Polistes canadensis (Patalano's data)
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads passed qc
+p_cana_passed_qc_table <- read.table("Polistes-canadensis/result/Patalano/qc-after-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)  
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads before qc
+p_cana_before_qc_table <- read.table("Polistes-canadensis/result/Patalano/qc-before-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+ 
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of merged read count
+p_cana_merged_read_count_table <- read.table("Polistes-canadensis/result/Patalano/number-merged-read-counts-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+
+
+# Liostenogaster flavolineata 
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads passed qc
+l_flav_passed_qc_table <- read.table("Liostenogaster-flavolineata/result/thirty-eight/qc-after-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)  
+
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of reads before qc
+l_flav_before_qc_table <- read.table("Liostenogaster-flavolineata/result/thirty-eight/qc-before-trim/number-reads-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+ 
+# text file obtained from Nextflow pipeline
+# one column with name of samples
+# one column with number of merged read count
+l_flav_merged_read_count_table <- read.table("Liostenogaster-flavolineata/result/thirty-eight/number-merged-read-counts-in-samples",
+                       header = FALSE,
+                       stringsAsFactors = FALSE)
+```
+
+
+
+```{r aim 0: make a function to plot results, eval = TRUE, echo = FALSE, include = FALSE}
+# name of passed qc table
+# nameof before qc table
+# name of merged reac count table
+# name of G.species
+
+make_bar_plot_for_this_species <- function(passed_qc_table,
+                                           before_qc_table,
+                                           merged_read_count_table,
+                                           g.species){
+  # name columns
+  colnames(passed_qc_table) <- c("sample", "count_passed_qc")
+  colnames(before_qc_table)  <- c("sample", "count_before_qc")
+  colnames(merged_read_count_table) <- c("sample", "final_read_count")
+  
+  # merge data into one df
+  species_df <- as.data.frame(rbind(sum(before_qc_table$count_before_qc),
+                     sum(passed_qc_table$count_passed_qc),
+                     sum(merged_read_count_table$final_read_count)),
+                     stringsAsFactors = FALSE)
+    
+  colnames(species_df) <- "Read_count" 
+  
+  species_df$count_type <- c("before_qc",
+                            "passed_qc",
+                            "total_final_count")
+  
+  
+  # make a barplot
+   ggplot(data = species_df,
+          aes(x = count_type, y = Read_count)) +
+     geom_bar(stat = "identity") +
+     theme_minimal() +
+     labs(title = g.species)
+}
+```
+
+```{r aim 0.2: run for australensis, eval = TRUE, echo = FALSE, include = FALSE}
+## Ceratina australensis
+
+make_bar_plot_for_this_species(passed_qc_table = c_aust_passed_qc_table,
+                                           before_qc_table = c_aust_before_qc_table,
+                                           merged_read_count_table = c_aust_merged_read_count_table,
+                                           g.species = "C.australensis.Rehan.2018")
+
+```
+
+```{r aim 0.3: run for calcarata, eval = TRUE, echo = FALSE, include = FALSE}
+## Ceratina calcarata
+make_bar_plot_for_this_species(passed_qc_table         = c_cal_passed_qc_table,
+                               before_qc_table         = c_cal_before_qc_table,
+                               merged_read_count_table = c_cal_merged_read_count_table,
+                               g.species               = "C.calcarata.Shell.2019")
+
+```
+
+```{r aim 0.4: run for genalis, eval = TRUE, echo = FALSE, include = FALSE}
+## Megalopta genalis
+make_bar_plot_for_this_species(passed_qc_table         = m_gena_passed_qc_table,
+                               before_qc_table         = m_gena_before_qc_table,
+                               merged_read_count_table = m_gena_merged_read_count_table,
+                               g.species               = "M.genalis.Jones.2017")
+
+```
+
+```{r aim 0.5: run for canadensis (Patalano 2015), eval = TRUE, echo = FALSE, include = FALSE}
+## Polistes canadensis
+make_bar_plot_for_this_species(passed_qc_table         = p_cana_passed_qc_table,
+                               before_qc_table         = p_cana_before_qc_table,
+                               merged_read_count_table = p_cana_merged_read_count_table,
+                               g.species               = "P.canadensis.patalano.2015")
+
+```
+
+```{r aim 0.6: run for dominula (Taylor2020), eval = TRUE, echo = FALSE, include = FALSE}
+## Polistes dominula
+make_bar_plot_for_this_species(passed_qc_table         = p_domi_passed_qc_table,
+                               before_qc_table         = p_domi_before_qc_table,
+                               merged_read_count_table = p_domi_merged_read_count_table,
+                               g.species               = "P.dominula.Taylor.2020")
+
+```
+
+```{r aim 0.7: run for flavolineata, eval = TRUE, echo = FALSE, include = FALSE}
+## Liostenogaster flavolineata
+make_bar_plot_for_this_species(passed_qc_table         = l_flav_passed_qc_table,
+                               before_qc_table         = l_flav_before_qc_table,
+                               merged_read_count_table = l_flav_merged_read_count_table,
+                               g.species               = "L.flavolineata.Sumner.Unpublished")
+
+```
+### Aim 1: Comparing species going through Nextflow
+```{r aim 1: combine all info and plot, eval = TRUE, echo = FALSE, include = TRUE}
+
+
+# combine all species read count before qc into a vector
+before_qc_vec <- c(c_aust_before_qc_table$V2,
+  c_cal_before_qc_table$V2,
+  m_gena_before_qc_table$V2,
+  p_cana_before_qc_table$V2,
+  p_domi_before_qc_table$V2,
+  l_flav_before_qc_table$V2)
+
+# combine all species read count passed qc into a vector
+passed_qc_vec <- c(c_aust_passed_qc_table$V2,
+  c_cal_passed_qc_table$V2,
+  m_gena_passed_qc_table$V2,
+  p_cana_passed_qc_table$V2,
+  p_domi_passed_qc_table$V2,
+  l_flav_passed_qc_table$V2)
+
+# combine all species merged read count into a vector
+total_final_count_vec <- c(c_aust_merged_read_count_table$V2,
+  c_cal_merged_read_count_table$V2,
+  m_gena_merged_read_count_table$V2,
+  p_cana_merged_read_count_table$V2,
+  p_domi_merged_read_count_table$V2,
+  l_flav_merged_read_count_table$V2)
+
+# add species (sample size)
+species_vec <- c(rep("C.aus n=12", times = nrow(c_aust_before_qc_table)),
+                 rep("C.cal n=34", times = nrow(c_cal_before_qc_table)),
+                 rep("M.gen n=12", times = nrow(m_gena_before_qc_table)),
+                 rep("P.can n=10", times = nrow(p_cana_before_qc_table)),
+                 rep("P.dom n=24", times = nrow(p_domi_before_qc_table)),
+                 rep("L.fla n=19", times = nrow(l_flav_before_qc_table)))
+
+
+# combine into one df
+all_species_df <- tibble(before_qc_vec,
+                         passed_qc_vec ,
+                         total_final_count_vec,
+                         species_vec)
+
+
+# plot
+require(scales)
+all_species_df %>%
+  gather("Type", "Value",-species_vec) %>%
+  ggplot(aes(species_vec, Value, fill = Type)) +
+  geom_bar(position = "dodge", stat = "identity") +
+  theme_minimal() +
+  labs(x = "Species",
+       y = "Read count for all combined samples",
+       title = "Impact of TrimGalore! trimming and STAR read mapping") + 
+  guides(fill = guide_legend(title = "Nextflow Steps")) +
+  scale_y_continuous(labels = comma) +
+  scale_fill_manual(labels = c("Raw read counts",
+                            "Trimmed read counts",
+                            "Mapped read counts"),
+                 values = c('#238443','#78c679','#c2e699')) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1))
+
+
+
+```
+
+Conclusion
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```
