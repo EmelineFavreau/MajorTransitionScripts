@@ -2,4 +2,4 @@ Each directory contains the .RMD to run the DESeq2 analysis on that species' raw
 * Output files include:
    * knitted HTML document
    * normalized expression counts from DESeq2
-   * DESeq2 results file, 
+   * DESeq2 results file with FDR set to 0.05
