@@ -19,20 +19,59 @@ ln -s ~/Scratch/orthology-analysis/input inputOnScratch
 ln -s ~/Scratch/orthology-analysis/result resultOnScratch
 ln -s ~/Scratch/orthology-analysis/tmp tmp
 mkdir result
+mkdir -p inputOnScratch/gff
+mkdir -p inputOnScratch/sequence-length 
+mkdir -p inputOnScratch/longest-isoform
+mkdir -p inputOnScratch/OrthoFinder-input
+
 
 # copy input files: protein files
 cd inputOnScratch
 
-# Vespula vulgaris
+# Drosophila melanogaster
+wget http://ftp.ensembl.org/pub/current_fasta/drosophila_melanogaster/pep/Drosophila_melanogaster.BDGP6.32.pep.all.fa.gz
+
+gunzip Drosophila_melanogaster.BDGP6.32.pep.all.fa.gz
+
+mv Drosophila_melanogaster.BDGP6.32.pep.all.fa Drosophila_melanogaster.faa
+
+# Apis mellifera
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/254/395/GCF_003254395.2_Amel_HAv3.1/GCF_003254395.2_Amel_HAv3.1_protein.faa.gz
+
+gunzip GCF_003254395.2_Amel_HAv3.1_protein.faa.gz
+
+mv GCF_003254395.2_Amel_HAv3.1_protein.faa Apis_mellifera.faa
+
 
 # Polistes dominula
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pdom_r1.2/GCF_001465965.1_Pdom_r1.2_protein.faa.gz
+
+mv GCF_001465965.1_Pdom_r1.2_protein.faa.gz \
+	Polistes_dominula.faa.gz
 
 # Polistes canadensis
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/313/835/GCF_001313835.1_ASM131383v1/GCF_001313835.1_ASM131383v1_protein.faa.gz
 
-# Liostenogaster flavolineata
+mv GCF_001313835.1_ASM131383v1_protein.faa.gz \
+	Polistes_canadensis.faa.gz
+
+
+# Liostenogaster flavolineata (not published yet)
+ssh ucfaeef@transfer02
+
+cd /lustre/scratch/scratch/ucfaeef/orthology-analysis/input
+
+# this is version 2 of LF protein/gff file sets
+cp /mnt/gpfs/live/ritd-ag-project-rd00qm-mbent70/Liostenogaster_flavolineata/genome/Liostenogaster_flavolineata.faa .
+
+
+gzip -d Liostenogaster_flavolineata.faa.gz
+gzip -d Polistes_canadensis.faa.gz 
+gzip -d Polistes_dominula.faa.gz 
+gzip -d Vespula_vulgaris.faa.gz
 
 ###############################################################################
-# Aim 1: Running orthofinder for 4 wasp species
+# Aim 1: Running orthofinder for 3 wasp species + fly + honey bee
 
 
 # find protein fasta files
@@ -40,4 +79,26 @@ cd inputOnScratch
 # ideal is to use a single primary/longest transcript variant for each gene
 # so need to check this and make a new version if needed
 
+# Drosophila comes from Ensembl, so use the OrthoFinder script
+module load python
+
+python /lustre/home/ucfaeef/programs/OrthoFinder/tools/primary_transcript.py Drosophila_melanogaster.faa
+
+# all the others are ran through homemade scripts (because their gff is abnormal)
+./obtain-longest-transcripts-apis.sh
+./obtain-longest-transcripts-liostenogaster.sh
+./obtain-longest-transcripts-dominula.sh
+./obtain-longest-transcripts-canadensis.sh
+
+# wc -l inputOnScratch/primary_transcripts/*
+# 19844 inputOnScratch/primary_transcripts/Apis_mellifera-longest-isoforms.faa
+# 145448 inputOnScratch/primary_transcripts/Drosophila_melanogaster.faa
+# 27796 inputOnScratch/primary_transcripts/Liostenogaster_flavolineata-longest-isoforms.faa
+# 19752 inputOnScratch/primary_transcripts/Polistes_canadensis-longest-isoforms.faa
+# 20358 inputOnScratch/primary_transcripts/Polistes_dominula-longest-isoforms.faa
+
 # run orthofinder
+qsub run-orthofinder.sh
+
+# check results
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/tmp/result
