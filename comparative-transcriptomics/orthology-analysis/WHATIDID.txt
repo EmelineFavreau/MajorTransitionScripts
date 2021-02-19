@@ -100,5 +100,11 @@ python /lustre/home/ucfaeef/programs/OrthoFinder/tools/primary_transcript.py Dro
 # run orthofinder
 qsub run-orthofinder.sh
 
-# check results
-ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/tmp/result
+# check results Results_Feb17
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/OrthoFinder/
+
+cd result
+ln -s ../inputOnScratch/primary_transcripts/OrthoFinder/Results_Feb17 WaspsFlyBee
+
+# copy important information to Github result/WaspsFlyBee/Orthogroups/*
+
