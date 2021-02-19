@@ -104,7 +104,8 @@ qsub run-orthofinder.sh
 ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/OrthoFinder/
 
 cd result
-ln -s ../inputOnScratch/primary_transcripts/OrthoFinder/Results_Feb17 WaspsFlyBee
+mkdir WaspsDrosoApis
+cp -r ../inputOnScratch/primary_transcripts/OrthoFinder/Results_Feb17/Orthogroups WaspsDrosoApis/.
 
 # copy important information to Github result/WaspsFlyBee/Orthogroups/*
 
