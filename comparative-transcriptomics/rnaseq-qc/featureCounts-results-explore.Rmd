@@ -1,0 +1,231 @@
+---
+title: "FeatureCounts explore"
+author: "Emeline Favreau"
+date: "15/02/2021"
+output: html_document
+---
+#### Copyright 2021 Emeline Favreau, University College London.
+
+
+# Objective of analysis
+
+Exploring the results of FeatureCounts
+
+## Analysis steps:
+- Obtaining data
+- Aim 1: Megalopta genalis
+- Aim 2: Polistes canadensis Patalano
+- Aim 3: description
+- Aim 4: description
+
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "tidyverse")
+
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+
+```{r import Megalopta data, eval = TRUE, echo = FALSE, include = FALSE}
+#https://www.pauloldham.net/importing-csv-files-into-r/
+# list all files with the extension
+megalopta <- list.files("Megalopta-genalis/result/Jones2017/mapping",
+                        pattern = "*1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                        full.names = TRUE) 
+
+# create a list with datasets
+megalopta_list <- lapply(megalopta,
+                             read.delim)
+
+# name each element as the sample name
+names(megalopta_list) <-gsub(x = megalopta, pattern = "Megalopta-genalis/result/Jones2017/mapping/|_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary", replacement = "")
+
+# import phenotype
+megalopta.phenotype <- read.csv("Megalopta-genalis/megalopta-phenotype.csv",
+                                header = FALSE,
+                                stringsAsFactors = FALSE)
+
+
+```
+
+```{r import Polistes data, eval = TRUE, echo = FALSE, include = FALSE}
+#https://www.pauloldham.net/importing-csv-files-into-r/
+# list 10 files with the extension
+polistes.canadensis <- list.files("Polistes-canadensis/result/Patalano/mapping",
+                        pattern = "*1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                        full.names = TRUE) 
+
+# create a list with datasets
+polistes.canadensis_list <- lapply(polistes.canadensis,
+                             read.delim)
+
+# name each element as the sample name
+names(polistes.canadensis_list) <- gsub(x = polistes.canadensis,
+                                        pattern = "Polistes-canadensis/result/Patalano/mapping/|_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                                        replacement = "")
+
+# import phenotype
+polistes.canadensis.phenotype <- read.csv("Polistes-canadensis/polistes-canadensis-patalano-phenotype.csv",
+                                header = FALSE,
+                                stringsAsFactors = FALSE)
+
+
+
+```
+
+
+
+```{r function to make a plot, eval = TRUE, echo = FALSE, include = TRUE}
+
+# make a figure 
+make_plot <- function(pheno_table, sample_name){
+  
+  phenotype_table <- pheno_table
+  
+  this_run_name <- gsub(x = names(sample_name)[2],
+                        pattern = "_1Aligned.sortedByCoord.out.bam",
+                        replacement = "")
+  
+  this_pheno <- phenotype_table$phenotype[phenotype_table$samples ==
+                                                           this_run_name]
+  
+  this_individual <- phenotype_table$individual_name[phenotype_table$samples ==
+                                                           this_run_name]
+  
+ p <- ggplot(data = sample_name,
+       aes(x = Status,
+           y = sample_name[, 2])) +
+    
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1)) +
+    labs(title = paste(this_run_name, this_pheno, this_individual, sep = " ")) +
+    ylab("Alignment Counts")
+  
+  return(p)
+  #print(p)
+}
+
+
+```
+
+
+# Megalopta
+
+```{r Megalopta, eval = TRUE, echo = FALSE, include = TRUE}
+# name col of phenotypes
+colnames(megalopta.phenotype) <- c("samples",
+                                   "individual_name",
+                                   "phenotype")
+
+for (this_sample in 1:length(megalopta_list)){
+  print(make_plot(megalopta.phenotype, megalopta_list[[this_sample]]))
+}
+
+# samples with more assigned alignments
+#make_plot(megalopta.phenotype,
+#          megalopta_list[[1]])
+
+```
+
+
+```{r Megalopta test, eval = TRUE, echo = FALSE, include = FALSE}
+#Half of the Megalopta genalis samples have many more alignments that are "unassigned no features". Based on sample and phenotype origins, this looks random. It is possible that the reads of those samples have more reads that map at multiple loci (check star output). This might be due to the amount of duplication (check FASTqc reports)
+# make_plot(megalopta.phenotype, SRR3948524) 
+# make_plot(megalopta.phenotype, SRR3948576)
+# make_plot(megalopta.phenotype, SRR3948582) 
+# make_plot(megalopta.phenotype, SRR3948574) 
+# make_plot(megalopta.phenotype, SRR3948565) 
+# make_plot(megalopta.phenotype, SRR3948557) 
+# make_plot(megalopta.phenotype, SRR3948555)
+# make_plot(megalopta.phenotype, SRR3948553) 
+# make_plot(megalopta.phenotype, SRR3948551) 
+# make_plot(megalopta.phenotype, SRR3948549)
+# make_plot(megalopta.phenotype, SRR3948543)
+# make_plot(megalopta.phenotype, SRR3948541)  
+# make_plot(megalopta.phenotype, SRR3948538)
+# make_plot(megalopta.phenotype, SRR3948534)   
+
+# samples with more UNassigned alignments
+# make_plot(megalopta.phenotype, SRR3948523)  
+# make_plot(megalopta.phenotype, SRR3948525) 
+# make_plot(megalopta.phenotype, SRR3948530)
+# make_plot(SRR3948532)                                                  
+# make_plot(SRR3948535)                                                  
+# make_plot(SRR3948545)                                                  
+# make_plot(SRR3948559)                                                  
+# make_plot(SRR3948561)                                                  
+# make_plot(SRR3948567)                                                  
+# make_plot(SRR3948569)                                                  
+# make_plot(SRR3948571)                                                  
+# make_plot(SRR3948573)                                                  
+# make_plot(SRR3948578)                                                  
+# make_plot(SRR3948580)                                                  
+
+
+```
+
+# Polistes canadensis
+
+```{r Polistes canndensis, eval = TRUE, echo = FALSE, include = TRUE}
+# name col of phenotypes
+colnames(polistes.canadensis.phenotype) <- c("samples",
+                                   "individual_name",
+                                   "phenotype")
+
+for (this_sample in 1:length(polistes.canadensis_list)){
+  print(make_plot(polistes.canadensis.phenotype,
+                  polistes.canadensis_list[[this_sample]]))
+}
+
+
+```
+Conclusion
+
+
+
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```
