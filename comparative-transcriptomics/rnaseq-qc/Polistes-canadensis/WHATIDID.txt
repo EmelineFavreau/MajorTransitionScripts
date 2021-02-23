@@ -4,38 +4,194 @@
 
 ## Analysis steps:
 # Obtaining data
-# Aim 1: Run Nextflow
-# Aim 2: TBD
+# Aim 1: Run Nextflow on Patalano's data
+# Aim 2: Run Nextflow on Emily's data
 # Aim 3: TBD
 
 ###############################################################################
-# Obtaining data
+# Obtaining data (Patalano)
 
 # set project structure
 Genusspecies="Polistes-canadensis"
+
 mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input
 mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result
 mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp
+
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
+
+dataset="Patalano"
+
+mkdir -p inputOnScratch/${dataset}
+mkdir -p resultOnScratch/${dataset}
+mkdir -p tmp/${dataset}
 
 mkdir -p result
 
 # set up myriad.config (in the directory where the experiment will run)
 cp ../myriad.config .
 
-# copy input files: RNAseq raw reads, genome fasta, gff SRR1519108
+# obtain reads from NCBI (add --gzip next time!)
+./obtain-NCBI-Polistes-canadensis.sh
+
+# compress fastq in an array is way quicker than in a loop
+ls inputOnScratch/Patalano > list_of_Patalano_files.txt
+qsub compress-fastq.sh
+
+# if not, in test, I am also compressing starttime Mon 15 1133
+mkdir test
+cp *.fastq test/.
+cd test
+gzip *.fastq
+
+
+cd ..
+
+###############################################################################
+# Aim 1: Run Nextflow for Patalano's data
+
+
+# run all samples - reverse stranded
+mkdir -p tmp/Patalano/star-all-samples
+
+mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/Patalano/star-all-samples
+
+cp myriad.config tmp/Patalano/star-all-samples/.
+
+cd tmp/Patalano/star-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	-profile singularity \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/Patalano/*{1,2}.fastq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.gff.gz' \
+	--reverseStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/myriad.config \
+	-with-tower \
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/Patalano/star-all-samples
+
+# astonishing_dalembert 
+
+# find GTF
+head /work/01/5bbacdffab10b3a4356468052694cf/GCF_001313835.1_ASM131383v1_genomic.gtf
+
+# there is transcript_id "rna-XR_001381396.1"; gene_id "gene-LOC106784153"; gene_name "LOC106784153"
+
+
+# type of attributes in a GTF annotation that will be used to group features. 
+# we said gene_id
+# http://seqanswers.com/forums/showthread.php?t=32862 
+# our GFF has the feature ID, which is exactly the same as the GTF's gene_id
+# NW_014569547.1	Gnomon	CDS	113610	113996	.	+	0	ID=cds-XP_014598360.1;Parent=rna-XM_014742874.1;Dbxref=GeneID:106783879,Genbank:XP_014598360.1;Name=XP_014598360.1;gbkey=CDS;gene=LOC106783879;product=thyroid receptor-interacting protein 6;protein_id=XP_014598360.1
+
+# check strandedness
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/Patalano/star-all-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+
+# overall mapping:
+grep "Uniquely mapped reads %" result/Patalano/mapping/SRR*Log.final.out
+
+# featurecounts unassigned:
+cat result/Patalano/mapping/*featureCounts.txt.summary
+
+#######
+# Copy important info to back-up home
+
+Genusspecies="Polistes-canadensis"
+dataset="Patalano"
+
+cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}
+
+mkdir -p result/${dataset}
+mkdir -p result/${dataset}/qc-before-trim/
+mkdir -p result/${dataset}/qc-after-trim/
+mkdir -p result/${dataset}/mapping
+mkdir -p result/${dataset}/sample-batch-effects-plots
+mkdir -p result/${dataset}/FPKM
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/pipeline_info/software_versions.csv result/${dataset}/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
+
+# list of fastqc before trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
+
+# list of fastqc after trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
+
+# Check for quality of mapping to the genome
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
+
+# check sample and batch effect:
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
+
+# location of raw read counts
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
+
+# location of StringTie's RPKM
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
+
+# Double-check all info are backed-up
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/${dataset}
+
+# copy raw input (compressed and cleaned) on rds
+# copy NCBI info on RDS /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/
 
 ssh ucfaeef@transfer02
 
-cd projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-canadensis/inputOnScratch/ 
+cd /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/
 
-# reproductives from Patalano's paper
-cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Polistes_canadensis/experiment5_PNAS_analys/data/Queen*/raw/*fastq .
+cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis/inputOnScratch/Patalano/*fastq.gz Polistes_canadensis-Patalano/rnaseq/.
 
-# non-reproductives from Patalano's paper
-cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Polistes_canadensis/experiment5_PNAS_analys/data/Worker*/raw/*fastq .
+cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis/inputOnScratch/*fna.gz Polistes_canadensis-Patalano/genome/.
+
+cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis/inputOnScratch/*gff.gz Polistes_canadensis-Patalano/gff/.
+
+cp -r /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/Patalano/star-all-samples/qualimap/SRR1519108_1_cleanedAligned.sortedByCoord.out/* Polistes_canadensis-Patalano/.
+
+
+exit
+# delete scratch space (10% of 1Tb)
+rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
+
+
+# calculate number of reads at 3 Nextflow steps this will need to be changed
+# Sumner lab dataset (Patalano's)
+# obtain sequences numbers from fastqc reports before trimming
+chmod +x count-sequences-before-qc-Patalano.sh
+./count-sequences-before-qc-Patalano.sh
+
+# obtain sequences numbers from fastqc reports after trimming
+chmod +x count-sequences-after-qc-Patalano.sh
+./count-sequences-after-qc-Patalano.sh
+
+# obtain final read counts from FeatureCount (this is input to DESeq2)
+chmod +x count-merged-read-counts-Patalano.sh
+./count-merged-read-counts-Patalano.sh
+
+# obtain per sample too from FeatureCounts
+
+cat result/Patalano/qc-after-trim/number-reads-in-samples  
+cat result/Patalano/qc-before-trim/number-reads-in-samples
+cat result/Patalano/number-merged-read-counts-in-samples
+
+
+
+###############################################################################
+# Aim 1: Run Nextflow for Emily's data
 
 # reproductives from Emily's thesis: DomFound1, DomFound2, DomFound3, Dom2, Dom3
 cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Polistes_canadensis_Emily/Emily_RNAwork_BC/Normal_samples/DomFound*/*_paired.fastq.gz .
@@ -47,9 +203,6 @@ cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Polistes_canadensis_Emily/Emily
 
 cp /mnt/gpfs/live/ritd-ag-project-rd00mk-mbent70/Polistes_canadensis_Emily/Emily_RNAwork_BC/Normal_samples/Sub{2,3}*/*_paired.fastq.gz .
 
-
-# compress files
-gzip *.fastq
 
 # change names forward / reverse
 mv Dom2_output_forward_paired.fastq.gz Dom2_1.fastq.gz 
@@ -81,205 +234,6 @@ mv SubFound2_output_reverse_paired.fastq.gz SubFound2_2.fastq.gz
 
 mv SubFound3_output_forward_paired.fastq.gz SubFound3_1.fastq.gz
 mv SubFound3_output_reverse_paired.fastq.gz SubFound3_2.fastq.gz
-
-# get the genome
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/313/835/GCF_001313835.1_ASM131383v1/GCF_001313835.1_ASM131383v1_genomic.fna.gz
-
-# get the gff
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/313/835/GCF_001313835.1_ASM131383v1/GCF_001313835.1_ASM131383v1_genomic.gff.gz
-
-
-
-# each raw file has the sample name in the 3rd line
-# this stops trim galore
-ls *fastq.gz* | cut -d "." -f 1 > list_of_samples.txt
-
-while read sample
-do
-  zcat ${sample}.fastq.gz | seqtk seq -C | gzip -c > ${sample}_cleaned.fastq.gz 
-done < list_of_samples.txt
-
-
-
-cd ..
-
-###############################################################################
-# Aim 1: Run Nextflow for Patalano's data
-
-mkdir -p tmp/star-one-sample
-
-mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/star-one-sample
-
-cp myriad.config tmp/star-one-sample/.
-
-cd tmp/star-one-sample
-
-tmux new-session
-
-module load blic-modules
-
-module load nextflow/19.10.0.5170
-
-nextflow run nf-core/rnaseq \
-	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/SRR1519110*{1,2}_cleaned.fastq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.fna.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.gff.gz' \
-	--forwardStranded \
-	--skipBiotypeQC \
-	--fc_group_features gene_id \
-	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-one-sample/myriad.config \
-	-with-tower \
-	-bg \
-	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/star-one-sample
-
-# silly_knuth this worked.
-
-
-
-# run all samples
-mkdir -p tmp/star-all-samples
-
-mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/star-all-samples
-
-cp myriad.config tmp/star-all-samples/.
-
-cd tmp/star-all-samples
-
-tmux new-session
-
-module load blic-modules
-
-module load nextflow/19.10.0.5170
-
-nextflow run nf-core/rnaseq \
-	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/*{1,2}_cleaned.fastq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.fna.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.gff.gz' \
-	--forwardStranded \
-	--skipBiotypeQC \
-	--fc_group_features gene_id \
-	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/myriad.config \
-	-with-tower \
-	-bg \
-	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/star-all-samples
-
-# insane_davinci 
-
-
-
-
-#######
-# Copy important info to back-up home
-
-Genusspecies="Polistes-canadensis"
-
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM
-
-# list pipeline information
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
-
-
-
-
-# list of fastqc before trimming. Visual check looks good.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/.
-
-# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/.
-
-# Check for quality of mapping to the genome - all above 89%
-grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/uniquely-mapped-reads-percentage.txt
-
-
-# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
-# something to check in R
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping/.
-
-# check sample and batch effect:
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots/.
-
-# location of raw read counts (795K)
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
-
-
-# location of StringTie's RPKM
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM/.
-
-
-# Double-check all info are backed-up
-tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result
-
-# delete scratch space (10% of 1Tb)
-rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
-
-
-#####################
-# 2021-01-18 calculate number of reads for each file, and for each sample, and for the whole experiment
-
-# create tmp again
-unlink tmp
-mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-canadensis/tmp
-ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-canadensis/tmp tmp
-
-# copy the zip files
-cp result/qc-after-trim/*.zip tmp/.
-
-# unzip files
-cd tmp
-ls > sample-file-names
-for filename in `cat sample-file-names`; do
-	unzip ${filename}
-done
-
-
-cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-canadensis
-
-# calculate number of reads for each file
-ls tmp/*_fastqc.zip | cut -d "/" -f 2 | cut -d "_" -f 1,2,3,4,5 > file-list
-
-# run a loop to do the job
-
-for sample in `cat file-list`; do
-	grep "Total Sequences" tmp/${sample}_fastqc/fastqc_data.txt >> tmp/number-reads-in-file
-done
-
-paste file-list tmp/number-reads-in-file > result/number-reads-in-files
-
-
-# calculate number of reads for each sample
-cat file-list | cut -d "_" -f 1 | uniq > samples-list
-
-# run a loop to do the job
-
-for sample in `cat samples-list`; do
-	grep ${sample} result/number-reads-in-files | awk '{sum+=$4}END{print sum}' >> tmp/number-reads-in-sample
-done
-
-paste samples-list tmp/number-reads-in-sample > result/number-reads-in-samples
-
-
-
-#sum the read number for the whole experiment: 34998690
-awk '{sum+=$2}END{print sum}' result/number-reads-in-samples
-
-
-
-###############################################################################
-# Aim 1: Run Nextflow for Emily's data
 
 mkdir -p tmp/star-one-sample
 
