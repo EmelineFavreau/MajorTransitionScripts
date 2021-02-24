@@ -4,9 +4,9 @@
 
 ## Analysis steps:
 # Obtaining data
-# Aim 1: Run Nextflow
-# Aim 2: TBD
-# Aim 3: TBD
+# Aim 1: Run Nextflow on fwd samples
+# Aim 2: Run Nextflow on rev samples
+# Aim 3: Combine merge counts
 
 ###############################################################################
 # Obtaining data from Jones 2017
@@ -41,16 +41,28 @@ exit
 
 cd ..
 
+# inputs are separated by strandedness
+mkdir -p inputOnScratch/Jones2017fwd
+mkdir -p inputOnScratch/Jones2017rev
+
+for sample in `cat Jones2017-fwd-samples`; do
+	mv inputOnScratch/${sample}*fastq.gz inputOnScratch/Jones2017fwd/.
+done
+
+for sample in `cat Jones2017-rev-samples`; do
+	mv inputOnScratch/${sample}*fastq.gz inputOnScratch/Jones2017rev/.
+done
+
 ###############################################################################
-# running Nextflow all samples 
+# Aim 1 running Nextflow all fwd samples 
 
-mkdir tmp/star-all-samples
+mkdir tmp/star-all-fwd-samples
 
-mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-samples
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples
 
-cp myriad.config tmp/star-all-samples/.
+cp myriad.config tmp/star-all-fwd-samples/.
 
-cd tmp/star-all-samples
+cd tmp/star-all-fwd-samples
 
 tmux new-session
 
@@ -60,19 +72,84 @@ module load nextflow/19.10.0.5170
 
 nextflow run nf-core/rnaseq \
 	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/*{1,2}.fastq.gz' \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/Jones2017fwd/*{1,2}.fastq.gz' \
 	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.fna.gz' \
 	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.gff.gz' \
 	--forwardStranded \
 	--skipBiotypeQC \
 	--fc_group_features gene_id \
 	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-samples/myriad.config \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-fwd-samples/myriad.config \
 	-with-tower \
 	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-samples
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples
 
-# mad_venter and furious_brattain  https://tower.nf/watch/hNTbqOL2tGIQA
+# scruffy_hawking done in 10h
+
+# check strandedness, overall mapping, assigned features
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+
+# overall mapping: 71.60% - 78.84%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples/STAR/logs/SRR*Log.final.out
+
+# featurecounts unassigned: looks good!
+cat /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples/featureCounts/gene_count_summaries/*featureCounts.txt.summary
+
+
+###############################################################################
+# Aim 2 running Nextflow all rev samples 
+
+mkdir tmp/star-all-rev-samples
+
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples
+
+cp myriad.config tmp/star-all-rev-samples/.
+
+cd tmp/star-all-rev-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+	-profile singularity \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/Jones2017rev/*{1,2}.fastq.gz' \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.gff.gz' \
+	--reverseStranded \
+	--skipBiotypeQC \
+	--fc_group_features gene_id \
+	-r 1.4.2 \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-rev-samples/myriad.config \
+	-with-tower \
+	-resume \
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples
+
+# hopeful_panini done in 10h
+
+# check strandedness
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+
+# overall mapping: 72.62% - 77.87%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples/STAR/logs/SRR*Log.final.out
+
+# featurecounts unassigned: looks good!
+cat /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples/featureCounts/gene_count_summaries/*featureCounts.txt.summary
+
+
+#############################################
+# Aim 3: merge the two read count files
+
+# check that it is the same order
+cut -f1 result/Jones2017rev/merged_gene_counts.txt > tmp/rev-genid
+cut -f1 result/Jones2017fwd/merged_gene_counts.txt > tmp/fwd-genid
+diff tmp/rev-genid tmp/fwd-genid
+
+
+# concatenate the two  outputs (removing 1st 2 columns fo second file as it is redundant)
+cut -f3- result/Jones2017rev/merged_gene_counts.txt | paste result/Jones2017fwd/merged_gene_counts.txt - > result/merged_gene_counts.txt
 
 
 
@@ -81,7 +158,7 @@ nextflow run nf-core/rnaseq \
 # Copy important info to back-up home
 
 Genusspecies="Megalopta-genalis"
-dataset="Jones2017"
+dataset="Jones2017fwd"
 
 cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}
 
@@ -93,41 +170,83 @@ mkdir -p result/${dataset}/sample-batch-effects-plots
 mkdir -p result/${dataset}/FPKM
 mkdir -p result/${dataset}/qualimap-reports
 
-# list pipeline information
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/software_versions.csv result/${dataset}/.
 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/pipeline_info/software_versions.csv result/${dataset}/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
 
 # list of fastqc before trimming 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
 
 # list of fastqc after trimming 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
 
 # Check for quality of mapping to the genome
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
-
-
-
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
 
 # check sample and batch effect:
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
 
 # location of raw read counts
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
 
 # location of StringTie's RPKM
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
-
-# check one sample report, then make all pdf of qualimap reports.
-# check if report of strandedness match nextflow command (important for featureCounts)
-#/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/qualimap/*sortedByCoord.out/* result/${dataset}/qualimap-reports/.
-cp -r /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/qualimap/SRR3948522_1Aligned.sortedByCoord.out/* result/${dataset}/qualimap-reports/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-fwd-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
 
 # Double-check all info are backed-up
 tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/${dataset}
+
+###################################################
+#######
+# Copy important info to back-up home
+
+Genusspecies="Megalopta-genalis"
+dataset="Jones2017rev"
+
+cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}
+
+mkdir -p result/${dataset}
+mkdir -p result/${dataset}/qc-before-trim/
+mkdir -p result/${dataset}/qc-after-trim/
+mkdir -p result/${dataset}/mapping
+mkdir -p result/${dataset}/sample-batch-effects-plots
+mkdir -p result/${dataset}/FPKM
+mkdir -p result/${dataset}/qualimap-reports
+
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/pipeline_info/software_versions.csv result/${dataset}/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
+
+# list of fastqc before trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
+
+# list of fastqc after trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
+
+# Check for quality of mapping to the genome
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
+
+# check sample and batch effect:
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
+
+# location of raw read counts
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
+
+# location of StringTie's RPKM
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-rev-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
+
+# Double-check all info are backed-up
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/${dataset}
+
+###################################
+
 
 # The first time, copy raw input (compressed and cleaned) on RDS
 # copy NCBI info on RDS name  /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/
@@ -174,4 +293,74 @@ cat result/Patalano/qc-before-trim/number-reads-in-samples
 cat result/Patalano/number-merged-read-counts-in-samples
 
 
+#######
+# the first round of Nextflow, we identified a fwd/rev pattern in the samples:
+# check strandedness. half of the samples are forwardstranded, the other half 
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt | cut -d "/" -f 11,13,14 | sed "s/_/ /g" | cut -d " " -f 1,4,6 | sort -n -k2
+sample fwd rev
+SRR3948530 0.05 0.95
+SRR3948532 0.05 0.95
+SRR3948535 0.05 0.95
+SRR3948545 0.05 0.95
+SRR3948561 0.05 0.95
+SRR3948567 0.05 0.95
+SRR3948569 0.05 0.95
+SRR3948571 0.05 0.95
+SRR3948578 0.05 0.95
+SRR3948523 0.06 0.94
+SRR3948525 0.06 0.94
+SRR3948546 0.06 0.94
+SRR3948559 0.06 0.94
+SRR3948573 0.06 0.94
+SRR3948580 0.06 0.94
 
+SRR3948534 0.94 0.06
+SRR3948541 0.94 0.06
+SRR3948549 0.94 0.06
+SRR3948553 0.94 0.06
+SRR3948582 0.94 0.06
+SRR3948522 0.95 0.05
+SRR3948524 0.95 0.05
+SRR3948538 0.95 0.05
+SRR3948543 0.95 0.05
+SRR3948551 0.95 0.05
+SRR3948555 0.95 0.05
+SRR3948557 0.95 0.05
+SRR3948565 0.95 0.05
+SRR3948576 0.95 0.05
+SRR3948574 0.96 0.04
+
+# samples sequenced reverse Jones2017-rev-samples
+SRR3948530
+SRR3948532
+SRR3948535
+SRR3948545
+SRR3948561
+SRR3948567
+SRR3948569
+SRR3948571
+SRR3948578
+SRR3948523
+SRR3948525
+SRR3948546
+SRR3948559
+SRR3948573
+SRR3948580
+
+# samples sequenced forward Jones2017-fwd-samples
+SRR3948534
+SRR3948541
+SRR3948549
+SRR3948553
+SRR3948582
+SRR3948522
+SRR3948524
+SRR3948538
+SRR3948543
+SRR3948551
+SRR3948555
+SRR3948557
+SRR3948565
+SRR3948576
+SRR3948574

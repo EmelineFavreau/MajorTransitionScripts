@@ -1,0 +1,6 @@
+Megalopta genalis Jones that has gone through Nextflow QC pipeline:
+- information about data: Megalopta-genalis-raw-reads-readme
+- raw read counts: result/merged_gene_counts.txt 
+
+Samples were ran in two batches (forward and reverse)
+- FPKM: result/Jones2017fwd/FPKM and result/Jones2017rev/FPKM

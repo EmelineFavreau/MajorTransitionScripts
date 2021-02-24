@@ -1,0 +1,64 @@
+----------------------------------------------------
+                                        ,--./,-.
+        ___     __   __   __   ___     /,-._.--~\
+  |\ | |__  __ /  ` /  \ |__) |__         }  {
+  | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                        `._,._,'
+  nf-core/rnaseq v1.4.2
+----------------------------------------------------
+
+Run Name: hopeful_panini
+
+## nf-core/rnaseq execution completed successfully! ##
+
+
+## nf-core/rnaseq execution completed successfully! ##
+
+
+
+
+The workflow was completed at 2021-02-23T04:52:56.927Z (duration: 10h 56m 2s)
+
+The command used to launch the workflow was as follows:
+
+  nextflow run nf-core/rnaseq -profile singularity --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/Jones2017rev/*{1,2}.fastq.gz' --fasta /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.fna.gz --gff /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.gff.gz --reverseStranded --skipBiotypeQC --fc_group_features gene_id -r 1.4.2 -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-rev-samples/myriad.config -with-tower -resume --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples
+
+
+
+Pipeline Configuration:
+-----------------------
+ - Pipeline Release: 1.4.2
+ - Run Name: hopeful_panini
+ - Reads: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/Jones2017rev/*{1,2}.fastq.gz
+ - Data Type: Paired-End
+ - Strandedness: Reverse
+ - Trimming: 5'R1: 0 / 5'R2: 0 / 3'R1: 0 / 3'R2: 0 / NextSeq Trim: 0
+ - Aligner: STAR
+ - Fasta Ref: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.fna.gz
+ - GFF3 Annotation: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.gff.gz
+ - Remove Ribosomal RNA: false
+ - Biotype GTF field: gene_biotype
+ - Save prefs: Ref Genome: No / Trimmed FastQ: No / Alignment intermediates: No
+ - Max Resources: 128 GB memory, 10 cpus, 3d time per job
+ - Container: singularity - nfcore/rnaseq:1.4.2
+ - Output dir: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-rev-samples
+ - Launch dir: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-rev-samples
+ - Working dir: /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-rev-samples/work
+ - Script dir: /home/ucfaeef/.nextflow/assets/nf-core/rnaseq
+ - User: ucfaeef
+ - Config Profile: singularity
+ - Date Started: 2021-02-22T17:56:54.450Z
+ - Date Completed: 2021-02-23T04:52:56.927Z
+ - Pipeline script file path: /home/ucfaeef/.nextflow/assets/nf-core/rnaseq/main.nf
+ - Pipeline script hash ID: efd50c97fd77bdc6b6161e3ee76f7ddd
+ - Pipeline repository Git URL: https://github.com/nf-core/rnaseq.git
+ - Pipeline repository Git Commit: 3b6df9bd104927298fcdf69e97cca7ff1f80527c
+ - Pipeline Git branch/tag: 1.4.2
+ - Docker image: nfcore/rnaseq:1.4.2
+ - Nextflow Version: 20.04.1
+ - Nextflow Build: 5335
+ - Nextflow Compile Timestamp: 03-05-2020 19:37 UTC
+
+--
+nf-core/rnaseq
+https://github.com/nf-core/rnaseq
