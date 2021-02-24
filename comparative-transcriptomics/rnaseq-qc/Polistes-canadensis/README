@@ -1,0 +1,4 @@
+Polistes canadensis patalano that has gone through Nextflow QC pipeline:
+- information about data: Polistes-canadensis-raw-reads-readme
+- raw read counts: result/Patalano/merged_gene_counts.txts
+- FPKM: result/Patalano/FPKM
