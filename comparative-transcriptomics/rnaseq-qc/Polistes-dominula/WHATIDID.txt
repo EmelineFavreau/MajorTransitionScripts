@@ -13,9 +13,12 @@
 
 # set project structure
 Genusspecies="Polistes-dominula"
+dataset="Taylor"
 mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input
 mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result
 mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/input/${dataset}
+mkdir -p ~/Scratch/comparative-transcriptomics/${Genusspecies}/result/${dataset}
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/input inputOnScratch
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/result resultOnScratch
 ln -s ~/Scratch/comparative-transcriptomics/${Genusspecies}/tmp tmp
@@ -27,7 +30,7 @@ cp ../myriad.config .
 
 ssh ucfaeef@transfer02
 
-cd projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-dominula/inputOnScratch/ 
+cd projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-dominula/inputOnScratch/Taylor
 
 # reproductives
 echo -e "F03BL\nF14GR\nF42OR\nF45OR\nF48SL\nF65ORWH\nF67YLBL\nF38BL\nF47RD\nF51RD\nF69OR\nF71BL" > queen-samples
@@ -62,62 +65,27 @@ cp /mnt/gpfs/live/ritd-ag-project-rd00qm-mbent70/Pdom_temp/W70RDYL*.fq.gz .
 
 exit
 
+cd inputOnScratch
+
 # get the genome
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pdom_r1.2/GCF_001465965.1_Pdom_r1.2_genomic.fna.gz .
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pdom_r1.2/GCF_001465965.1_Pdom_r1.2_genomic.fna.gz 
 
 # get the gff
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pdom_r1.2/GCF_001465965.1_Pdom_r1.2_genomic.gff.gz .
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pdom_r1.2/GCF_001465965.1_Pdom_r1.2_genomic.gff.gz 
 
 
 cd ..
 
 ###############################################################################
-# Aim 1: Run Nextflow on one sample
+# Aim 1: Run Nextflow on all samples
 
-mkdir tmp/hisat-one-sample
+mkdir tmp/${dataset}/star-all-samples
 
-mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/hisat-one-sample
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/${dataset}/star-all-samples
 
-cp myriad.config tmp/hisat-one-sample/.
+cp myriad.config tmp/${dataset}/star-all-samples/.
 
-cd tmp/hisat-one-sample
-
-tmux new-session
-
-module load blic-modules
-
-module load nextflow/19.10.0.5170
-
-nextflow run nf-core/rnaseq \
-	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/W01RDYL*{1,2}.fq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/GCF_001465965.1_Pdom_r1.2_genomic.fna.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/GCF_001465965.1_Pdom_r1.2_genomic.gff.gz' \
-	--forwardStranded \
-	--skipBiotypeQC \
-	--fc_group_features gene_id \
-	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/tmp/hisat-one-sample/myriad.config \
-	-with-tower \
-	-bg \
-	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/hisat-one-sample
-
-# extravagant_engelbart worked
-
-
-
-
-
-#########################
-# running all samples 
-mkdir tmp/hisat-all-samples
-
-mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/hisat-all-samples
-
-cp myriad.config tmp/hisat-all-samples/.
-
-cd tmp/hisat-all-samples
+cd tmp/${dataset}/star-all-samples
 
 tmux new-session
 
@@ -127,121 +95,70 @@ module load nextflow/19.10.0.5170
 
 nextflow run nf-core/rnaseq \
 	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/*{1,2}.fq.gz' \
+	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/Taylor/*{1,2}.fq.gz' \
 	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/GCF_001465965.1_Pdom_r1.2_genomic.fna.gz' \
 	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/GCF_001465965.1_Pdom_r1.2_genomic.gff.gz' \
-	--forwardStranded \
+	--unStranded \
 	--skipBiotypeQC \
 	--fc_group_features gene_id \
 	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/tmp/hisat-all-samples/myriad.config \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/tmp/Taylor/star-all-samples/myriad.config \
 	-with-tower \
-	-bg \
 	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/hisat-all-samples
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/Taylor/star-all-samples
 
-# drunk_celsius worked
+# amazing_snyder (forward stranded was loving_bardeen)
+
+# check strandedness: it looks unstranded --unStranded 0.51 / 0.49
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/Taylor/star-all-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+
+# overall mapping: 85.83% to 90.27%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/Taylor/star-all-samples/STAR/logs/*Log.final.out  | cut -f 2 | sort -n
+
+# featurecounts: good ratio
+cat /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/Taylor/star-all-samples/featureCounts/gene_count_summaries/*featureCounts.txt.summary
+
 
 #######
 # Copy important info to back-up home
 
 Genusspecies="Polistes-dominula"
+dataset="Taylor"
 
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM
+mkdir -p result/${dataset}
+mkdir -p result/${dataset}/qc-before-trim/
+mkdir -p result/${dataset}/qc-after-trim/
+mkdir -p result/${dataset}/mapping
+mkdir -p result/${dataset}/sample-batch-effects-plots
+mkdir -p result/${dataset}/FPKM
 
 # list pipeline information
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/pipeline_info/software_versions.csv result/${dataset}/.
 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
 
+# list of fastqc before trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
 
+# list of fastqc after trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
 
+# Check for quality of mapping to the genome
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
 
-# list of fastqc before trimming. Visual check looks good.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/.
-
-# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/.
-
-# Check for quality of mapping to the genome - all above 89%
-grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/uniquely-mapped-reads-percentage.txt
-
-
-# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
-# something to check in R
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
 
 # check sample and batch effect:
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
 
-# location of raw read counts (795K)
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
-
+# location of raw read counts
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
 
 # location of StringTie's RPKM
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM/.
-
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/${dataset}/star-all-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
 
 # Double-check all info are backed-up
-tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result
-
-# delete scratch space (10% of 1Tb)
-rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
-
-#####################
-# 2021-01-18 calculate number of reads for each file, and for each sample, and for the whole experiment
-
-# create tmp again
-unlink tmp
-mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-dominula/tmp
-ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Polistes-dominula/tmp tmp
-
-# copy the zip files
-cp result/qc-after-trim/*.zip tmp/.
-
-# unzip files
-cd tmp
-ls > sample-file-names
-for filename in `cat sample-file-names`; do
-	unzip ${filename}
-done
-
-
-cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/Polistes-dominula
-
-# calculate number of reads for each file
-ls tmp/*_fastqc.zip | cut -d "/" -f 2 | cut -d "_" -f 1,2,3,4 > file-list
-
-# run a loop to do the job
-
-for sample in `cat file-list`; do
-	grep "Total Sequences" tmp/${sample}_fastqc/fastqc_data.txt >> tmp/number-reads-in-file
-done
-
-paste file-list tmp/number-reads-in-file > result/number-reads-in-files
-
-
-# calculate number of reads for each sample
-cat file-list | cut -d "_" -f 1 | uniq > samples-list
-
-# run a loop to do the job
-
-for sample in `cat samples-list`; do
-	grep ${sample} result/number-reads-in-files | awk '{sum+=$4}END{print sum}' >> tmp/number-reads-in-sample
-done
-paste samples-list tmp/number-reads-in-sample > result/number-reads-in-samples
-
-
-
-
-#sum the read number for the whole experiment: 593620808
-awk '{sum+=$2}END{print sum}' result/number-reads-in-samples
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/${dataset}
 
 
 

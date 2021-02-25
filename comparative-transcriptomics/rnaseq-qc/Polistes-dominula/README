@@ -1,0 +1,4 @@
+Polistes dominula Taylor that has gone through Nextflow QC pipeline:
+- information about data: Polistes-dominula-raw-reads-readme
+- raw read counts: result/Taylor/merged_gene_counts.txts
+- FPKM: result/Taylor/FPKM
