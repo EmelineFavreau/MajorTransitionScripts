@@ -30,101 +30,30 @@ cp ../myriad.config .
 
 cd inputOnScratch
 
-# raw files on EBI. SRA from publication
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR291/007/SRR2915407/SRR2915407_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR291/007/SRR2915407/SRR2915407_2.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR295/006/SRR2954866/SRR2954866_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR295/006/SRR2954866/SRR2954866_2.fastq.gz
+# first time use 
+# ./obtain-NCBI-Ceratina-australensis.sh
 
-# raw files from NCBI
-SAMN04267403 SRR2917198
-SAMN04267402 SRR2917152
-SAMN04267401 SRR2916699	
-SAMN04267313 SRR2916653
-SAMN04267311 SRR2916652
-SAMN04267303 SRR2916648
-SAMN04267302 SRR2916647
-SAMN04267194 SRR2916637
-SAMN04267193 SRR2916631	
-SAMN04263879 SRR2916026
-SAMN04263487 SRR2916025
-SAMN04263476 SRR2915407
+# 2nd time or after
+ssh ucfaeef@transfer02
 
-# download the data bioproject-PRJNA302037-accession-list
-~/programs/sratoolkit.2.10.8-centos_linux64/bin/prefetch --option-file bioproject-PRJNA302037-accession-list.txt
+cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch
 
-ls -lhrt /lustre/scratch/scratch/ucfaeef/ncbi/sra/
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/gff/*gz .
 
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/genome/*gz .
 
-
-# convert to fastq 
-~/programs/sratoolkit.2.10.8-centos_linux64/bin/fastq-dump \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/ \
-	--split-files /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2917198.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2917152.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916699.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916653.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916652.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916648.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916647.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916637.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916631.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916026.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2916025.sra \
-	/lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR2915407.sra 
-
-
-ls -lrth /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/
-
-# compress them all # wed 27/01 HERE
-gzip /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/*.fastq
-
-  
-
-# we use the genome from Sandra Rehan
-Ceratina australensis genome: 
-https://drive.google.com/drive/folders/0B1P0qnA-7O3Afm1ieUZKa2VhSGpacWVsNXVWWGZ0eVNJLUFfX0xZTG9YRWs1YUhoZS1qb00?usp=sharing
-
-gzip australensis_DNA.noNUL.fasta
-
-# we use the annotation from Sandra Rehan
-https://drive.google.com/drive/folders/0B1P0qnA-7O3Afm1ieUZKa2VhSGpacWVsNXVWWGZ0eVNJLUFfX0xZTG9YRWs1YUhoZS1qb00?usp=sharing
-
-gzip australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/rnaseq/*gz .
 
 
 cd ..
 
-# checking paired files: same length? 
-for i in $(ls *.fastq.gz); do
-	zcat ${i} | wc -l
-done
 
-# there is a problem with SRR2916699
+###################################
+# Aim 1: Run Nextflow on all samples 
 
-# to go quicker with some results, I will run Nextflow on all but this sample
-mkdir inputOnScratch/eleven-paired
+mkdir -p tmp/star-all-samples
 
-cp inputOnScratch/SRR2915407* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916637* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916653* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916025* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916647* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916026* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916648* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916631* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2917152* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2916652* inputOnScratch/eleven-paired/.
-cp inputOnScratch/SRR2917198* inputOnScratch/eleven-paired/.
-
-
-###############################################################################
-# Aim 1: Run Nextflow 
-# running all samples 
-
-mkdir tmp/star-all-samples
-
-mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples
+mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples
 
 cp myriad.config tmp/star-all-samples/.
 
@@ -141,59 +70,81 @@ nextflow run nf-core/rnaseq \
 	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/*{1,2}.fastq.gz' \
 	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis_DNA.noNUL.fasta.gz' \
 	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered.gz' \
-	--forwardStranded \
+	--reverseStranded \
 	--skipBiotypeQC \
 	--fc_group_features gene_id \
 	-r 1.4.2 \
 	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/tmp/star-all-samples/myriad.config \
 	-with-tower \
-	-bg \
 	-resume \
 	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples
 
-# insane_kimura this failed because SRR2916699 is not comparable
+### forward: elated_keller and curious_archimedes and shrivelled_blackwell and amazing_mirzakhani
+### reverse: soggy_kare and wise_yonath and intergalactic_pare
 
 
+# # check strandedness - infered reverse, need to run it again
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+
+# overall mapping: 55.92% - 83.70%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples/STAR/logs/*Log.final.out | cut -f 2 | sort -n
+
+# featurecounts - looks good
+cat /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples/featureCounts/gene_count_summaries/*featureCounts.txt.summary
+
+#######
+# Copy important info to back-up home
+
+Genusspecies="Ceratina-australensis"
+dataset="Rehan2018"
+
+mkdir -p result/${dataset}
+mkdir -p result/${dataset}/qc-before-trim/
+mkdir -p result/${dataset}/qc-after-trim/
+mkdir -p result/${dataset}/mapping
+mkdir -p result/${dataset}/sample-batch-effects-plots
+mkdir -p result/${dataset}/FPKM
+
+# list pipeline information
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/software_versions.csv result/${dataset}/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
+
+# list of fastqc before trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
+
+# list of fastqc after trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
+
+# Check for quality of mapping to the genome
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
+
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
+
+# check sample and batch effect:
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
+
+# location of raw read counts
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
+
+# location of StringTie's RPKM
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
+
+# Double-check all info are backed-up
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/${dataset}
 
 
+#### DRAFT
+##### Pre-analysis clean
 
-# Aim 2: Run Nextflow on the paired eleven
-# running all samples 
+# checking paired files: same length? 
+for i in $(ls *.fastq.gz); do
+	zcat ${i} | wc -l
+done
 
-mkdir -p tmp/eleven-paired/star-all-samples
+# there is a problem with SRR2916699
 
-mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/eleven-paired/star-all-samples
-
-cp myriad.config tmp/eleven-paired/star-all-samples/.
-
-cd tmp/eleven-paired/star-all-samples
-
-tmux new-session
-
-module load blic-modules
-
-module load nextflow/19.10.0.5170
-
-nextflow run nf-core/rnaseq \
-	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/eleven-paired/*{1,2}.fastq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis_DNA.noNUL.fasta.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered.gz' \
-	--forwardStranded \
-	--skipBiotypeQC \
-	--fc_group_features gene_id \
-	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/tmp/eleven-paired/star-all-samples/myriad.config \
-	-with-tower \
-	-bg \
-	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/eleven-paired/star-all-samples
-
-# intergalactic_gilbert failed, probably just need to restart: goofy_goldberg
-
-
-
-# Aim 3: clean the sample with issues SRR2916699
+# clean the sample with issues SRR2916699
 
 # trim-galore highlighted the problem: not same amount of reads in forward and reverse
 
@@ -202,176 +153,31 @@ nextflow run nf-core/rnaseq \
 # It rewrites the files with the sequences in order, with matching files for the two files provided on the command line, and then any single reads that are not matched are place in two separate files, one for each original file.
 
 # need decompressed files
-mkdir inputOnScratch/uneven-pairs
-
-cp inputOnScratch/SRR2916699_1.fastq.gz inputOnScratch/uneven-pairs/.
-cp inputOnScratch/SRR2916699_2.fastq.gz inputOnScratch/uneven-pairs/.
-gzip -d inputOnScratch/uneven-pairs/SRR2916699_1.fastq.gz
-gzip -d inputOnScratch/uneven-pairs/SRR2916699_2.fastq.gz
+cp inputOnScratch/SRR2916699_1.fastq.gz tmp/.
+cp inputOnScratch/SRR2916699_2.fastq.gz tmp/.
+gzip -d tmp/SRR2916699_1.fastq.gz
+gzip -d tmp/SRR2916699_2.fastq.gz
 
 # provide smallest file first SRR2916699_1.fastq
-ls -lrth inputOnScratch/uneven-pairs/
+ls -lrth tmp/SRR2916699*
 
 # The optimal table size is basically somewhere around the number of sequences in your fastq files. 
 # 78443752 / 4 = 19610938
-wc -l inputOnScratch/uneven-pairs/SRR2916699_1.fastq
-wc -l inputOnScratch/uneven-pairs/SRR2916699_2.fastq
+wc -l tmp/SRR2916699_1.fastq
+wc -l tmp/SRR2916699_2.fastq
 
 # the resulting files will be in inputOnScratch/uneven-pairs
-fastq_pair -t 19610938 inputOnScratch/uneven-pairs/SRR2916699_1.fastq inputOnScratch/uneven-pairs/SRR2916699_2.fastq
+fastq_pair -t 19610938 tmp/SRR2916699_1.fastq tmp/SRR2916699_2.fastq
 
-ls inputOnScratch/uneven-pairs
+# replace the pair in input for Nextflow
+rm inputOnScratch/SRR2916699_*.fastq.gz
+cp tmp/SRR2916699_1.fastq inputOnScratch/SRR2916699_1.fastq
+cp tmp/SRR2916699_2.fastq inputOnScratch/SRR2916699_2.fastq
+gzip inputOnScratch/SRR2916699_*.fastq
 
-
-
-
-# Aim 4: Run Nextflow on all twelve samples (one of them has been cleaned)
-
-mkdir inputOnScratch/twelve-paired
-
-cp inputOnScratch/uneven-pairs/SRR2916699_1.fastq.paired.fq inputOnScratch/twelve-paired/SRR2916699_1.fastq
-gzip inputOnScratch/twelve-paired/SRR2916699_1.fastq
-
-cp inputOnScratch/uneven-pairs/SRR2916699_2.fastq.paired.fq inputOnScratch/twelve-paired/SRR2916699_2.fastq
-gzip inputOnScratch/twelve-paired/SRR2916699_2.fastq
-
-cp inputOnScratch/eleven-paired/*.gz inputOnScratch/twelve-paired/.
-
-cp inputOnScratch/australensis_DNA.noNUL.fasta.gz inputOnScratch/twelve-paired/.
-
-cp inputOnScratch/australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered.gz inputOnScratch/twelve-paired/.
-
-mkdir -p tmp/twelve-paired/star-all-samples
-
-mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/twelve-paired/star-all-samples
-
-cp myriad.config tmp/twelve-paired/star-all-samples/.
-
-cd tmp/twelve-paired/star-all-samples
-
-tmux new-session
-
-module load blic-modules
-
-module load nextflow/19.10.0.5170
-
-nextflow run nf-core/rnaseq \
-	-profile singularity \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/twelve-paired/*{1,2}.fastq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis_DNA.noNUL.fasta.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered.gz' \
-	--forwardStranded \
-	--skipBiotypeQC \
-	--fc_group_features gene_id \
-	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/tmp/twelve-paired/star-all-samples/myriad.config \
-	-with-tower \
-	-bg \
-	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/twelve-paired/star-all-samples
-
-# fabulous_dubinski
-
-
-#######
-# Copy important info to back-up home
-
-Genusspecies="Ceratina-australensis"
-
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/qc-before-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/qc-after-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/mapping
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/sample-batch-effects-plots
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/FPKM
-
-# list pipeline information
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/.
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/.
-
-
-
-
-# list of fastqc before trimming. Visual check looks good.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/qc-before-trim/.
-
-# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/qc-after-trim/.
-
-# Check for quality of mapping to the genome
-grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/uniquely-mapped-reads-percentage.txt
-
-
-# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
-# something to check in R
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/mapping/.
-
-# check sample and batch effect:
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/sample-batch-effects-plots/.
-
-# location of raw read counts (795K)
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/.
-
-
-# location of StringTie's RPKM
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/twelve-paired/star-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired/FPKM/.
-
-
-# Double-check all info are backed-up
-tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/twelve-paired
-
-# copy NCBI info on RDS name  /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/
+# upload clean data to RDS
 ssh ucfaeef@transfer02
 
-ls ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch
+cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch
 
-cd /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/
-
-mkdir Ceratina_autralensis/Ceratina_australensis_2019
-mkdir Ceratina_autralensis/Ceratina_australensis_2019/genome
-mkdir Ceratina_autralensis/Ceratina_australensis_2019/gff
-mkdir Ceratina_autralensis/Ceratina_australensis_2019/rnaseq
-
-cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch/*fastq.gz /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/rnaseq/.
-
-cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch/twelve-paired/*fastq.gz /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/rnaseq/.
-
-cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch/*fasta.gz /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/genome/.
-
-cp /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/inputOnScratch/*gff*.gz /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/gff/.
-
-exit
-
-
-# delete scratch space (10% of 1Tb)
-rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/
-
-
-#####################
-# 2021-02-04 calculate number of reads for each file, and for each sample, and for the whole experiment
-# before and after read cleaning
-
-# create tmp
-unlink tmp
-mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Ceratina-australensis/tmp
-ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Ceratina-australensis/tmp tmp
-
-# obtain sequences numbers from fastqc reports before trimming
-chmod +x count-sequences-before-qc.sh
-./count-sequences-before-qc.sh
-
-# obtain sequences numbers from fastqc reports after trimming
-chmod +x count-sequences-after-qc.sh
-./count-sequences-after-qc.sh
-
-# obtain final read counts from FeatureCount (this is input to DESeq2)
-chmod +x count-merged-read-counts.sh
-./count-merged-read-counts.sh
-
-cat result/twelve-paired/qc-after-trim/number-reads-in-samples  
-cat result/twelve-paired/qc-before-trim/number-reads-in-samples
-cat result/twelve-paired/number-merged-read-counts-in-samples
-
-
+cp inputOnScratch/SRR2916699_*.fastq.gz /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/rnaseq/.

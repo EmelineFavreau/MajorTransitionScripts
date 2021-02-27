@@ -1,0 +1,4 @@
+Ceratina australensis Rehan 2018 that has gone through Nextflow QC pipeline:
+- information about data: Ceratina-australensis-raw-reads-readme
+- raw read counts: result/Rehan2018/merged_gene_counts.txt 
+- FPKM: result/Rehan2018/FPKM
