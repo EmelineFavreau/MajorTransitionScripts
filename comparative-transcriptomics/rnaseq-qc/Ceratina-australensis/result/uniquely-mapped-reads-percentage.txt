@@ -1,2 +1,0 @@
-/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/hisat-all-samples/STAR/logs/SRR2915407_1Log.final.out:                        Uniquely mapped reads % |	81.09%
-/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/hisat-all-samples/STAR/logs/SRR2954866_1Log.final.out:                        Uniquely mapped reads % |	81.15%
