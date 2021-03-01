@@ -28,6 +28,7 @@ mkdir -p inputOnScratch/OrthoFinder-input
 # copy input files: protein files
 cd inputOnScratch
 
+#################
 # Drosophila melanogaster
 wget http://ftp.ensembl.org/pub/current_fasta/drosophila_melanogaster/pep/Drosophila_melanogaster.BDGP6.32.pep.all.fa.gz
 
@@ -35,6 +36,8 @@ gunzip Drosophila_melanogaster.BDGP6.32.pep.all.fa.gz
 
 mv Drosophila_melanogaster.BDGP6.32.pep.all.fa Drosophila_melanogaster.faa
 
+
+#################
 # Apis mellifera
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/003/254/395/GCF_003254395.2_Amel_HAv3.1/GCF_003254395.2_Amel_HAv3.1_protein.faa.gz
 
@@ -43,12 +46,15 @@ gunzip GCF_003254395.2_Amel_HAv3.1_protein.faa.gz
 mv GCF_003254395.2_Amel_HAv3.1_protein.faa Apis_mellifera.faa
 
 
+#################
 # Polistes dominula
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pdom_r1.2/GCF_001465965.1_Pdom_r1.2_protein.faa.gz
 
 mv GCF_001465965.1_Pdom_r1.2_protein.faa.gz \
 	Polistes_dominula.faa.gz
 
+
+#################
 # Polistes canadensis
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/313/835/GCF_001313835.1_ASM131383v1/GCF_001313835.1_ASM131383v1_protein.faa.gz
 
@@ -56,6 +62,7 @@ mv GCF_001313835.1_ASM131383v1_protein.faa.gz \
 	Polistes_canadensis.faa.gz
 
 
+#################
 # Liostenogaster flavolineata (not published yet)
 ssh ucfaeef@transfer02
 
@@ -65,10 +72,48 @@ cd /lustre/scratch/scratch/ucfaeef/orthology-analysis/input
 cp /mnt/gpfs/live/ritd-ag-project-rd00qm-mbent70/Liostenogaster_flavolineata/genome/Liostenogaster_flavolineata.faa .
 
 
+#################
+# Ceratina australensis
+
+ssh ucfaeef@transfer02
+
+cd /lustre/scratch/scratch/ucfaeef/orthology-analysis/input
+
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_autralensis/Ceratina_australensis_2019/protein/australensis.MAKER_run_v1.cfig_v5.gff.all.maker.proteins.fasta.filtered .
+
+mv australensis.MAKER_run_v1.cfig_v5.gff.all.maker.proteins.fasta.filtered Ceratina_australensis.faa
+
+#################
+# Ceratina calcarata
+
+ssh ucfaeef@transfer02
+
+cd /lustre/scratch/scratch/ucfaeef/orthology-analysis/input
+
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_calcarata/ShellRehan2019/protein/GCF_001652005.1_ASM165200v1_protein.faa.gz .
+
+gzip -d GCF_001652005.1_ASM165200v1_protein.faa.gz
+
+mv GCF_001652005.1_ASM165200v1_protein.faa Ceratina_calcarata.faa
+
+#################
+# Megalopta genalis
+
+ssh ucfaeef@transfer02
+
+cd /lustre/scratch/scratch/ucfaeef/orthology-analysis/input
+
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Megalopta-genalis/protein/GCF_011865705.1_USU_MGEN_1.2_protein.faa.gz .
+
+gzip -d GCF_011865705.1_USU_MGEN_1.2_protein.faa.gz
+
+mv GCF_011865705.1_USU_MGEN_1.2_protein.faa Megalopta_genalis.faa
+
+#################
 gzip -d Liostenogaster_flavolineata.faa.gz
 gzip -d Polistes_canadensis.faa.gz 
 gzip -d Polistes_dominula.faa.gz 
-gzip -d Vespula_vulgaris.faa.gz
+
 
 ###############################################################################
 # Aim 1: Running orthofinder for 3 wasp species + fly + honey bee
@@ -108,4 +153,55 @@ mkdir WaspsDrosoApis
 cp -r ../inputOnScratch/primary_transcripts/OrthoFinder/Results_Feb17/Orthogroups WaspsDrosoApis/.
 
 # copy important information to Github result/WaspsFlyBee/Orthogroups/*
+
+
+
+
+
+###############################################################################
+# Aim 2: Running orthofinder for 3 bee species + fly + honey bee
+
+
+# find protein fasta files
+
+# ideal is to use a single primary/longest transcript variant for each gene
+# so need to check this and make a new version if needed
+
+
+# all the others are ran through homemade scripts (because their gff is abnormal)
+./obtain-longest-transcripts-australensis.sh
+./obtain-longest-transcripts-calcarata.sh
+./obtain-longest-transcripts-genalis.sh
+
+# wc -l inputOnScratch/primary_transcripts/*
+#   19844 inputOnScratch/primary_transcripts/Apis_mellifera-longest-isoforms.faa
+#   41900 inputOnScratch/primary_transcripts/Ceratina_australensis-longest-isoforms.faa
+#   22394 inputOnScratch/primary_transcripts/Ceratina_calcarata-longest-isoforms.faa
+#  145448 inputOnScratch/primary_transcripts/Drosophila_melanogaster.faa
+#   20850 inputOnScratch/primary_transcripts/Megalopta_genalis-longest-isoforms.faa
+
+
+# make a directory for this experiment
+mkdir inputOnScratch/primary_transcripts/beesDrosoApis
+
+cp inputOnScratch/primary_transcripts/Apis_mellifera-longest-isoforms.faa inputOnScratch/primary_transcripts/beesDrosoApis/.
+
+cp inputOnScratch/primary_transcripts/Drosophila_melanogaster.faa inputOnScratch/primary_transcripts/beesDrosoApis/.
+
+mv inputOnScratch/primary_transcripts/Ceratina* inputOnScratch/primary_transcripts/beesDrosoApis/.
+
+mv inputOnScratch/primary_transcripts/Megalopta* inputOnScratch/primary_transcripts/beesDrosoApis/.
+
+# run orthofinder
+qsub run-orthofinder.sh
+
+# check results Results_Feb26
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/beesDrosoApis/OrthoFinder/Results_Feb26/
+
+
+cd result
+mkdir BeesDrosoApis
+cp -r ../inputOnScratch/primary_transcripts/beesDrosoApis/OrthoFinder/Results_Feb26/Orthogroups BeesDrosoApis/.
+
+# copy important information to Github result/BeesFlyBee/Orthogroups/*
 

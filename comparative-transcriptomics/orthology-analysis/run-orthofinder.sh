@@ -1,14 +1,8 @@
 #!/bin/bash -l
-
+#$ -cwd # work from this directory
 #$ -l h_rt=30:0:0
-
 #$ -l mem=50G
 
-#$ -N Orthofinder_3wasps_apis_droso
-
-#$ -wd /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis
-
-#$ -e /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/tmp
 
 module load python/2.7.9
 
@@ -24,7 +18,7 @@ module add muscle/3.8.31
 
 /lustre/home/ucfaeef/programs/OrthoFinder/orthofinder \
 	-t 8 \
-	-f /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts \
+	-f /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/beesDrosoApis \
 	-A muscle \
 	-S diamond \
 	-M msa
