@@ -25,7 +25,21 @@ mkdir -p result
 # set up myriad.config (in the directory where the experiment will run)
 cp ../myriad.config .
 
-# copy input files: RNAseq raw reads, genome fasta, gff
+# the first time, run these:
+./obtain-NCBI-Ceratina-calcarata.sh
+
+# next time, run these:
+ssh ucfaeef@transfer02
+
+cd ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Ceratina-calcarata/inputOnScratch
+
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_calcarata/ShellRehan2019/genome/* .
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_calcarata/ShellRehan2019/gff/* .
+cp /mnt/gpfs/live/rd01__/ritd-ag-project-rd011y-eefav92/Ceratina_calcarata/ShellRehan2019/rnaseq/* .
+
+exit
+
+cd ..
 
 cd inputOnScratch
 
@@ -35,86 +49,17 @@ https://doi.org/10.1098/rspb.2019.1815
 
 
 
-#####
-
-
-# download the data 
-~/programs/sratoolkit.2.10.8-centos_linux64/bin/prefetch --option-file bioproject-PRJNA434715-accession-list
-
-ls -lhrt /lustre/scratch/scratch/ucfaeef/ncbi/sra/
-
-# convert to fastq 
-~/programs/sratoolkit.2.10.8-centos_linux64/bin/fastq-dump --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/ --split-files /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281997.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281999.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281996.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281983.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282001.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282002.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282006.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282000.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281992.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281990.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282008.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281981.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281993.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282011.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281991.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281986.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282005.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282009.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281989.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281985.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281987.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282010.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282004.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282003.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281984.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281979.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281988.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281995.sra  /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281982.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13282007.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281994.sra  /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281980.sra /lustre/scratch/scratch/ucfaeef/ncbi/sra/SRR13281998.sra
-
-
-ls -lrth /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/
-
-# compress them all # mon 18/01 HERE
-gzip /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/*.fastq
-
-# If the decompression went well (you can check that in your job outputs), you can delete the sra files: rm *.sra    (be careful using "rm"!).
-
-
-# we use the genome from Sandra Rehan
-Ceratina calcarata genome: https://drive.google.com/drive/folders/0B1P0qnA-7O3AfmotYXQ1c2tKdzNTQ3FTc3plNkRvRkViaWcwRFFvV0dIREQ3bEVoM1JFQ1k?usp=sharing
-
-gzip Rehan1.Ccalc_v1.1.draft_build.over200.fa
-
-# we use the annotation from Sandra Rehan
-Ceratina calcarata annotation: https://drive.google.com/drive/folders/0B1P0qnA-7O3AfmotYXQ1c2tKdzNTQ3FTc3plNkRvRkViaWcwRFFvV0dIREQ3bEVoM1JFQ1k?usp=sharing
-
-gzip CCalc_v1.1.draft_genome_remap.v5c_3G2.MAKERonly.gff.filtered
-
-
-cd ..
-
-###############################################################################
-# Aim 1: Run Nextflow on one sample
-
-mkdir tmp/hisat-one-sample
-
-mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/hisat-one-sample
-
-cp myriad.config tmp/hisat-one-sample/.
-
-cd tmp/hisat-one-sample
-
-tmux new-session
-
-Genusspecies="Ceratina-calcarata"
-
-module load blic-modules
-
-module load nextflow/19.10.0.5170
-
-nextflow run nf-core/rnaseq \
-	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/SRR13281997_*{1,2}.fastq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/Rehan1.Ccalc_v1.1.draft_build.over200.fa.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/CCalc_v1.1.draft_genome_remap.v5c_3G2.MAKERonly.gff.filtered.gz' \
-	--forwardStranded \
-	--skipBiotypeQC \
-	--fc_group_features gene_id \
-	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/tmp/hisat-one-sample/myriad.config \
-	-with-tower \
-	-bg \
-	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/hisat-one-sample
-
-# marvelous rubens failed for unknown reasons, so restart scruffy yonath, this worked yay
-
-
-
 
 #########################
 # running all samples 
-mkdir tmp/hisat-all-samples
 
-mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/hisat-all-samples
+mkdir tmp/star-all-samples
 
-cp myriad.config tmp/hisat-all-samples/.
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples
 
-cd tmp/hisat-all-samples
+cp myriad.config tmp/star-all-samples/.
+
+cd tmp/star-all-samples
 
 tmux new-session
 
@@ -124,99 +69,71 @@ module load nextflow/19.10.0.5170
 
 nextflow run nf-core/rnaseq \
 	--reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/SRR132*{1,2}.fastq.gz' \
-	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/Rehan1.Ccalc_v1.1.draft_build.over200.fa.gz' \
-	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/CCalc_v1.1.draft_genome_remap.v5c_3G2.MAKERonly.gff.filtered.gz' \
-	--forwardStranded \
+	--fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/GCF_001652005.1_ASM165200v1_genomic.fna.gz' \
+	--gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/GCF_001652005.1_ASM165200v1_genomic.gff.gz' \
+	--reverseStranded \
 	--skipBiotypeQC \
 	--fc_group_features gene_id \
 	-r 1.4.2 \
-	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/tmp/hisat-all-samples/myriad.config \
+	-c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/tmp/star-all-samples/myriad.config \
 	-with-tower \
-	-bg \
 	-resume \
-	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/hisat-all-samples
+	--outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples
 
-# extravagant plateau failed for no apparant reason, so started again intergalactic gilbert
+# forward: cheeky_golick and crazy_montalcini and gloomy_bell and drunk_boyd
+# reverse: serene_linnaeus and naughty_ampere and mad_meitner and thirsty_borg and desperate_archimedes
 
 
 
+# # check strandedness - infered reverse!
+grep "SSP estimation (fwd/rev)" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples/qualimap/*1Aligned.sortedByCoord.out/rnaseq_qc_results.txt
+
+# overall mapping: 64.46% - 86.86%
+grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples/STAR/logs/*Log.final.out | cut -f 2 | sort -n
+
+# featurecounts - looks good
+cat /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples/featureCounts/gene_count_summaries/*featureCounts.txt.summary
 
 #######
 # Copy important info to back-up home
 
 Genusspecies="Ceratina-calcarata"
+dataset="ShellRehan2019"
 
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots
-mkdir -p ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM
+mkdir -p result/${dataset}
+mkdir -p result/${dataset}/qc-before-trim/
+mkdir -p result/${dataset}/qc-after-trim/
+mkdir -p result/${dataset}/mapping
+mkdir -p result/${dataset}/sample-batch-effects-plots
+mkdir -p result/${dataset}/FPKM
 
 # list pipeline information
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/software_versions.csv ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/software_versions.csv result/${dataset}/.
 
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/pipeline_info/pipeline_report.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/pipeline_info/pipeline_report.txt result/${dataset}/.
 
+# list of fastqc before trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/fastqc/zips/* result/${dataset}/qc-before-trim/.
 
+# list of fastqc after trimming 
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/trim_galore/FastQC/*zip result/${dataset}/qc-after-trim/.
 
+# Check for quality of mapping to the genome
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/STAR/logs/*Log.final.out result/${dataset}/mapping/.
 
-# list of fastqc before trimming. Visual check looks good.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/fastqc/zips/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-before-trim/.
-
-# list of fastqc after trimming. Visual check looks ok. I am surprised that the quality is not so great.
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/trim_galore/FastQC/*zip ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/qc-after-trim/.
-
-# Check for quality of mapping to the genome - all above 89%
-grep "Uniquely mapped reads %" /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/STAR/logs/*Log.final.out > ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/uniquely-mapped-reads-percentage.txt
-
-
-# Check read distributions over gene features: most reads should be assigned (ie low unassigned)
-# something to check in R
-
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/gene_count_summaries/* ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/mapping/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/gene_count_summaries/* result/${dataset}/mapping/.
 
 # check sample and batch effect:
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/sample_correlation/*pdf ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/sample-batch-effects-plots/.
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/sample_correlation/*pdf result/${dataset}/sample-batch-effects-plots/.
 
-# location of raw read counts (795K)
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/featureCounts/merged_gene_counts.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/.
-
+# location of raw read counts
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/featureCounts/merged_gene_counts.txt result/${dataset}/.
 
 # location of StringTie's RPKM
-cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/hisat-all-samples/stringtieFPKM/*gene_abund.txt ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result/FPKM/.
-
+cp /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/result/star-all-samples/stringtieFPKM/*gene_abund.txt result/${dataset}/FPKM/.
 
 # Double-check all info are backed-up
-tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/${Genusspecies}/result
+tree ~/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/${Genusspecies}/result/${dataset}
 
-# delete scratch space (10% of 1Tb)
-rm -rf /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/${Genusspecies}/
-
-
-
-
-#####################
-# 2021-02-06 calculate number of reads for each file, and for each sample, and for the whole experiment
-# before and after read cleaning
-
-# create tmp
-unlink tmp
-mkdir -p /home/ucfaeef/Scratch/comparative-transcriptomics/Ceratina-calcarata/tmp
-ln -s /home/ucfaeef/Scratch/comparative-transcriptomics/Ceratina-calcarata/tmp tmp
-
-# obtain sequences numbers from fastqc reports before trimming
-chmod +x count-sequences-before-qc.sh
-./count-sequences-before-qc.sh
-
-# obtain sequences numbers from fastqc reports after trimming
-chmod +x count-sequences-after-qc.sh
-./count-sequences-after-qc.sh
-
-# obtain final read counts from FeatureCount (this is input to DESeq2)
-chmod +x count-merged-read-counts.sh
-./count-merged-read-counts.sh
-
-cat result/thirty-six-paired/qc-after-trim/number-reads-in-samples  
-cat result/thirty-six-paired/qc-before-trim/number-reads-in-samples
-cat result/thirty-six-paired/number-merged-read-counts-in-samples
+# calcarata 33 samples, starting at the 3rd column 99,554,401
+cut -f 3-35 merged_gene_counts.txt | tail -n +2  | awk '{SUM+=$1+$2+$3+$4+$5+$6+$7+$8+$9+$10+$11+$12+$13+$14+$15+$16+$17+$18+$19+$20+$21+$22+$23+$24+$25+$26+$27+$28+$29+$30+$31+$32+$33+$34+$35}END{print SUM}'
