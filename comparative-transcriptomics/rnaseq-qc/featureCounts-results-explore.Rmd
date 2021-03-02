@@ -2,7 +2,9 @@
 title: "FeatureCounts explore"
 author: "Emeline Favreau"
 date: "15/02/2021"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 Copyright 2021 Emeline Favreau, University College London.
 
@@ -18,7 +20,7 @@ We aim to have a high ratio of Assigned:Unassigned alignments.
 - Aim 2: Polistes canadensis Patalano
 - Aim 3: Polistes dominula Taylor
 - Aim 4: Liostenogaster flavolineata Taylor
-
+- Aim 5: Ceratina australensis Rehan 2018
 
 
 ```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
@@ -153,6 +155,61 @@ liostenogaster.flavolineata.phenotype <- read.csv("Liostenogaster-flavolineata/l
 
 
 ```
+
+
+```{r import australensis data, eval = TRUE, echo = FALSE, include = FALSE}
+#https://www.pauloldham.net/importing-csv-files-into-r/
+# list 10 files with the extension
+ceratina.australensis <- list.files("Ceratina-australensis/result/Rehan2018/mapping",
+                        pattern = "*1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                        full.names = TRUE) 
+
+# create a list with datasets
+ceratina.australensis_list <- lapply(ceratina.australensis,
+                             read.delim)
+
+# name each element as the sample name
+names(ceratina.australensis_list) <- gsub(x = ceratina.australensis,
+                                        pattern = "Ceratina-australensis/result/Rehan2018/mapping/|_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                                        replacement = "")
+
+# import phenotype
+ceratina.australensis.phenotype <- read.csv("Ceratina-australensis/ceratina-australensis-phenotype.csv",
+                                header = FALSE,
+                                stringsAsFactors = FALSE)
+
+
+
+```
+
+
+
+```{r import calcarata data, eval = TRUE, echo = FALSE, include = FALSE}
+#https://www.pauloldham.net/importing-csv-files-into-r/
+# list 10 files with the extension
+ceratina.calcarata <- list.files("Ceratina-calcarata/result/ShellRehan2019/mapping",
+                        pattern = "*1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                        full.names = TRUE) 
+
+# create a list with datasets
+ceratina.calcarata_list <- lapply(ceratina.calcarata,
+                             read.delim)
+
+# name each element as the sample name
+names(ceratina.calcarata_list) <- gsub(x = ceratina.calcarata,
+                                        pattern = "Ceratina-calcarata/result/Rehan2018/mapping/|_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary",
+                                        replacement = "")
+
+# import phenotype
+ceratina.calcarata.phenotype <- read.csv("Ceratina-calcarata/ceratina-calcarata-phenotype.csv",
+                                header = FALSE,
+                                stringsAsFactors = FALSE)
+
+
+
+```
+
+
 
 ```{r function to make a plot, eval = TRUE, echo = FALSE, include = TRUE}
 
@@ -378,8 +435,101 @@ ggplot(liostenogaster.flavolineata_df_lg, aes(x    = Status,
 
 ```
 
+### Ceratina australensis
+
+```{r Ceratina australensis, eval = TRUE, echo = FALSE, include = TRUE}
+# name col of phenotypes
+colnames(ceratina.australensis.phenotype) <- c("samples",
+                                   "individual_name",
+                                   "phenotype")
+# 
+# for (this_sample in 1:length(ceratina.australensis_list)){
+#   print(make_individual_plots(ceratina.australensis.phenotype,
+#                   ceratina.australensis_list[[this_sample]]))
+# }
+# make a violin plot for all
+# combine info in a wide format dataset
+ceratina.australensis_df_wd <- ceratina.australensis_list %>%
+  reduce(left_join,
+         by = "Status")
+
+# change to long format
+# three columns: count, sample, Status
+ceratina.australensis_df_lg <- gather(ceratina.australensis_df_wd,
+       sample,
+       count,
+       colnames(ceratina.australensis_df_wd)[2:length(colnames(ceratina.australensis_df_wd))])
+
+
+# plot one violin per feature status, colour + jitter to help visualising
+ggplot(ceratina.australensis_df_lg, aes(x    = Status,
+                            y    = count,
+                            colour = Status)) + 
+  geom_violin() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1, size = 8)) +
+  geom_jitter(aes(x = Status,
+                  y = count,
+                  colour = Status),
+              shape = 16,
+              position = position_jitter(0.2)) +
+  labs(title = paste("C.australensis", "Rehan 2018", "12 samples", sep = ", ")) +
+  theme(legend.position = "none") +
+  ylab("Alignment Counts") +
+  xlab("Alignment status")
+
+```
+
+### Ceratina calcarata
+
+```{r Ceratina calcarata, eval = TRUE, echo = FALSE, include = TRUE}
+# name col of phenotypes
+colnames(ceratina.calcarata.phenotype) <- c("samples",
+                                   "individual_name",
+                                   "phenotype")
+# 
+# for (this_sample in 1:length(ceratina.calcarata_list)){
+#   print(make_individual_plots(ceratina.calcarata.phenotype,
+#                   ceratina.calcarata_list[[this_sample]]))
+# }
+# make a violin plot for all
+# combine info in a wide format dataset
+ceratina.calcarata_df_wd <- ceratina.calcarata_list %>%
+  reduce(left_join,
+         by = "Status")
+
+# change to long format
+# three columns: count, sample, Status
+ceratina.calcarata_df_lg <- gather(ceratina.calcarata_df_wd,
+       sample,
+       count,
+       colnames(ceratina.calcarata_df_wd)[2:length(colnames(ceratina.calcarata_df_wd))])
+
+
+# plot one violin per feature status, colour + jitter to help visualising
+ggplot(ceratina.calcarata_df_lg, aes(x    = Status,
+                            y    = count,
+                            colour = Status)) + 
+  geom_violin() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1, size = 8)) +
+  geom_jitter(aes(x = Status,
+                  y = count,
+                  colour = Status),
+              shape = 16,
+              position = position_jitter(0.2)) +
+  labs(title = paste("C.calcarata", "Shell Rehan 2019", "33 samples", sep = ", ")) +
+  theme(legend.position = "none") +
+  ylab("Alignment Counts") +
+  xlab("Alignment status")
+
+```
+
+
 ### Conclusion
-So far, most of the aligned reads are assigned to features (such as exon, gene, CDS).
+Most of the aligned reads are assigned to features (such as exon, gene, CDS).
 
 
 
