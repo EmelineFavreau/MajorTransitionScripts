@@ -18,7 +18,7 @@ module add muscle/3.8.31
 
 /lustre/home/ucfaeef/programs/OrthoFinder/orthofinder \
 	-t 8 \
-	-f /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/beesDrosoApis \
+	-f /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/allSpecies \
 	-A muscle \
 	-S diamond \
 	-M msa

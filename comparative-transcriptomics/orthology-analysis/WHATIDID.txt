@@ -6,7 +6,7 @@
 # Obtaining data
 # Aim 1: Run OrthoFinder for wasps
 # Aim 2: Run OrthoFinder for bees
-# Aim 3: TBD
+# Aim 3: Run OrthoFinder for all
 
 ###############################################################################
 # Obtaining data
@@ -205,3 +205,36 @@ cp -r ../inputOnScratch/primary_transcripts/beesDrosoApis/OrthoFinder/Results_Fe
 
 # copy important information to Github result/BeesFlyBee/Orthogroups/*
 
+
+###############################################################################
+# Aim 3: Running orthofinder for all: 3 wasps, 4 bees, 1 fly
+
+# make a directory for this experiment
+mkdir inputOnScratch/primary_transcripts/allSpecies
+
+cp inputOnScratch/primary_transcripts/Apis_mellifera-longest-isoforms.faa inputOnScratch/primary_transcripts/allSpecies/.
+
+cp inputOnScratch/primary_transcripts/Drosophila_melanogaster.faa inputOnScratch/primary_transcripts/allSpecies/.
+
+cp inputOnScratch/primary_transcripts/beesDrosoApis/Ceratina* inputOnScratch/primary_transcripts/allSpecies/.
+
+cp inputOnScratch/primary_transcripts/beesDrosoApis/Megalopta* inputOnScratch/primary_transcripts/allSpecies/.
+
+cp inputOnScratch/primary_transcripts/Liostenogaster* inputOnScratch/primary_transcripts/allSpecies/.
+
+cp inputOnScratch/primary_transcripts/Polistes* inputOnScratch/primary_transcripts/allSpecies/.
+
+
+
+# run orthofinder
+qsub run-orthofinder.sh
+
+# check results Results_Mar02
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/allSpecies/OrthoFinder/Results_Mar02/
+
+
+cd result
+mkdir allSpecies
+cp -r ../inputOnScratch/primary_transcripts/beesDrosoApis/OrthoFinder/Results_Mar02/Orthogroups allSpecies/.
+
+# copy important information to Github result/BeesFlyBee/Orthogroups/*
