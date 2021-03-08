@@ -76,6 +76,9 @@ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/465/965/GCF_001465965.1_Pd
 
 cd ..
 
+# Katie needs GFF
+mkdir input
+cp inputOnScratch/GCF_001465965.1_Pdom_r1.2_genomic.gff.gz input/.
 ###############################################################################
 # Aim 1: Run Nextflow on all samples
 

@@ -50,6 +50,10 @@ exit
 
 cd ..
 
+# Katie needs the GFF
+mkdir input
+cp inputOnScratch/Liostenogaster_flavolineata.gff3.gz input/.
+
 ###############################################################################
 # Aim 1:  running all samples 
 mkdir tmp/star-all-samples
