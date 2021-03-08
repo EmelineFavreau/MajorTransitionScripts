@@ -1,5 +1,6 @@
 Each species that has gone through Nextflow QC pipeline has:
 - information about data: Genus-species/Genus-species-raw-reads-readme
+- gff files: Genus-species/input/*gff*
 - raw read counts: Genus-species/result/merged_gene_counts.txt 
 - FPKM: Genus-species/result/FPKM
 - various QC plots, pipeline info, etc
