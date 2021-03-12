@@ -1,0 +1,7 @@
+Ceratina_calcarata	Ceratina_australensis	Megalopta_genalis	Polistes_canadensis	Polistes_dominula	Liostenogaster_flavolineata
+Total Features	12316	22745	12793	10708	11313	14095
+Prop. Genes with Zero Expression	0.0786	0.3578	0.0643	0.0461	0.0172	0.0749
+Num Genes with Low Expression	0.2273	0.5914	0.2816	0.1669	0.1449	0.2802
+Total Reads Mapped	27827791	21031691	59463251	48110419	84012105	135702815
+Num Reads: R Phenotype	48906086	24972132	62244151	58643157	98275294	150850659
+Num Reads: NR Phenotype	76733877	46003823	121707402	106753576	182287399	286553474

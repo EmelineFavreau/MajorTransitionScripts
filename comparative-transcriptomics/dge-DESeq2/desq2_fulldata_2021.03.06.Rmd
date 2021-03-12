@@ -1,0 +1,643 @@
+---
+title: "DESeq2 Analyses: Full Data Sets"
+author: "KS Geist"
+date: "6 March 2021"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = F, warning = F, include = F}
+#install.packages("htmltools")
+#BiocManager::install("DESeq2")
+## Install BiocManager if you don't already have it first.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+## Load libraries
+library(RCurl)
+library(DESeq2)
+library(htmltools)
+library(vsn)
+library(ggplot2)
+library(tidyverse)
+library(pheatmap)
+```
+
+## Getting Started
+
+##### Read in the metadata:
+```{r}
+meta <- read.csv(file = "/Users/ksg/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/Comparative_Transcriptomics_Metadata.csv", strip.white = T, header = T)
+#str(meta)
+```
+
+##### Importing & cleaning up the raw count data. Make the associated phenotype metadata.
+
+First, we set a function to do the cleanup to the data & make the associated metadata that we need for DESeq2. For the pheno metadata, make sure that the row names of the metadata dataframe are present and in the same order as the column names of the counts dataframe. Function returns a check to verify that this is true.
+
+```{r}
+# df <- infile
+# spp <- species[1]
+# is.character(spp)
+
+setupDESeq2 <- function(df, spp) {
+  ## Save the gene IDs as a vector for the row names:
+  geneID <- df[,1]
+  ## Need to remove the geneID column + unecessary second column:
+  df <- df[,-c(1:2)]
+  ## Rename the headers to the sample names only, stripping extra text:
+  names(df) <- gsub("_1Aligned.sortedByCoord.out.bam", "", names(df))
+  ## Next, move the gene IDs to the row names instead of as a column:
+  rownames(df) <- geneID
+  ## Grab just the columns you want given the metadata:
+  cols2grab <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"]
+  ## Select each of the columns from the cols2grab vector:
+  df <- df[,as.character(cols2grab)]
+  #df %>% select(one_of(cols2grab))
+
+  ## Next, move the gene IDs to the row names instead of as a column:
+  rownames(df) <- geneID
+
+  ## Ensure the dimensions look good:
+  print(head(df))
+  
+  ## Now, we also need to make the phenotype metadata. Notice that the resulting pheno DF is analogous to the expression DF
+  id <- colnames(df)
+  phenotype <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR") & meta$Species == spp),"R.NR_Phenotype"]
+  
+  pheno <- as.data.frame(phenotype)
+  row.names(pheno) <- id
+
+  # Check that the column names of the counts df are the same and in the same order as the phenotypes df:
+  print(all(colnames(df) %in% rownames(pheno)))
+  print(all(colnames(df) == rownames(pheno)))
+  
+  return(list(df, pheno)) 
+}
+```
+
+Then, import the raw count data for each species from GitHub and apply the cleanupCounts function:
+```{r}
+
+## Set the species:
+species <- c("Ceratina_calcarata", "Ceratina_australensis", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata") 
+wasps <- species[4:6]
+bees <- species[1:3]
+
+
+## Import data from GitHub for each species, then process with the cleanupCounts function:
+######### Ceratina calcarata
+infile <- read.table(text=getURL("https://raw.githubusercontent.com/EmelineFavreau/MajorTransitionScripts/master/comparative-transcriptomics/rnaseq-qc/Ceratina-calcarata/result/ShellRehan2019/merged_gene_counts.txt?token=AAVDM4PKUKMOH7PEIQVSTGTAJ5IG2"), header = T, sep = "\t")
+
+Ccal <- setupDESeq2(infile, species[1])
+str(Ccal)
+
+######### Ceratina australensis
+infile <- read.table(text=getURL("https://raw.githubusercontent.com/EmelineFavreau/MajorTransitionScripts/master/comparative-transcriptomics/rnaseq-qc/Ceratina-australensis/result/Rehan2018/merged_gene_counts.txt?token=AAVDM4M7NV5XV2VTUEF6CQ3AJ5HRA"), header = T, sep = "\t")
+
+Caus <- setupDESeq2(infile, species[2])
+str(Caus)
+
+######### Megalopta genalis
+infile <- read.table(text=getURL("https://raw.githubusercontent.com/EmelineFavreau/MajorTransitionScripts/master/comparative-transcriptomics/rnaseq-qc/Megalopta-genalis/result/merged_gene_counts.txt?token=AAVDM4NGVU62V5CW3C2LLILAKCWDS"), header = T, sep = "\t")
+
+Mgen <- setupDESeq2(infile, species[3])
+str(Mgen)
+
+######### Polistes canadensis
+infile <- read.table(text=getURL("https://raw.githubusercontent.com/EmelineFavreau/MajorTransitionScripts/master/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis/result/Patalano/merged_gene_counts.txt?token=AAVDM4LKAXYHR7QA3WQZ7KLAKCODY"), header = T, sep = "\t")
+
+Pcan <- setupDESeq2(infile, species[4])
+str(Pcan)
+
+######### Polistes dominula
+infile <- read.table(text=getURL("https://raw.githubusercontent.com/EmelineFavreau/MajorTransitionScripts/master/comparative-transcriptomics/rnaseq-qc/Polistes-dominula/result/Taylor/merged_gene_counts.txt?token=AAVDM4KS33DQBRNO2UKIFHTAJ5MI6"), header = T, sep = "\t")
+
+Pdom <- setupDESeq2(infile, species[5])
+str(Pdom)
+
+######### Liostenogaster flavolineata
+infile <- read.table(text=getURL("https://raw.githubusercontent.com/EmelineFavreau/MajorTransitionScripts/master/comparative-transcriptomics/rnaseq-qc/Liostenogaster-flavolineata/result/Taylor/merged_gene_counts.txt?token=AAVDM4NVAXR26455PI5DBDDAJ5MXS"), header = T, sep = "\t")
+
+Lfla <- setupDESeq2(infile, species[6])
+str(Lfla)
+
+```
+
+##### Quick Summary Statistics on the Raw Feature Counts:
+```{r}
+countsSummStats <- function(df, spp) {
+  header <- c("Total Features", "Prop. Genes with Zero Expression", "Num Genes with Low Expression", "Total Reads Mapped", "Num Reads: R Phenotype", "Num Reads: NR Phenotype")
+  
+  ## How many total genes:
+  totalGenes <- nrow(df)
+
+  ## One quick quality check: how many of my gene counts are zero for all samples?
+  totalCounts <- rowSums(df)
+  ## Proportion of all genes not expressed AT ALL:
+  propZeroExp <- length(totalCounts[totalCounts == 0]) / totalGenes
+
+  ## How about how many genes where there are fewer than 10 reads in 90% of samples?
+  ## If you have 9 samples, and 10 reads per sample, then there should be less than 90 total reads for that gene.
+  lowExp <- length(totalCounts[totalCounts < 10*ncol(df)*0.9]) 
+  # hist(totalCounts[totalCounts < 10*ncol(df)*0.9])
+  # lowExp ## the genes with fewer than 10 counts in 90% of the samples
+  ## Now, let's get a proportion of any gene in any sample that was 0:
+  propLowExp <- sum(lowExp) / totalGenes
+
+  ## Read count by phenotype
+  Rcount <- sum(df[,as.character(meta[which((meta$R.NR_Phenotype == "R") & meta$Species == spp),"Sample.Name.on.SRA"])])
+  #Rcount <- sum(df %>% select(one_of(meta[which((meta$R.NR_Phenotype == "R") & meta$Species == spp),"Sample.Name.on.SRA"])))
+  NRcount <- sum(df[,as.character(meta[which((meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"])])
+  #NRcount <- sum(df %>% select(one_of(meta[which((meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"])))
+
+  # Total read count:
+  totalReads <- sum(df)
+
+  summStats <- as.data.frame(rbind(sprintf("%1.0f", totalGenes), sprintf("%1.4f", propZeroExp), sprintf("%1.4f", propLowExp), 
+                                   sprintf("%1.0f", Rcount), sprintf("%1.0f", NRcount), sprintf("%1.0f", totalReads)))
+  rownames(summStats) <- header
+  colnames(summStats) <- spp
+
+  return(summStats)
+}
+
+summaryStatsDF <- cbind(countsSummStats(Ccal[[1]], species[1]), countsSummStats(Caus[[1]], species[2]), 
+                        countsSummStats(Mgen[[1]], species[3]), countsSummStats(Pcan[[1]], species[4]), 
+                        countsSummStats(Pdom[[1]], species[5]), countsSummStats(Lfla[[1]], species[6]))
+
+summaryStatsDF
+write.table(summaryStatsDF, file = "Raw_Read_Counts_Summary_Statistics.txt", row.names = T, col.names = T, append = F, quote = F,             sep = "\t")
+
+```
+
+## Resampling N=3 Samples to Generate a More Comparable Estimate of DEG Counts
+```{r, echo = FALSE, message= FALSE}
+## Set seed
+set.seed(50010)
+
+## Subset the data into R and NR
+#R <- hymn %>% select(one_of(meta[which((meta$R.NR_Phenotype == "R") & meta$Species == spp),"Sample.Name.on.SRA"]))
+#NR <- hymn %>% select(one_of(meta[which((meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"]))
+
+## Make a directory to save everything to:
+dir.create(path=paste(getwd(), "/N3_resampling", sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+
+## Make a df to store it into
+DEG.counts.df <- NULL
+
+start_time <- Sys.time()
+
+iter = 100
+dgeResampler <- function(R, NR) {
+  ## Sample 3 times, without replacement from the known columns:
+  for (k in 1:iter) {
+    tempR <- sample(x = R, size = 3, replace = FALSE) 
+    tempNR <- sample(x = NR, size = 3, replace = FALSE)
+    hymnResample <- cbind(tempR, tempNR)
+    ## Record the raw data that went into each resampling:
+    write.table(hymnResample, file=paste("N3_resampling/resampled_raw_counts_", k, ".txt", sep = ""),  
+                sep="\t", quote=F, col.names=NA, row.names = T)
+
+    ## Now make the phenodata object:
+    idResample <- as.vector(colnames(hymnResample))
+    phenotypeResample <- c(rep("R",3), rep("NR",3))
+    phenoResample <- as.data.frame(phenotypeResample)
+    row.names(phenoResample) <- idResample
+    
+    ## Run DESeq2:
+    ddsResample <- DESeqDataSetFromMatrix(countData=hymnResample, colData=phenoResample, design=~phenotypeResample)
+    ddsResample <- DESeq(ddsResample) ## Yes, overwriting on the dataset obj
+    
+    ## Extract the normalized counts for this run:
+    normalized_countsResample <- counts(ddsResample, normalized=TRUE)
+    ## Note that genes are rownames; let's turn them back to a column
+    #normalized_countsResample <- cbind(rownames(normalized_countsResample), data.frame(normalized_countsResample, row.names=NULL)) 
+    ## Actually, let's not. We will need it in this structure for downstream processes.
+    write.table(normalized_countsResample, file=paste("N3_resampling/resampled_normalized_counts_", k, 
+                ".txt", sep = ""),  sep="\t", quote=F, col.names=NA, row.names = T)
+    
+    ## Extract the Results table for this run:
+    ddsResultsResample <- results(ddsResample, alpha = 0.05)
+    write.table(ddsResultsResample, file=paste("N3_resampling/DESeq2_results_", k, ".txt", sep = ""), 
+                sep="\t", quote=F, col.names=NA, row.names = T)
+
+    ## Now filter to get the number of genes with FDR < 0.05
+    sig <- subset(ddsResultsResample, padj < 0.05)
+    tempRow <- c(nrow(sig), nrow(subset(sig, log2FoldChange > 0)), nrow(subset(sig, 
+                log2FoldChange < 0)), mean(abs(sig$log2FoldChange))) 
+    DEG.counts.df <- rbind(DEG.counts.df, tempRow)
+  }
+  DEG.counts.df <- as.data.frame(DEG.counts.df)
+  rownames(DEG.counts.df) <- c(1:iter)
+  return(as.data.frame(DEG.counts.df))
+}
+
+#DEG.counts.df <- dgeResampler(R, NR)
+#colnames(DEG.counts.df) <- c("totalCount", "Up_R", "Up_NR", "mean_abs(LFC)")
+
+end_time <- Sys.time()
+paste("RUNTIME:  ", end_time - start_time, " min", sep = "")
+#write.table(DEG.counts.df, file = "N3_resampling/N3_DEG_counts.txt", sep="\t", quote = F, col.names = T, row.names = F)
+
+#boxplot(DEG.counts.df$totalCount, col = "light gray", xlab = paste(spp, "N=3 Resampled", sep=" "), ylab = "Total DEG Count")
+#boxplot(DEG.counts.df$Up_R, col = "light yellow", xlab = paste(spp, "N=3 Resampled", sep=" "), ylab = "Up-regulated in Reproductives")
+#boxplot(DEG.counts.df$totalCount, col = "light blue", xlab = paste(spp, "N=3 Resampled", sep=" "), ylab = "Up-regulated in Non-Reproductives")
+#summary(DEG.counts.df)
+
+## Let's scale up to how many mins of run time:
+# 55/60*10 ## 100 runs
+# 55/60*100 ## 1000 runs      1.33 hours
+# 55/60*1000 ## 10000 runs    12 hours
+```
+
+## Run DESeq2 on the Full dataset for Comparison
+
+#### Run DESeq Function
+* **Performs normalization (median of ratios):**
+  1.Corrects for variance in read sequencing depth
+  2.Corrects for inter-library dispersion in counts (for each gene)
+
+* **Calculates the significance of coefficients with a negative binomial GLM**
+
+Note that DESeq2 does not actually use the normalized counts but rather uses the raw counts and models the normalization in the negative binomial model.
+
+```{r, message = F, warning = F}
+runDESeq2 <- function(df, pheno, spp) {
+  ## Construct DESEQDataSet Object (stored as dds):
+  dds <- DESeqDataSetFromMatrix(countData=df, 
+                              colData=pheno, 
+                              design=~phenotype)
+  ## Design specifies how the counts from each gene depend on our variables in the metadata; we currently only have one factor of   interest, phenotype
+      ## tidy=TRUE argument tells DESeq2 to output the results table with rownames as a first column called 'row; alternatively,       I could have used that argument here to move the first col into the rownames of each dataset.
+
+  ## Now run the DESeq model:
+  dds <- DESeq(dds)
+  ## Yes, we are overwriting / performing the functions on the dataset object
+  
+  ## Let's extract the normalized counts (from either the DESeq() function or the estimateSizeFactors() function, whichever was used above):
+  normalized_counts <- counts(dds, normalized=TRUE)
+  write.table(normalized_counts, file=paste(spp, "_normalized_counts.txt", sep=""), sep="\t", quote=F, col.names=NA)
+
+  ## I would also like to write the results file for future use / reference:
+  ddsResults <- results(dds)
+  write.table(ddsResults, file=paste(spp, "_DESeq2_results.txt", sep=""), sep="\t", quote=F, col.names=NA)
+
+  ## Phenotype sample sizes
+  R.N <- ncol(df[,as.character(meta[which((meta$R.NR_Phenotype == "R") & meta$Species == spp),"Sample.Name.on.SRA"])])
+  NR.N <- ncol(df[,as.character(meta[which((meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"])])
+  
+  ## Next, I want to filter for the number of genes with FDR < 0.05
+  sig <- subset(ddsResults, padj < 0.05)
+  DEG.counts.df <- c(sprintf("%1.0f", nrow(sig)), sprintf("%1.0f", nrow(subset(sig, log2FoldChange > 0))), sprintf("%1.0f", nrow(subset(sig, log2FoldChange 
+                    < 0))), sprintf("%1.3f", mean(abs(sig$log2FoldChange))), sprintf("%1.3f", sd(abs(sig$log2FoldChange))), R.N, NR.N) 
+  DEG.counts.df <- as.data.frame(DEG.counts.df)
+  rownames(DEG.counts.df) <- c("Total DEGs", "Up-Reg in R", "Up-Reg in NR", "meanAbsLFC", "stdevAbsLFC", "Reproductives N", "Non-Repros N")
+  colnames(DEG.counts.df) <- spp
+
+  ## Lastly, we want the identities of the DEGs:
+  allDEGs <- rownames(sig)
+  write.table(allDEGs, file = paste(spp, "_all_DEGs.txt", sep=""), sep="\t", quote=F, col.names=F, row.names = F)
+  upR <- rownames(subset(sig, log2FoldChange > 0))
+  write.table(upR, file = paste(spp, "_upR_DEGs.txt", sep=""), sep="\t", quote=F, col.names=F, row.names = F)
+  upNR <- rownames(subset(sig, log2FoldChange < 0))
+  write.table(upNR, file = paste(spp, "_upNR_DEGs.txt", sep=""), sep="\t", quote=F, col.names=F, row.names = F)
+
+  return(list(normalized_counts, ddsResults, DEG.counts.df, allDEGs, upR, upNR))
+}
+
+## Note that size factors for normalization could be extracted as follows:
+#dds <- estimateSizeFactors(dds)
+#sizeFactors(dds)
+
+Ccal_DEG <- runDESeq2(Ccal[[1]], Ccal[[2]], species[1])
+Caus_DEG <- runDESeq2(Caus[[1]], Caus[[2]], species[2])
+Mgen_DEG <- runDESeq2(Mgen[[1]], Mgen[[2]], species[3])
+Pcan_DEG <- runDESeq2(Pcan[[1]], Pcan[[2]], species[4])
+Pdom_DEG <- runDESeq2(Pdom[[1]], Pdom[[2]], species[5])
+Lfla_DEG <- runDESeq2(Lfla[[1]], Lfla[[2]], species[6])
+
+## Let's also make a vector of the results objects so we can loop through them downstream:
+Results.list <- c(Ccal_DEG[[1]], Caus_DEG[[1]], Mgen_DEG[[1]], Pcan_DEG[[1]], Pdom_DEG[[1]], Lfla_DEG[[1]])
+
+combinedDEGcounts <- cbind(Ccal_DEG[[3]], Caus_DEG[[3]], Mgen_DEG[[3]], Pcan_DEG[[3]], Pdom_DEG[[3]], Lfla_DEG[[3]])
+combinedDEGcounts
+
+write.table(combinedDEGcounts, file = "DEGs_Summary_All_Species.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+
+```
+
+## Quality Control & Visualizing Gene & Sample-Wise Variation
+
+#### Estimating Gene-Wise Dispersion
+DESeq2 uses a specific measure of dispersion ($\alpha$) related to the mean ($\mu$) and variance of the data: $\sigma^2 = \mu + \alpha * \mu^2$. This means that genes with moderate to high counts, the square root of dispersion ($\alpha$) equals the Coefficient of Variation ($CV = \sigma^2 / \mu$). Thus, a 0.01 dispersion means there is 10% variation around the mean expected across biological replicates.
+
+```{r}
+## Let's also make a vector of the results objects so we can loop through them downstream:
+DF.list <- c(Ccal[[1]], Caus[[1]], Mgen[[1]], Pcan[[1]], Pdom[[1]], Lfla[[1]])
+
+for (i in 1:length(DF.list)) {
+    meanCounts <- rowMeans(DF.list[i])
+    varCounts <- apply(DF.list[i], 1, var)  ## Apply the variance function by margin = 1, which is rows
+    plot(log(varCounts)~log(meanCounts), ylab = "log Variance", xlab = "log Mean", main = "\nLog-log plot of variance by mean for each gene\n should be linear.\n", pch = 16, cex = 0.75)
+    abline(lm(log(varCounts+0.0001)~log((meanCounts+0.0001))), col = "blue", lty = 2, lwd = 1.5)
+}
+
+
+
+```
+The relationship between mean and variance should be linear on the log scale, and in gene expression data we predict that for higher means, we can more accurately predict the variance (it should be fanned out at lower means and a tighter relationship at higher means). We expect that for low mean counts, the variance estimates have a much larger spread, such that the dispersion estimates will differ much more between genes with small means.
+
+This looks as anticipated. A variance-stabilizing transformation will help to resolve this issue.
+
+All of the variance stabilizing transformation (VST) functions provided by DESeq2 attempt to shrink the gene-wise dispersion. **Note: there are compelling arguments that these VSTs do a better job than a mixed model would, which is why we do not / cannot add random effects to our NB model.**
+
+When we perform the VST & visualize it, we can ensure that our data are a good fit for DESeq2. In Visualization, the VST will allow us to more accurately identify DE genes. The shrinkage is being performed in the NB model as part of the DESeq2 function, which is important to reduce false positives. 
+
+What does the plot of our dispersion estimates look like after model-fitting? 
+```{r}
+plotDispEsts(dds)
+```
+This is a little concerning. There is a gap (pattern) in the final fitted data. I'm not sure if this can be corrected. **WE NEED TO LOOK INTO THIS**
+
+#### Variance Transformations
+Transformations: Variance Stabilizing Functions - Parametric Fit
+### Note that all transformations have set blind = FALSE. We do not want the transformations to be blind to the experimental design (phenotypes) at this point; we expect large differential expression in some genes, and so we need to control for outliers by setting blind to FALSE.
+```{r}
+#vsdata <- vst(dds, blind=FALSE) 
+## This is a quicker function but not as thorough
+vsdata1 <- varianceStabilizingTransformation(dds, blind = FALSE, fitType = "parametric")
+meanSdPlot(assay(vsdata1))
+```
+
+Transformations: Variance Stabilizing Functions - Local Fit
+```{r}
+vsdata2 <- varianceStabilizingTransformation(dds, blind = FALSE, fitType = "local")
+meanSdPlot(assay(vsdata2))
+```
+
+Transformations: Variance Stabilizing Functions - Mean Type
+```{r}
+vsdata3 <- varianceStabilizingTransformation(dds, blind = FALSE, fitType = "mean")
+meanSdPlot(assay(vsdata3))
+```
+
+Transformations: Regularized Log, recommended for smaller numbers of samples
+```{r}
+rld <- rlog(dds, blind = FALSE)
+meanSdPlot(assay(rld))
+```
+Heuristically, they all appear to do well except rld. Let's just stick with the parametric VST.
+
+```{r}
+#save(vsdata1, file = "Pcanadensis_VarStab.RData")
+#write.csv(file = "Pcanadensis_VarStab.csv", assay(vsdata1), row.names = T, quote = F)
+```
+
+#### Principal Component Analysis
+```{r}
+plotPCA(vsdata1, intgroup="phenotype", ntop = 300)
+## I have changed ntop from the default of 500 to 300 because we're not anticipating huge numbers of DE genes. ntop plots the top XX most variable genes in the dataset.
+```
+Some Rs and non are quite dissimilar, but the phenotypes don't cluster distinctly.
+
+**Hierarchical Clustering**
+There is no built-in function for heatmaps in DESeq2 so let's use the pheatmap() function from the pheatmap package. 
+```{r}
+## It requires a matrix/dataframe of numeric values as input, which we can extract with the assay() function from our VST object.
+vsdata1.assay <- assay(vsdata1)
+
+## Compute  pairwise correlation values for samples:
+pwCorr <- cor(vsdata1.assay)
+#pwCorr   ## check the output, make note of the rownames and colnames
+
+## Lastly, let's make our heatmap!
+pheatmap(pwCorr)
+```
+There is clear clusters, BUT they contain a mix of workers and foundresses. 115, 113, & 114 are all workers, and 108 is a queen. **Are they all from the same nest??**
+
+#### Calculating Log-fold Change & Getting DE Genes
+In the original DESeq2 paper, the authors shrink the log-fold change estimates toward zero for genes with low counts and/or high dispersion values. It uses the distribution of LFC estimates as a prior to perform this shrinkage. In the most recent versions of DESeq2, the shrinkage of LFC estimates is not performed by default.
+
+```{r}
+## These are the LFC estimates without shrinkage:
+#LFC <- ddsResults$log2FoldChange
+
+## These are the LFC results with shrinkage:
+shrunkenLFC <- lfcShrink(dds = dds, coef = 1)
+#shrunkenLFC
+```
+*However, note that these shrunked LFC values will not change the number of DE genes. The reason to do this is for additional downstream assessments. For example, if you wanted to subset your sig genes based on foldchange for further evaluation, you would want to use these values instead.*
+
+##### Numbers of DE Genes Based on Fold-Change (Wald Tests)
+Since we want a standardized way to retrieve DE genes for all our species, rather than using the commonly used Tibble filtering people will do, we will do hypothesis tests using set significance and log-fold change thresholds. This is a more conservative approach, so you will receive fewer genes than with the Tibble filtering method.
+
+Quick breakdown of LFC:
+```{r}
+linear.changes <- c(1.5, 2, 2.5, 3, 4)
+lfc.thresholds <- log(linear.changes, base = 2)
+lfc.thresholds
+## Thus, a LFC of 0.58 is equivalent to a linear fold change of 1.5 in the gene expression value.
+```
+
+```{r}
+## This performs a Wald test of the specified contrast with a set significance threshold and a LFC threshold
+## Can use a theshold of 0.05 since they use a BH adjustment to the p-value
+foldchange <- results(dds, alpha = 0.05, lfcThreshold = 0.58)  
+#head(foldchange, tidy = T)
+summary(foldchange)
+
+## Function to calculate the number of DE genes for each of the LFC values:
+LFC.df <- NULL
+DEGenumerator <- function(dds) {
+  for (i in 1:length(lfc.thresholds)) {
+    ## Do the Wald tests with each of the LFC thresholds you want to try
+    foldchange <- results(dds, alpha = 0.05, lfcThreshold = lfc.thresholds[i])  
+    ## Get the total number of DE genes
+    total <- nrow(subset(foldchange, padj < 0.05))
+    ## Get the up genes, greater than the positive LFC threshold
+    up <- nrow(subset(foldchange, padj < 0.05 & log2FoldChange > lfc.thresholds[i]))
+    ## Get the down genes, less than the negative LFC threshold
+    down <- nrow(subset(foldchange, padj < 0.05 & log2FoldChange < -lfc.thresholds[i]))
+    ## Put in a dataframe:
+    LFC.df <- rbind(LFC.df, c(lfc.thresholds[i], linear.changes[i], total, up, down, "Pcanadensis"))
+  }
+  return(as.data.frame(LFC.df))
+}
+
+LFC.df <- DEGenumerator(dds)
+names(LFC.df) <- c("LFC.threshold", "Linear.Change", "Total.DEGs", "Up.DEGs", "Down.DEGs", "Species")
+LFC.df
+## Writes the number of DEGs to an appended file in the DEG main directory
+#write.table(LFC.df, file = "../DEG_counts.txt", append = T, quote = F, row.names = F, col.names = T)
+```
+
+#### The *post hoc* Filtering Method
+Alternatively, we can externally set the p-cutoff and log-fold change cutoff and filter the results from there. Note that the lfc.cutoff is set to 0.58, which translates to an actual fold change of 1.5.
+
+```{r, include = TRUE}
+## Set the contrast of interest (R vs. NR). Contrasts are of the form ("sample_type", "contrast2compare", "base_condition")
+contrastRNR <- c("phenotype", "R", "NR")
+## Note: if I don't set my contrast, it will default to taking the lowest category alphabetically as the base  condition
+
+## To filter the ddsResults based on an FDR of 0.05 (versus 0.1, which is the default) we also need to set the alpha parameter to 0.05 before running the results() function:
+#ddsResults <- results(dds, alpha = 0.05)
+ddsResults <- results(dds, contrast = contrastRNR, alpha = 0.05)
+## Allows us to see the outcome / verify the correct contrast was made
+#mcols(ddsResults, use.name = T)
+
+## Note that if you do not set alpha = 0.05, it's doing the Benjamini-Hochberg adjustment at 0.1. This means that the results of your filtering will likely be different. 
+
+### Set thresholds
+padj.cutoff <- 0.05
+lfc.cutoff <- 1
+
+## Let's add the row names (gene IDs) back to the results table as a column:
+ddsResults$geneID <- row.names(ddsResults)
+#names(ddsResults)
+
+## I see a full range of adjusted p-values at this stage.
+#hist(ddsResults$padj, col = "lightgray")
+#abline(v = 0.05, col = "red", lwd = 2, lty = 2)
+
+## I also see a full range of LFC values at this stage.
+#hist(ddsResults$log2FoldChange, col = "lightgray")
+#abline(v = c(lfc.cutoff, -lfc.cutoff), col = "blue", lwd = 2, lty = 2)
+
+## P-value filtering only:
+sigDGE <- subset(ddsResults, padj < padj.cutoff)
+hist(sigDGE$log2FoldChange, col = "lightgray", breaks = 50)
+abline(v = c(lfc.cutoff, -lfc.cutoff), col = "blue", lwd = 2, lty = 2)
+
+## How many of these are DEGs?
+# nrow(sigDGE)
+# ## How many up?
+# nrow(subset(sigDGE, log2FoldChange > 0))
+# ## How many down?
+# nrow(subset(sigDGE, log2FoldChange < 0))
+DEG.counts.df <- NULL
+sig <- subset(ddsResults, padj < 0.05)
+tempRow <- c(nrow(sig), nrow(subset(sig, log2FoldChange > 0)), nrow(subset(sig, 
+          log2FoldChange < 0)), mean(abs(sig$log2FoldChange))) 
+DEG.counts.df <- rbind(DEG.counts.df, tempRow)
+DEG.counts.df
+
+## Summary statistics of the LFC for the p-value filtered data. Make sure to do it on the absolute value of the LFC, or you will get the wrong mean.
+summary(abs(sigDGE$log2FoldChange))
+
+## Filter on both the p-value & an LFC of the absolute value of the minimal cutoff:
+sigDGE <- subset(ddsResults, padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
+# hist(sigDGE$padj, col = "lightgray", breaks = 50)
+# abline(v = padj.cutoff, col = "blue", lwd = 2, lty = 2)
+
+## How many of these are DEGs?
+nrow(sigDGE)
+## How many up?
+nrow(subset(sigDGE, log2FoldChange > lfc.cutoff))
+## How many down?
+nrow(subset(sigDGE, log2FoldChange < -lfc.cutoff))
+
+## Filter based on the LFC cutoff only:
+# sigDGE <- subset(ddsResults, abs(log2FoldChange) > lfc.cutoff)
+# hist(sigDGE$padj, col = "lightgray", breaks = 50)
+# abline(v = padj.cutoff, col = "blue", lwd = 2, lty = 2)
+
+# ## How many of these are DEGs?
+# nrow(sigDGE)
+# ## How many up?
+# nrow(subset(sigDGE, padj > padj.cutoff))
+# ## How many down?
+# nrow(subset(sigDGE, padj < padj.cutoff))
+# ## This verifies that number.
+```
+
+#### Results Visualization: Volcano Plot, Heatmap
+
+Sort log fold change results by adjusted p-value
+```{r}
+foldchange <- foldchange[order(foldchange$padj),]
+head(foldchange, 3)
+```
+
+Plotting the Normalized Counts for our Top 3 Most DE Genes:
+```{r}
+#Compare the normalized counts between our two groups
+par(mfrow=c(1,3))
+
+plotCounts(dds, gene="gene-LOC106793584", intgroup="phenotype")
+plotCounts(dds, gene="gene-LOC106786050", intgroup="phenotype")
+plotCounts(dds, gene="gene-LOC106790280", intgroup="phenotype")
+```
+
+#### Volcano Plot
+```{r}
+# Make a basic volcano plot
+with(foldchange, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 0.75, main="Volcano Plot for LFC = 1.5", xlim=c(-3,3), col ="gray", ylim=c(0,25)))
+
+# Add colored points: blue if padj<0.01, orange if log2FC > 1.5 and padj<0.05)
+with(subset(foldchange, padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
+with(subset(foldchange, padj<.05 & abs(log2FoldChange)>1.5), points(log2FoldChange, -log10(pvalue), pch=20, col="orange"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+```
+
+#### Top 20 Genes
+Not currently working.
+```{r, include = FALSE}
+
+# library(tidyverse)
+# ## Order results by padj values
+# top20_sigOE_genes <- res_tableOE_tb %>% 
+#         arrange(padj) %>% 	#Arrange rows by padj values
+#         pull(gene) %>% 		#Extract character vector of ordered genes
+#         head(n=20) 		#Extract the first 20 genes
+# 
+# top20_sigOE_genes <- as.data.frame(top20_sigOE_genes)
+# 
+# ## normalized counts for top 20 significant genes
+# top20_sigOE_norm <- as.data.frame(normalized_counts) %>% filter(gene %in% top20_sigOE_genes)
+# 
+# # Gathering the columns to have normalized counts to a single column
+# gathered_top20_sigOE <- top20_sigOE_norm %>% 
+#   gather(colnames(top20_sigOE_norm)[2:9], key = "samplename", value = "normalized_counts")
+# 
+# ## check the column header in the "gathered" data frame
+# View(gathered_top20_sigOE)
+# 
+# # The inner_join() will merge 2 data frames with respect to the "samplename" column, i.e. a column with the same column name in both data frames.
+# gathered_top20_sigOE <- inner_join(mov10_meta, gathered_top20_sigOE)
+# 
+# ## plot using ggplot2
+# ggplot(gathered_top20_sigOE) +
+#         geom_point(aes(x = gene, y = normalized_counts, color = sampletype)) +
+#         scale_y_log10() +
+#         xlab("Genes") +
+#         ylab("log10 Normalized Counts") +
+#         ggtitle("Top 20 Significant DE Genes") +
+#         theme_bw() +
+# 	theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+# 	theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Heatmap
+Also not working yet
+```{r. include = FALSE}
+### Extract normalized expression for significant genes from the OE and control samples (4:9), and set the gene column (1) to row names
+# norm_OEsig <- normalized_counts[,c(1,4:9)] %>% 
+#               filter(gene %in% sigOE$gene) %>% 
+# 	            data.frame() %>%
+# 	            column_to_rownames(var = "gene")
+# 
+# normalized_counts <- as.data.frame(normalized_counts)
+# is.data.frame(sigOE)
+```
+
