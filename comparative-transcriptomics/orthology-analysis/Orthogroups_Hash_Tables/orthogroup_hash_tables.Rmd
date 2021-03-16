@@ -1,0 +1,166 @@
+---
+title: "Orthogroup Hash Tables"
+author: "KS Geist"
+date: "3/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+## Load libraries
+library(dplyr)
+library(tidyverse)
+# BiocManager::install("rtracklayer")
+library(rtracklayer)  ## Need to read in GFF
+```
+
+## Read in the Bees Only orthogroup Info:
+```{r}
+bees1to1 <- read.table(file = "/Users/ksg/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/BeesDrosoApis/Orthogroups/Orthogroups_SingleCopyOrthologues.txt")
+head(bees1to1)
+dim(bees1to1)
+
+beesOrthogroups <- read.table(file = "/Users/ksg/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/BeesDrosoApis/Orthogroups/Orthogroups.txt", sep = ":")
+head(beesOrthogroups)
+dim(beesOrthogroups)
+
+## Now, I know that the orthologs are all listed in one column; before we deal with that, let's merge with the 1:1's:
+bees1to1merged <- merge(bees1to1, beesOrthogroups, by = "V1", all.x = T)
+dim(bees1to1merged)
+head(bees1to1merged)
+
+## There is trailing whitespace that is being made into the first column
+## Species were associated to the GFF for gene ID
+bees1to1merged <- bees1to1merged %>% separate(V2, c("blank", "C_australensis", "D_melanogaster", "A_mellifera", "C_calcarata", "M_genalis"), sep = " ")
+beesOrthologs <- bees1to1merged[,-2]
+colnames(beesOrthologs)[1] <- "Orthogroup"
+head(beesOrthologs)
+```
+
+## Some of the bee species' gene IDs in the transcriptomics data are different IDs from the GFF file, so we need to associate them. We do not need to do C. australensis, though.
+
+###### C. calcarata -- associate locus ID with the ID in orthogroup
+```{r}
+## I only want to load some of the tags from the GFF:
+my_tags <- c("ID", "Parent", "Name", "Dbxref", "geneID", "gene")
+
+Ccal.gff <- readGFF("/Users/ksg/Dropbox/0.ISU/0.network_analyses/Orthogroups/C_calarata_GCF_001652005.1_ASM165200v1_genomic.gff", tags = my_tags)
+# head(Ccal.gff)
+# names(Ccal.gff)
+Ccal.gff.filt <- as.data.frame(Ccal.gff[which(Ccal.gff$type == "CDS"),c("gene", "Name")])
+# head(Ccal.gff.filt)
+## At this point, we have non-unique entries, so we need to condense this:
+Ccal.gff.filt.uniq <- distinct(Ccal.gff.filt, Name, gene) 
+
+beesOrthologs <- merge(beesOrthologs, Ccal.gff.filt.uniq, by.x = "C_calcarata", by.y = "Name", all.x = T)
+names(beesOrthologs)
+colnames(beesOrthologs)[7] <- "C_calcarata_locusID"
+
+## Wait, why are we not getting all the genes??? I can't even find them in the GFF! Would the GFF not match the protein FASTA that Em used somehow?
+subset(beesOrthologs, is.na(C_calcarata_locusID))$C_calcarata
+write.table(subset(beesOrthologs, is.na(C_calcarata_locusID))$C_calcarata, "Ccalcarata_CDS_missing_geneIDs.txt", sep = "\t", row.names = F, col.names = F, append = F, quote = F)
+```
+
+## Let's plow ahead for now and get a lay of the land:
+###### M. genalis -- associate locus ID with the ID in orthogroup
+```{r}
+Mgen.gff <- readGFF("/Users/ksg/Dropbox/0.ISU/0.network_analyses/Orthogroups/Mgenalis_GCF_011865705.1_USU_MGEN_1.2_genomic.gff", tags = my_tags)
+head(Mgen.gff)
+# names(Mgen.gff)
+Mgen.gff.filt <- as.data.frame(Mgen.gff[which(Mgen.gff$type == "CDS"),c("gene", "Name")])
+head(Mgen.gff.filt)
+## At this point, we have non-unique entries, so we need to condense this:
+Mgen.gff.filt.uniq <- distinct(Mgen.gff.filt, Name, gene) 
+
+beesOrthologs <- merge(beesOrthologs, Mgen.gff.filt.uniq, by.x = "M_genalis", by.y = "Name", all.x = T)
+names(beesOrthologs)
+colnames(beesOrthologs)[8] <- "M_genalis_locusID"
+
+## Wait, why are we not getting all the genes??? I can't even find them in the GFF! Would the GFF not match the protein FASTA that Em used somehow?
+# subset(beesOrthologs, is.na(M_genalis_locusID))$M_genalis
+write.table(subset(beesOrthologs, is.na(M_genalis_locusID))$M_genalis, "Mgenalis_CDS_missing_geneIDs.txt", sep = "\t", row.names = F, col.names = F, append = F, quote = F)
+```
+
+
+## Read in the Wasps Only orthogroup Info:
+```{r}
+wasps1to1 <- read.table(file = "/Users/ksg/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/WaspsDrosoApis/Orthogroups/Orthogroups_SingleCopyOrthologues.txt")
+head(wasps1to1)
+dim(wasps1to1)
+
+waspsOrthogroups <- read.table(file = "/Users/ksg/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/waspsDrosoApis/Orthogroups/Orthogroups.txt", sep = ":")
+head(waspsOrthogroups)
+dim(waspsOrthogroups)
+
+## Now, I know that the orthologs are all listed in one column; before we deal with that, let's merge with the 1:1's:
+wasps1to1merged <- merge(wasps1to1, waspsOrthogroups, by = "V1", all.x = T)
+dim(wasps1to1merged)
+head(wasps1to1merged)
+
+## There is trailing whitespace that is being made into the first column
+## Species were associated to the GFF for gene ID
+wasps1to1merged <- wasps1to1merged %>% separate(V2, c("blank", "D_melanogaster", "L_flavolineata", "A_mellifera", "P_canadensis", "P_dominula"), sep = " ")
+waspsOrthologs <- wasps1to1merged[,-2]
+colnames(waspsOrthologs)[1] <- "Orthogroup"
+head(waspsOrthologs)
+```
+
+## Let's plow ahead for now and get a lay of the land:
+###### P. canadensis -- associate locus ID with the ID in orthogroup
+```{r}
+Pcan.gff <- readGFF("/Users/ksg/Dropbox/0.ISU/0.network_analyses/Orthogroups/Pcanadensis_GCF_001313835.1_ASM131383v1_genomic.gff", tags = my_tags)
+head(Pcan.gff)
+# names(Pcan.gff)
+Pcan.gff.filt <- as.data.frame(Pcan.gff[which(Pcan.gff$type == "CDS"),c("gene", "Name")])
+head(Pcan.gff.filt)
+## At this point, we have non-unique entries, so we need to condense this:
+Pcan.gff.filt.uniq <- distinct(Pcan.gff.filt, Name, gene) 
+
+waspsOrthologs <- merge(waspsOrthologs, Pcan.gff.filt.uniq, by.x = "P_canadensis", by.y = "Name", all.x = T)
+colnames(waspsOrthologs)[7] <- "P_canadensis_locusID"
+
+## Wait, why are we not getting all the genes??? I can't even find them in the GFF! Would the GFF not match the protein FASTA that Em used somehow?
+# subset(waspsOrthologs, is.na(P_canadensis_locusID))$P_canadensis
+write.table(subset(waspsOrthologs, is.na(P_canadensis_locusID))$P_canadensis, "Pcanadensis_CDS_missing_geneIDs.txt", sep = "\t", row.names = F, col.names = F, append = F, quote = F)
+```
+
+###### P. dominula -- associate locus ID with the ID in orthogroup
+```{r}
+Pdom.gff <- readGFF("/Users/ksg/Dropbox/0.ISU/0.network_analyses/Orthogroups/Pdominula_GCF_001465965.1_Pdom_r1.2_genomic.gff", tags = my_tags)
+head(Pdom.gff)
+# names(Pdom.gff)
+Pdom.gff.filt <- as.data.frame(Pdom.gff[which(Pdom.gff$type == "CDS"),c("gene", "Name")])
+head(Pdom.gff.filt)
+## At this point, we have non-unique entries, so we need to condense this:
+Pdom.gff.filt.uniq <- distinct(Pdom.gff.filt, Name, gene) 
+names(Pdom.gff.filt.uniq)
+
+waspsOrthologs <- merge(waspsOrthologs, Pdom.gff.filt.uniq, by.x = "P_dominula", by.y = "Name", all.x = T)
+colnames(waspsOrthologs)[8] <- "P_dominula_locusID"
+
+## Wait, why are we not getting all the genes??? I can't even find them in the GFF! Would the GFF not match the protein FASTA that Em used somehow?
+# subset(waspsOrthologs, is.na(P_canadensis_locusID))$P_dominula
+write.table(subset(waspsOrthologs, is.na(P_dominula_locusID))$P_dominula, "Pdominula_CDS_missing_geneIDs.txt", sep = "\t", row.names = F, col.names = F, append = F, quote = F)
+```
+
+##### For Liostenogaster, the only change needed is to strip off an extra "P\d" at the end of each locus ID:
+```{r}
+waspsOrthologs$L_flavolineata <- gsub("P\\d", "", waspsOrthologs$L_flavolineata)
+```
+
+## Lastly, let's write the beesOrthologs, waspsOrthologs to outfiles:
+```{r}
+write.table(beesOrthologs, file = "bees_1.1_orthologs_lookup_table.txt", sep = "\t", row.names = F, col.names = T, append = F, quote = F)
+write.table(waspsOrthologs, file = "wasps_1.1_orthologs_lookup_table.txt", sep = "\t", row.names = F, col.names = T, append = F, quote = F)
+```
+
+Come back and do all Species. You've got the code to do it.
