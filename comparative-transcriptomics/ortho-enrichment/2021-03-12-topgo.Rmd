@@ -1,0 +1,293 @@
+---
+title: "TopGo analyses"
+author: "Emeline Favreau"
+date: "2021/03/12"
+output: html_document
+---
+
+Copyright 2021 Emeline Favreau, University College London.
+
+##### Objective of analysis
+Understanding TopGo by testing _Ceratina australensis_ dataset of differentially expressed genes that are upregulated in reproductives.
+
+##### Analysis steps:
+- Obtaining data
+- Aim 1: GO term enrichment (BP) c.austra DEG up Queen
+
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "readr")
+
+# install and/or load
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+
+#install.packages("BiocManager")
+#BiocManager::install("topGO")
+#BiocManager::install("biomaRt")
+library(topGO)
+library("biomaRt")
+```
+
+
+```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
+# import orthofinder results
+# columns: orthogroups, and names of species
+Orthogroups <- read_table2("~/myriad/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/BeesDrosoApis/Orthogroups/Orthogroups.tsv")
+
+
+# import all DEG results for ceratina australensis
+# columns: X     baseMean log2FoldChange     lfcSE       stat    pvalue     padj
+# rows: genes
+Ceratina_australensis_DESeq2_results <- read.delim("~/myriad/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/Ceratina_australensis_DESeq2_results.txt",
+                                             stringsAsFactors = FALSE)
+
+# import DEG upregulated in reproductives
+# one column with names of genes
+Ceratina_australensis_upR_DEGs <- read.table("~/myriad/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/Ceratina_australensis_upR_DEGs.txt",
+                                             quote = "\"",
+                                             comment.char = "",
+                                             stringsAsFactors = FALSE)
+
+      
+# blast results: each Drosophila Orthogroup has a match in similarity with a species' protein
+blast_results_austra <- read.table("~/myriad/projects/MajorTransitionScripts/comparative-transcriptomics/ortho-enrichment/resultOnScratch/Ceratina_australensis",
+                                    stringsAsFactors = FALSE)
+```
+
+
+```{r getting gene to go mapping droso, eval = TRUE, echo = FALSE, include = FALSE}
+# https://www.bioconductor.org/packages/devel/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html#introduction
+
+# the first time around do this
+# ensembl <- useEnsembl(biomart = "ensembl")
+# find droso
+# dmelanogaster_gene_ensembl	Drosophila melanogaster genes (BDGP6.32)	BDGP6.32
+# datasets <- listDatasets(ensembl)
+
+# the following instances, just run this
+# connect to the genes services
+ensembl <- useEnsembl(biomart = "ensembl",
+                      dataset = "dmelanogaster_gene_ensembl")
+
+
+# searchAttributes(mart = ensembl, pattern = "FlyBase")
+# we want flybase_translation_id
+# our droso gene name come from ensembl under name FlyBase translation
+
+# list of droso genes that I want, I think these are transcript id
+droso_gene_list <- blast_results_austra$V2
+
+# ideally we'd like to update r to version 4.0.03 and bioconductor to 3.12
+# https://support.bioconductor.org/p/p132704/#p132714
+# https://support.bioconductor.org/p/p132709/#p133220
+# but we can go around the issue with useCache = FALSE
+gene2Go_raw <- getBM(attributes = c("flybase_translation_id", "go_id"), 
+              filters     = "flybase_translation_id", 
+              values      = droso_gene_list, 
+              mart        = ensembl,
+              useCache    = FALSE)
+
+# Remove the genes without GO terms
+gene2Go_df <- subset(x = gene2Go_raw,
+                     subset = !go_id == "")
+
+# update the object to fit topgo
+gene_to_go <- aggregate(go_id ~ flybase_translation_id,
+                        data = gene2Go_df,
+                        c)
+# vector of GO identifiers
+go_id <- gene_to_go$go_id
+
+# add names to the vector
+gene2go <- setNames(go_id,
+                    gene_to_go$flybase_translation_id)
+
+
+
+
+```
+
+
+##### Aim 1: GO term enrichment (BP) c.austra DEG up Queen 
+
+```{r aim 1 test for GO term enrichment austra DEG up Queen, eval = TRUE, echo = FALSE, include = FALSE}
+# set species data input
+raw_results <- Ceratina_australensis_DESeq2_results
+raw_selectionGenes <- Ceratina_australensis_upR_DEGs
+raw_blast_results <- blast_results_austra
+
+# add column names
+colnames(raw_blast_results) <- c("qseqid", "sseqid", "pident", "length",
+                                    "mismatch", "gapopen", "qstart",
+                                    "qend", "sstart", "send", "evalue",
+                                    "bitscore")
+
+# change the names in results for drosophila
+colnames(raw_results) <- c("gene", colnames(raw_results)[2:7])
+
+colnames(raw_selectionGenes) <- "gene"
+
+# aim to change species's protein names for drosophila names
+# because the TopGO database does not contain non-model data
+raw_results$droso_gene <- raw_blast_results$sseqid[match(raw_results$gene,
+                                                         raw_blast_results$qseqid)]
+
+raw_selectionGenes$droso_gene <- raw_blast_results$sseqid[match(raw_selectionGenes$gene,
+                                                         raw_blast_results$qseqid)]
+
+
+
+
+
+
+## make a vector with 0 or 1 values depending if a gene is DE or not
+# results: lists of genes differentially expressed 
+geneList <- rep(0, times = length(rownames(raw_results)))
+
+# name each value with the droso genes names
+names(geneList) <- raw_results$droso_gene
+
+# selectionGenes: list of DEG for selection
+DEGenes <- raw_selectionGenes$droso_gene
+
+# for each gene that is the focus of the analysis, change the value 0 for 1
+geneList[DEGenes] <- 1
+
+# change the class to factor
+geneList <-  as.factor(geneList)
+
+# check input: 562 genes are in the focus group
+#summary(geneList)
+
+
+
+## Build the topGO object for biological process ontology
+# GO section; Biological process
+# gene environment: geneList
+# gene selection: factored list of genes that are under study (here upregulated)
+# remove terms that have less than 5 annotated genes
+# function annFUN.gene2GO used when the annotations are provided as a gene-to-GOs mapping
+# gene2Go file has droso gene identifiers and GO
+BPdata <- new("topGOdata",
+              ontology = "BP",
+              allGenes = geneList,
+              geneSel  = raw_selectionGenes$droso_gene,
+              nodeSize = 5,
+              annot    = annFUN.gene2GO,
+              gene2GO  = gene2go)
+
+# test for enrichment
+# because we coded the genes 1 or 0 for DEG presence or absence, Fisher test (gene count) is probably the best algorithm
+# classic: each GO category is tested independently
+resultBP <- runTest(BPdata,
+                    algorithm = "classic",
+                    statistic = "fisher")
+
+#resultBP
+
+# create a result table
+# GO Terms identified by fisher test
+# 4170: the number of top GO terms to be included in the table.
+myTable <- GenTable(BPdata,
+                    pvalue = resultBP,
+                    topNodes = length(BPdata@graph@nodes),
+                    numChar = 100)
+
+```
+
+```{r present results, eval = TRUE, echo = FALSE, include = TRUE}
+# check the first top hits
+head(myTable)
+
+# get the pvalues (named vector)
+pvalues <- score(resultBP)
+# length(pvalues[pvalues<0.05])
+
+```
+
+*Conclusion*
+
+161 GO terms that are enriched in C.australensis DEG dataset (upregulated in reproductives)
+
+
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```
+```{r draft, eval = FALSE, echo = FALSE, include = FALSE}
+# # carlos code
+# #Get the Ensembl info from S.invicta
+# metazoa_mart <- useMart(biomart = "metazoa_mart",
+#                         dataset = "sinvicta_eg_gene",
+#                         host = "metazoa.ensembl.org")
+# #Select the gene names, its associated GO terms and the names of these GO terms
+# gene_to_go <- getBM(attributes = c("ensembl_gene_id", "go_id", "name_1006"),
+#                     mart = metazoa_mart)
+# #Remove the genes without GO terms
+# gene_to_go <- subset(x = gene_to_go,
+#                      subset = !go_id == "")
+# #Parse the data frame to adapt it to the topGO format (named list of character vectors. The list names are genes identifiers. For eachgene the character vector contains the GO identifiers it maps to).
+# gene_to_go <- aggregate(go_id ~ ensembl_gene_id, data = gene_to_go, c)
+# go_id <- gene_to_go$go_id
+# gene2go <- setNames(go_id, gene_to_go$ensembl_gene_id)
+# #Generate a TopGO object
+# all_genes <- factor(as.integer(unique(tx_gene$gene)))
+# names(all_genes) <- unique(tx_gene$gene)
+# go_data <- new("topGOdata", ontology = "BP", allGenes = all_genes,
+#                  annot = annFUN.gene2GO, gene2GO = gene2go)
+# 
+# ##############################################################################
+# # federico code
+# biomaRt::listMarts(host = "metazoa.ensembl.org")
+# 
+# dmel_mart <- biomaRt::useEnsembl(
+#   biomart = "metazoa_mart",
+#   dataset = "dmelanogaster_eg_gene",
+#   host = "metazoa.ensembl.org"
+# )
+# 
+# dmel_tx2gene <- biomaRt::getBM(
+#   attributes = c("ensembl_transcript_id", "ensembl_gene_id"),
+#   mart = dmel_mart
+# )
+```
