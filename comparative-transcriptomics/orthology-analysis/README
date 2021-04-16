@@ -1,0 +1,5 @@
+OrthoFinder runs:
+  * BeesDrosoApis: Ceratina australensis, C. calcarata, Megalopta genalis, Drosphila melanogaster, Apis mellifera
+  * WaspsDrosoApis: Polistes dominula, P. canadensis, Liostenogaster flavolineata, D. melanogaster, A. mellifera
+  * allSpecies: P. dominula, P. canadensis, L. flavolineata, C. australensis, C. calcarata, M. genalis, D. melanogaster, A. mellifera
+  * sixSpecies: P. dominula, P. canadensis, L. flavolineata, C. australensis, C. calcarata, M. genalis
