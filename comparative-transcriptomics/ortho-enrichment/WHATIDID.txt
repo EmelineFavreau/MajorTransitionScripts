@@ -1,0 +1,163 @@
+# 2021-03-15
+## Author: Emeline Favreau
+## Objective: Running TopGO on wasps and bees
+
+## Analysis steps:
+# Obtaining data
+# Aim 1: Run TopGo for Ceratina australensis
+# Aim 2: 
+# Aim 3: 
+
+###############################################################################
+# Obtaining data
+
+# set project structure
+mkdir -p ~/Scratch/ortho-enrichment/input
+mkdir -p ~/Scratch/ortho-enrichment/result
+mkdir -p ~/Scratch/ortho-enrichment/tmp
+ln -s ~/Scratch/ortho-enrichment/input inputOnScratch
+ln -s ~/Scratch/ortho-enrichment/result resultOnScratch
+ln -s ~/Scratch/ortho-enrichment/tmp tmp
+mkdir result
+
+
+
+# copy input files: protein files
+cd inputOnScratch
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/Drosophila_melanogaster.faa .
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/primary_transcripts/allSpecies/Ceratina_australensis-longest-isoforms.faa .
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/primary_transcripts/allSpecies/Liostenogaster_flavolineata-longest-isoforms.faa .
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/primary_transcripts/allSpecies/Polistes_canadensis-longest-isoforms.faa .
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/primary_transcripts/allSpecies/Ceratina_calcarata-longest-isoforms.faa .
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/primary_transcripts/allSpecies/Megalopta_genalis-longest-isoforms.faa .         
+
+ln -s /lustre/scratch/scratch/ucfaeef/orthology-analysis/input/primary_transcripts/allSpecies/Polistes_dominula-longest-isoforms.faa .
+
+
+# copy important files
+# import orthofinder results
+# columns: orthogroups, and names of species
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv .
+
+
+# import all DEG results for 6 species
+# columns: X baseMean log2FoldChange lfcSE stat pvalue padj
+# rows: genes
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_DESeq2_results.txt .
+
+# import DEG upregulated in reproductives
+# one column with names of genes
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_upR_DEGs.txt .
+
+# import DEG upregulated in non-reproductives
+# one column with names of genes
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_upNR_DEGs.txt .
+
+
+#################################################################
+
+
+module load blast+/2.2.30/intel-2015-update2
+
+
+
+# Make database from fly
+makeblastdb -in inputOnScratch/Drosophila_melanogaster.faa \
+	-parse_seqids \
+	-dbtype prot
+
+# Blast each species against fly
+# keep one droso sequence per query
+qsub blastp-fly-agst-australensis.sh  
+qsub blastp-fly-agst-canadensis.sh
+qsub blastp-fly-agst-flavolineata.sh
+qsub blastp-fly-agst-calcarata.sh
+qsub blastp-fly-agst-dominula.sh
+qsub blastp-fly-agst-genalis.sh
+
+# this gives multiple hits per query (bee/wasp)
+# keep the hit that has the lowest p value
+
+ls resultOnScratch > species-list
+
+for species in $(cat species-list);do
+	cut -f 1 resultOnScratch/${species} | sort | uniq > tmp/${species}_seq-list
+	touch resultOnScratch/${species}_filtered
+	for sequence in $(cat tmp/${species}_seq-list); do
+		grep ${sequence} resultOnScratch/${species} | awk 'NR == 1 || $11 < min {line = $0; min = $11}END{print line}' >> resultOnScratch/${species}_filtered
+	done
+done
+
+# check that the resulting file has one hit per sequence
+for species in $(cat species-list);do
+	cut -f 1 resultOnScratch/${species} | sort | uniq | wc -l
+	wc -l resultOnScratch/${species}_filtered
+done
+
+
+# Table of corresponding species and droso
+resultOnScratch/${species}_filtered
+
+# check that all three files correspond
+Ceratina_australensis
+Ceratina_calcarata # blast is NP_001352264.1, the rest are gene-LOC108622641
+Liostenogaster_flavolineata # blast is Lflavo2a000001P1, the rest are Lflavo2a011908
+Megalopta_genalis # blast is XP_033320756.1, the rest are gene-LOC117221139
+Polistes_canadensis # blast is XP_033320756.1, the rest are gene-LOC117217331
+Polistes_dominula # blast is XP_015171009.1, the rest are gene-LOC107072648
+species="Polistes_dominula"
+head -n 5 resultOnScratch/${species}_filtered | cut -f 1
+head -n 5 inputOnScratch/${species}_upNR_DEGs.txt | cut -f 1
+head -n 5 inputOnScratch/${species}_upR_DEGs.txt | cut -f 1
+head -n 7 inputOnScratch/${species}_DESeq2_results.txt | cut -f 1
+
+# I need a translation table: protein to gene
+# Ceratina_calcarata
+# e.g XP_017888733.1	gene-LOC108630137
+zcat ../orthology-analysis/inputOnScratch/gff/Ceratina_calcarata.gff.gz | sed "s/ /_/g" | awk '$3=="CDS"{gsub(".+;Name=", "", $9); gsub(";.*gbkey=CDS;.*gene=", "\tgene-", $9); gsub(";product=.*", "", $9); gsub(";partial=true", "", $9); print $9}' | sort | uniq > tmp/Ceratina_calcarata_protein_gene_hash_table
+
+# Liostenogaster_flavolineata
+# e.g. Lflavo2a000001P1 Lflavo2a011908
+cut -f 1 resultOnScratch/${species}_filtered > tmp/${species}_protein
+cut -f 1 resultOnScratch/${species}_filtered | awk '{gsub("P[0-9]{1,2}", "", $1); print $1}' > tmp/${species}_gene 
+paste tmp/${species}_protein tmp/${species}_gene > tmp/Liostenogaster_flavolineata_protein_gene_hash_table
+
+# Megalopta_genalis
+# e.g. XP_033320756.1 gene-LOC117221139
+zcat ../orthology-analysis/inputOnScratch/gff/Megalopta_genalis.gff.gz | sed "s/ /_/g" | awk '$3=="CDS"{gsub(".+;Name=", "", $9); gsub(";.*gbkey=CDS;.*gene=", "\tgene-", $9); gsub(";inference=.*", "", $9) ; gsub(";product=.*", "", $9); gsub(";partial=true", "", $9); print $9}' | sort | uniq > tmp/Megalopta_genalis_protein_gene_hash_table
+
+# Polistes_canadensis
+# e.g. XP_014597714.1 gene-LOC106792969
+zcat ../orthology-analysis/inputOnScratch/gff/Polistes_canadensis.gff.gz | sed "s/ /_/g" | awk '$3=="CDS"{gsub(".+;Name=", "", $9); gsub(";.*gbkey=CDS;.*gene=", "\tgene-", $9); print $9}' | cut -d ";" -f 1 | sort | uniq > tmp/Polistes_canadensis_protein_gene_hash_table
+
+# Polistes_dominula
+# e.g. XP_015171009.1 gene-LOC107072648
+zcat ../orthology-analysis/inputOnScratch/gff/Polistes_dominula.gff.gz | sed "s/ /_/g" | awk '$3=="CDS"{gsub(".+;Name=", "", $9); gsub(";.*gbkey=CDS;.*gene=", "\tgene-", $9); print $9}' | cut -d ";" -f 1 | sort | uniq > tmp/Polistes_dominula_protein_gene_hash_table
+
+
+# copy all hash tables to result
+mkdir result/hash_tables
+cp tmp/*_protein_gene_hash_table result/hash_tables/.
+
+
+# get enriched GO terms
+qsub get-GO-terms-for-all-species.sh
+
+# check result
+ls -lrth resultOnScratch/
+
+# Conclusion
+High social species have enrichment for these GO terms when genes are up regulated in reproductive.
+Less social species have ....
+
+We expect from individual studies a GO enrichment for boring genes.
+
+
+
+##############################################################

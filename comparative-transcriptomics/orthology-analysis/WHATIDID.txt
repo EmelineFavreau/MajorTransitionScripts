@@ -7,6 +7,9 @@
 # Aim 1: Run OrthoFinder for wasps
 # Aim 2: Run OrthoFinder for bees
 # Aim 3: Run OrthoFinder for all
+# Aim 4: Make a tree figure
+# Aim 5: Run OrthoFinder for all 6 species, no outgroup
+
 
 ###############################################################################
 # Obtaining data
@@ -238,3 +241,47 @@ mkdir allSpecies
 cp -r ../inputOnScratch/primary_transcripts/beesDrosoApis/OrthoFinder/Results_Mar02/Orthogroups allSpecies/.
 
 # copy important information to Github result/BeesFlyBee/Orthogroups/*
+
+
+###############################################################################
+# Aim 4: Make a tree figure
+
+mkdir -p result/allSpecies/tree
+
+# input from OrthoFinder for all Species
+cp inputOnScratch/primary_transcripts/allSpecies/OrthoFinder/Results_Mar02/Species_Tree/SpeciesTree* result/allSpecies/tree/.
+
+
+###############################################################################
+# Aim 5: Running orthofinder for all: 3 wasps, 3 bees (no outgroup)
+
+# make a directory for this experiment
+mkdir inputOnScratch/primary_transcripts/sixSpecies
+
+cp inputOnScratch/primary_transcripts/beesDrosoApis/Ceratina* inputOnScratch/primary_transcripts/sixSpecies/.
+
+cp inputOnScratch/primary_transcripts/beesDrosoApis/Megalopta* inputOnScratch/primary_transcripts/sixSpecies/.
+
+cp inputOnScratch/primary_transcripts/Liostenogaster* inputOnScratch/primary_transcripts/sixSpecies/.
+
+cp inputOnScratch/primary_transcripts/Polistes* inputOnScratch/primary_transcripts/sixSpecies/.
+
+
+
+# run orthofinder
+qsub run-orthofinder.sh
+
+# check results Results_Mar02
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/sixSpecies/OrthoFinder/Results_Apr14/
+
+
+cd result
+
+mkdir sixSpecies
+
+# copy results
+cp -r ../inputOnScratch/primary_transcripts/sixSpecies/OrthoFinder/Results_Apr14/Orthogroups sixSpecies/.
+
+# copy important information to Github result/sixSpecies/Orthogroups/*
+
+# make a list of OG and species equivalent using Orthogroups.txt and Orthogroups_SingleCopyOrthologues.txt
