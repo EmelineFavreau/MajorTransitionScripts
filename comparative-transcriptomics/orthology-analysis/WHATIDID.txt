@@ -9,6 +9,8 @@
 # Aim 3: Run OrthoFinder for all
 # Aim 4: Make a tree figure
 # Aim 5: Run OrthoFinder for all 6 species, no outgroup
+# Aim 6: Run OrthoFinder for all bees no fly
+# Aim 7: Run OrthoFinder for all wasps no fly
 
 
 ###############################################################################
@@ -284,4 +286,69 @@ cp -r ../inputOnScratch/primary_transcripts/sixSpecies/OrthoFinder/Results_Apr14
 
 # copy important information to Github result/sixSpecies/Orthogroups/*
 
+#######################################################################
+# Aim 6: Run OrthoFinder for all bees no fly
+
+# make a directory for this experiment
+mkdir inputOnScratch/primary_transcripts/allBees
+
+cp inputOnScratch/primary_transcripts/beesDrosoApis/Ceratina* inputOnScratch/primary_transcripts/allBees/.
+
+cp inputOnScratch/primary_transcripts/beesDrosoApis/Megalopta* inputOnScratch/primary_transcripts/allBees/.
+
+cp inputOnScratch/primary_transcripts/Apis_mellifera-longest-isoforms.faa inputOnScratch/primary_transcripts/allBees/.
+
+# run orthofinder
+qsub run-orthofinder.sh
+
+# check result
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/allBees/OrthoFinder/Results_Apr18/
+
+
+cd result
+
+mkdir allBees
+
+# copy results
+cp -r ../inputOnScratch/primary_transcripts/allBees/OrthoFinder/Results_Apr18/Orthogroups allBees/.
+
+###############################################################################
+# Aim 7: Running orthofinder for all wasps + Apis (no fly)
+
+# make a directory for this experiment
+mkdir inputOnScratch/primary_transcripts/allWasps
+
+cp inputOnScratch/primary_transcripts/sixSpecies/Polistes* inputOnScratch/primary_transcripts/allWasps/.
+
+cp inputOnScratch/primary_transcripts/sixSpecies/Liostenogaster* inputOnScratch/primary_transcripts/allWasps/.
+
+cp inputOnScratch/primary_transcripts/Apis_mellifera-longest-isoforms.faa inputOnScratch/primary_transcripts/allWasps/.
+
+# run orthofinder
+qsub run-orthofinder.sh
+
+# check results Results_Apr
+ls /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/inputOnScratch/primary_transcripts/allWasps/OrthoFinder/Results_Apr18/
+
+
+cd result
+
+mkdir allWasps
+
+# copy results
+cp -r ../inputOnScratch/primary_transcripts/allWasps/OrthoFinder/Results_Apr18/Orthogroups allWasps/.
+
 # make a list of OG and species equivalent using Orthogroups.txt and Orthogroups_SingleCopyOrthologues.txt
+grep -f result/sixSpecies/Orthogroups/Orthogroups_SingleCopyOrthologues.txt result/sixSpecies/Orthogroups/Orthogroups.txt | sed "s/://g" > result/sixSpecies/singleCopyOrthogroup-orthologues.txt
+
+
+
+1:1 orthologs are not numerous in our analysis:
+ - 419 sixSpecies
+ - 123 allSpecies
+ - 322 BeesDrosoApis
+ - 708 WaspsDrosoApis
+
+We could include more orthologous genes if we relaxed our filtering:
+ - allow 1, 2, 3 copies in a given species
+ - allow 1:1 orthologs present in all but one species 
