@@ -1,0 +1,7 @@
+Ceratina_calcarata	Ceratina_australensis	Megalopta_genalis	Polistes_canadensis	Polistes_dominula	Liostenogaster_flavolineata
+NModules	17	31	12	15	8	15
+MeanGenesPerModule	577.00	322.58	588.83	606.87	224.12	562.80
+MinGenesPerModule	32	30	64	52	53	54
+MaxGenesPerModule	2740	2282	2614	2750	518	2897
+NumGenesUnassigned	4	0	2562	25	8112	2003
+totalGenes	9813	10000	9628	9128	9905	10445

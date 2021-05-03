@@ -1,0 +1,7 @@
+N.Genes.Sig.Modules	N.Sig.Modules	N.Genes.NonSig.Modules	N.NonSig.Modules	N.Genes	N.Modules
+Ceratina_calcarata	2091	3	7722	15	9813	18
+Ceratina_australensis	3259	2	6741	29	10000	31
+Megalopta_genalis	4290	2	5338	11	9628	13
+Polistes_canadensis	290	2	8838	14	9128	16
+Polistes_dominula	634	4	9271	5	9905	9
+Liostenogaster_flavolineata	3871	5	6574	11	10445	16
