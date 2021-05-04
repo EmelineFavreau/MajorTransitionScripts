@@ -4,9 +4,10 @@
 
 ## Analysis steps:
 # Obtaining data
-# Aim 1: Run TopGo for Ceratina australensis
-# Aim 2: 
-# Aim 3: 
+# Aim 1: blast species protein against Drosophila for TopGo
+# Aim 2: make hash table for each species (protein sequence name | gene name)
+# Aim 3: Run GO Term enrichment for each species (DEG genes as focus loci)
+# Aim 4: Run GO Term enrichment for each species (WGCNA genes as focus loci)
 
 ###############################################################################
 # Obtaining data
@@ -51,6 +52,10 @@ ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcrip
 # rows: genes
 ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_DESeq2_results.txt .
 
+# import DEG upregulated (no directionality)
+# one column with names of genes
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_all_DEGs.txt .
+
 # import DEG upregulated in reproductives
 # one column with names of genes
 ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_upR_DEGs.txt .
@@ -60,8 +65,16 @@ ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcrip
 ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/full_set/*/*_upNR_DEGs.txt .
 
 
-#################################################################
+# import WGCNA input genes
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/WGCNA/full_set/*/GO_Gene_Lists/*_WGCNA_Input_Genes.txt .
 
+# import WGCNA genes with significant correlation with reproductive status
+# ie in modules correlated to being reproductives or non-reproductives
+ln -s /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/WGCNA/full_set/*/GO_Gene_Lists/*_WGCNA_Significant_Module_Genes.txt .
+
+
+#################################################################
+# Aim 1: blast species protein against Drosophila for TopGo
 
 module load blast+/2.2.30/intel-2015-update2
 
@@ -101,9 +114,14 @@ for species in $(cat species-list);do
 done
 
 
-# Table of corresponding species and droso
-resultOnScratch/${species}_filtered
+# Table of corresponding species and droso gene names
+resultOnScratch/${species}_filtered*
 
+
+######################################################################################
+# Aim 2: make hash table for each species (protein sequence name | gene name)
+
+# The species protein sequence header do not match the DESeq2 result gene name
 # check that all three files correspond
 Ceratina_australensis
 Ceratina_calcarata # blast is NP_001352264.1, the rest are gene-LOC108622641
@@ -111,7 +129,7 @@ Liostenogaster_flavolineata # blast is Lflavo2a000001P1, the rest are Lflavo2a01
 Megalopta_genalis # blast is XP_033320756.1, the rest are gene-LOC117221139
 Polistes_canadensis # blast is XP_033320756.1, the rest are gene-LOC117217331
 Polistes_dominula # blast is XP_015171009.1, the rest are gene-LOC107072648
-species="Polistes_dominula"
+species="Ceratina_australensis"
 head -n 5 resultOnScratch/${species}_filtered | cut -f 1
 head -n 5 inputOnScratch/${species}_upNR_DEGs.txt | cut -f 1
 head -n 5 inputOnScratch/${species}_upR_DEGs.txt | cut -f 1
@@ -121,12 +139,6 @@ head -n 7 inputOnScratch/${species}_DESeq2_results.txt | cut -f 1
 # Ceratina_calcarata
 # e.g XP_017888733.1	gene-LOC108630137
 zcat ../orthology-analysis/inputOnScratch/gff/Ceratina_calcarata.gff.gz | sed "s/ /_/g" | awk '$3=="CDS"{gsub(".+;Name=", "", $9); gsub(";.*gbkey=CDS;.*gene=", "\tgene-", $9); gsub(";product=.*", "", $9); gsub(";partial=true", "", $9); print $9}' | sort | uniq > tmp/Ceratina_calcarata_protein_gene_hash_table
-
-# Liostenogaster_flavolineata
-# e.g. Lflavo2a000001P1 Lflavo2a011908
-cut -f 1 resultOnScratch/${species}_filtered > tmp/${species}_protein
-cut -f 1 resultOnScratch/${species}_filtered | awk '{gsub("P[0-9]{1,2}", "", $1); print $1}' > tmp/${species}_gene 
-paste tmp/${species}_protein tmp/${species}_gene > tmp/Liostenogaster_flavolineata_protein_gene_hash_table
 
 # Megalopta_genalis
 # e.g. XP_033320756.1 gene-LOC117221139
@@ -140,24 +152,56 @@ zcat ../orthology-analysis/inputOnScratch/gff/Polistes_canadensis.gff.gz | sed "
 # e.g. XP_015171009.1 gene-LOC107072648
 zcat ../orthology-analysis/inputOnScratch/gff/Polistes_dominula.gff.gz | sed "s/ /_/g" | awk '$3=="CDS"{gsub(".+;Name=", "", $9); gsub(";.*gbkey=CDS;.*gene=", "\tgene-", $9); print $9}' | cut -d ";" -f 1 | sort | uniq > tmp/Polistes_dominula_protein_gene_hash_table
 
+# Liostenogaster_flavolineata
+# e.g. Lflavo2a000001P1 Lflavo2a011908
+cut -f 1 resultOnScratch/${species}_filtered > tmp/${species}_protein
+cut -f 1 resultOnScratch/${species}_filtered | awk '{gsub("P[0-9]{1,2}", "", $1); print $1}' > tmp/${species}_gene 
+paste tmp/${species}_protein tmp/${species}_gene > tmp/Liostenogaster_flavolineata_protein_gene_hash_table
+
+# Ceratina_australensis
+# e.g. Caust.v2_000001 Caust.v2_000001
+cut -f 1 inputOnScratch/Ceratina_australensis_DESeq2_results.txt | sort | uniq > tmp/Ceratina_australensis_protein
+paste tmp/Ceratina_australensis_protein tmp/Ceratina_australensis_protein > tmp/Ceratina_australensis_protein_gene_hash_table
+
 
 # copy all hash tables to result
 mkdir result/hash_tables
 cp tmp/*_protein_gene_hash_table result/hash_tables/.
 
 
-# get enriched GO terms
-qsub get-GO-terms-for-all-species.sh
+
+######################################################################################
+# Aim 3: Run GO Term enrichment for each species (DEG genes as focus loci)
+
+# Each species has a set of differentially expressed genes. We use TopGo to get the list of GO Terms that are enriched in those DEGs, when comparing to all genes that were input to DESeq2.
+
+# get enriched GO terms using a R script to run the loop
+makeGOTermsTable-manual.R
 
 # check result
 ls -lrth resultOnScratch/
 
-# Conclusion
-High social species have enrichment for these GO terms when genes are up regulated in reproductive.
-Less social species have ....
+# understand output from TopGo (compare and contrast between species)
+2021-03-22-make-result-figure.Rmd
 
-We expect from individual studies a GO enrichment for boring genes.
 
+
+######################################################################################
+# Aim 4: Run GO Term enrichment for each species (WGCNA genes as focus loci)
+
+# Each species has a set of genes found in significant WGCNA modules. We use TopGo to get the list of GO Terms that are enriched in those genes significantly correlated to reproductive status (reproductives and non-reproductives), when comparing to all genes that were input to WGCNA.
+
+# get enriched GO terms
+makeGOTermsTable-no-directionality-WGCNA.R
+
+# check result
+ls -lrth resultOnScratch/topgo_result_WGCNA*
+
+# understand output from TopGo (compare and contrast between species)
+2021-05-04-analysis-GOTerms-WGCNA.Rmd
 
 
 ##############################################################
+# DRAFT
+# get enriched GO terms - this is not working and I do not know why
+qsub get-GO-terms-for-all-species.sh
