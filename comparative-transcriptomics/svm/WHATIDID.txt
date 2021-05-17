@@ -1,0 +1,160 @@
+# make a dataframe for R input
+# all samples of all species in columns
+# all orthogroups in rows (3718)
+
+mkdir input
+
+# soft link the merged count from rnaseq pipeline
+cd input
+ln -s ../../rnaseq-qc/Ceratina-australensis/result/Rehan2018/merged_gene_counts.txt Ceratina-australensis_raw-read-counts
+
+ln -s ../../rnaseq-qc/Ceratina-calcarata/result/ShellRehan2019/merged_gene_counts.txt Ceratina-calcarata_raw-read-counts
+
+ln -s ../../rnaseq-qc/Megalopta-genalis/result/merged_gene_counts.txt Megalopta-genalis_raw-read-counts
+
+ln -s ../../rnaseq-qc/Polistes-canadensis/result/Patalano/merged_gene_counts.txt Polistes-canadensis_raw-read-counts
+
+ln -s ../../rnaseq-qc/Polistes-dominula/result/Taylor/merged_gene_counts.txt Polistes-dominula_raw-read-counts
+
+ln -s ../../rnaseq-qc/Liostenogaster-flavolineata/result/Taylor/merged_gene_counts.txt Liostenogaster-flavolineatas_raw-read-counts
+
+# soft link list of genes associated with the 3,718 orthogroups
+ln -s ../../orthology-analysis/result/*_3718_gene_orthogroups_list .
+
+# info on sample name, phenotype and species
+# species-pheno-sampleName.txt
+
+# make one file with samples in columns, orthogroups in rows, read counts as values
+# if a species does not have the orthogroup, the read count for that orthogroup is 10
+make-input-file-for-svm.R
+
+# test svm code on a subset
+2021-04-30-svm-test-on-gotit-data.Rmd
+
+# each following run test data of one species against a training data made of 5 other
+qsub running-svm-job-Caus.sh
+qsub running-svm-job-Ccal.sh
+qsub running-svm-job-Mgen.sh
+qsub running-svm-job-Pdom.sh
+qsub running-svm-job-Pcan.sh
+qsub running-svm-job-Lfla.sh
+
+Support Vector Machine is a machine learning classifier used in many applications, such as predicting genes that classify wasp individuals in phenotypic groups (reproductives or non-reproductives) using expression patterns (Taylor et al 2020). This is a complementary approach to conventional differential gene expression analysis such as DESeq2.
+
+In each of our analyses, we use samples of one species as testing data, and the samples of the remaining five species as training data. The input is read counts of 3,718 nearly single-copy orthologous genes in reproductive and non-reproductive samples from six species (82 samples in total). As a result, we obtain a list of genes identified by the SVM as classification key features in a given species: the expression of those genes predict whether a given sample is reproductive or non-reproductive. We iterate the following analysis steps, each time with a different species as testing data.
+
+Following Taylor et al 2020 approach, we first ran a SVM cross-validation test, in which a third of the data is tested on the remaining data. The predicted phenotype is then compared against the actual phenotype with an error rate to compare with the optimised model. The cross-validation tested a subset of samples of one species (C. australensis) against the training data comprising of a subset of samples of the remaining five species (C. calcarata, M. genalis, P. dominula, P. canadensis, L. flavolineata), with an error rate of 0.2249. 
+
+We then tested all C. australensis samples against the whole training dataset (all samples from the remaining five species), in a series of SVMs that fine-tuned parameters (gamma and cost). This was iterated 20 times to obtain the best model (ie with the lowest error rate) which assigned weight to each of the 3,718 genes (ie the highest weight, the better at predicting phenotype). To perform recursive feature elimination, we removed the gene with the lowest predicting power, and re-computed the best model through the series of fine-tuning SVMs on now 3,717 genes. This remove-one-gene cycle was iterated until the dataset contained 100 genes only. We selected the optimised model with the lowest error rate amongst these 3,618 best models. In our C. australensis test, the optimised model has 515 genes that predicted best the phenotypes of the samples. We finally conducted a SVM on those 515 genes only, applying the fine-tuned parameters of the optimised model, with an error rate of 0.1735 lower than in the full-data model.
+
+
+
+We tested C. australensis data against the data from the other five species. We find 551 genes that are included in the optimised model (root mean cross-validation error rate 0.1735). The non-optimed model error rate is 0.1923.
+
+We tested C. calcarata data against the data from the other five species. We find 672 genes that are included in the optimised model (root mean cross-validation error rate 0.1896. The non-optimed model error rate is 0.2423
+
+
+We tested L. flavolineata data against the data from the other five species. We find 497 genes that are included in the optimised model (root mean cross-validation error rate 0.1938). The non-optimed model error rate is 0.2352.
+
+We tested P. dominula data against the data from the other five species. We find 639 genes that are included in the optimised model (root mean cross-validation error rate 0.2672). The non-optimed model error rate is 0.2993.
+
+We tested P. canadensis data against the data from the other five species. We find 537 genes that are included in the optimised model (root mean cross-validation error rate 0.1905). The non-optimed model error rate is 0.2235.
+
+We tested M. genalis data against the data from the other five species. We find 509 genes that are included in the optimised model (root mean cross-validation error rate 0.1769). The non-optimed model error rate is 0.2208.
+
+
+
+# For 5 iterations result
+mkdir result
+
+mkdir result/5-iterations
+
+mv SVM_V1* result/5-iterations/.
+mv *_svm_predicted_gene_list result/5-iterations/.
+mv *_svm_plot.pdf result/5-iterations/.
+
+# make a list of predictor genes per species
+cut -d " " -f 1 result/5-iterations/Ceratina_australensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/5-iterations/Ceratina_calcarata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/5-iterations/Megalopta_genalis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/5-iterations/Polistes_dominula_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Polistes_dominula_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/5-iterations/Polistes_canadensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/5-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy
+
+
+# do we have overlap of svm genes with DEGs? with WGCNAs? (venn diagram)
+# do we have interesting GO Terms enrichment? (TopGO)
+# what is the overall story here? common to wasps? common to bees? common to all (genetic toolkit)?
+2021-05-14-svm-result-analysis.Rmd
+
+# find the 141 common predictor geneson the annotation file (we want GO Terms)
+sed "s/OG/^id: GO:/g" result/5-iterations/141_common_predictor_genes | grep -A 3 -f - ../ortho-enrichment/inputOnScratch/go-basic.obo > result/5-iterations/141_common_predictor_genes_GOTerms
+
+
+# For 20 iterations result
+mkdir result
+
+mkdir result/20-iterations
+
+mv SVM_20rep_*.*71793* result/20-iterations/.
+mv *_svm_predicted_gene_list result/20-iterations/.
+mv *_svm_plot.pdf result/20-iterations/.
+
+# make a list of predictor genes per species
+cut -d " " -f 1 result/20-iterations/Ceratina_australensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/20-iterations/Megalopta_genalis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/20-iterations/Polistes_dominula_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Polistes_dominula_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/20-iterations/Polistes_canadensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy
+
+cut -d " " -f 1 result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy
+
+
+# do we have overlap of svm genes with DEGs? with WGCNAs? (venn diagram)
+# do we have interesting GO Terms enrichment? (TopGO)
+# what is the overall story here? common to wasps? common to bees? common to all (genetic toolkit)?
+2021-05-14-svm-result-analysis.Rmd
+
+# find the 141 common predictor geneson the annotation file (we want GO Terms)
+sed "s/OG/^id: GO:/g" result/20-iterations/132_common_predictor_genes | grep -A 3 -f - ../ortho-enrichment/inputOnScratch/go-basic.obo > result/20-iterations/132_common_predictor_genes_GOTerms
+
+
+
+
+####
+# run svm using one lineage as training dataset (either only wasp, or only bee)
+qsub running-svm-job-Caus-wasp-only.sh
+qsub running-svm-job-Ccal-wasp-only.sh
+qsub running-svm-job-Mgen-wasp-only.sh
+qsub running-svm-job-Pcan-wasp-only.sh
+qsub running-svm-job-Pdom-wasp-only.sh
+qsub running-svm-job-Lfla-wasp-only.sh
+
+qsub running-svm-job-Caus-bee-only.sh
+qsub running-svm-job-Ccal-bee-only.sh
+qsub running-svm-job-Mgen-bee-only.sh
+qsub running-svm-job-Pcan-bee-only.sh
+qsub running-svm-job-Pdom-bee-only.sh
+qsub running-svm-job-Lfla-bee-only.sh
+
+
+
+# For 20 iterations result of wasp only
+mkdir result/20-iterations-wasponly
+mv *wasp_only* result/20-iterations-wasponly/.
+mv *wasponly* result/20-iterations-wasponly/.
+
+# For 20 iterations result of bee only
+mkdir result/20-iterations-beeonly
+mv *bee_only* result/20-iterations-beeonly/.
+mv *beeonly* result/20-iterations-beeonly/.
+
