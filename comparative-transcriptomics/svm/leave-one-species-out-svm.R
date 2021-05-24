@@ -9,10 +9,13 @@
 #- Aim 1: Define SVM function
 #- Aim 2: Perform initial classification
 #- Aim 3: Perform feature selection
-
+#
 args = commandArgs(trailingOnly=TRUE)
+# focus_species    <- "Ceratina_australensis"
 focus_species    <- args[1]
+# training_species <- c("Ceratina_calcarata", "Megalopta_genalis")
 training_species <- c(args[-c(1,2)])
+# experiment_name <- "bees_only"
 experiment_name <- args[2]
 crossfold_level  <- 3
 
@@ -243,7 +246,7 @@ err_esti_num <- 1
 # create copy of training data that we can subject to repeated trimming
 # while preserving original frame
 svm.counts.train.iterate <- svm.full$traincounts
-
+svm.counts.test.iterate <- svm.full$testcounts
 # record original number of features
 nfeatures <- nrow(svm.counts.train.iterate)
 
@@ -273,7 +276,7 @@ while(nfeatures > nfeatures_target){
   
   #run repeatedly to account for stochasticity in cross-validation
   for(i in 1:err_esti_num){
-    
+    print("starting the loop of 1:1")
     # Perform a grid search to optimise SVM parameters
     svm.counts.tuneResult <- tune("svm", 
                           train.x     = t(svm.counts.train.iterate), 
@@ -288,16 +291,19 @@ while(nfeatures > nfeatures_target){
     
     # record error
     error <- c(error, svm.counts.tuneResult$best.performance)
+    
+    
+    
   }
   
   # sample classifier
   svm.counts.classifier <- svm.counts.tuneResult$best.model
-  
+  print("about to start the predit function")
   # vector of probability of being reproductive
   predictions <- rbind(predictions,
                        c(nfeatures,
                          predict(svm.counts.classifier,
-                  t(svm.full$testcounts), type = "class", probability = TRUE)))
+                  t(svm.counts.test.iterate), type = "class", probability = TRUE)))
   
   # return mean error value
   error <- signif(mean(error), 4)
@@ -308,9 +314,14 @@ while(nfeatures > nfeatures_target){
   # calculate feature with lowest weight (for ties, choose arbitrarily)
   weakfeature <- colnames(weights)[which(abs(weights) == min(abs(weights)))[1]]
   
-  # remove lowest-weight feature from data frame
+  # remove lowest-weight feature from data frame (train data)
   svm.counts.train.iterate <- subset(svm.counts.train.iterate,
                                      !(rownames(svm.counts.train.iterate) %in%
+                                         c(weakfeature)))
+  
+  # remove lowest-weight feature from data frame (test data)
+  svm.counts.test.iterate <- subset(svm.counts.test.iterate,
+                                     !(rownames(svm.counts.test.iterate) %in%
                                          c(weakfeature)))
   
   # store removed feature name and error value before removing that feature
@@ -318,7 +329,7 @@ while(nfeatures > nfeatures_target){
                                          error_before_removal = error))
   # tick down
   nfeatures <- (nfeatures-1)
-  
+  print("finishing the while loop")
   # output every 100 runs to track progress
   if((nfeatures/100)%%1==0){print(paste0("Features remaining: ",
                                          nfeatures))
