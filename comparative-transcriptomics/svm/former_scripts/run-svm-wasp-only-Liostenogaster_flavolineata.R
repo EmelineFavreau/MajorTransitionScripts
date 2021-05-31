@@ -1,37 +1,37 @@
----
-title: "SMV test on GOTIT data"
-author: "Emeline Favreau"
-date: "2021/04/27"
-output: html_document
----
+#---
+#title: "SVM test on Liostenogaster flavolineata, by training on wasp only"
+#author: "Emeline Favreau"
+#date: "2021/05/15"
+
+#---
 #### Copyright 2021 Emeline Favreau, University College London.
 
-Based on https://github.com/BenjaminATaylor/Taylor-et-al-2020-demo
-https://cran.r-project.org/web/packages/e1071/vignettes/svmdoc.pdf
-https://towardsdatascience.com/a-guide-to-svm-parameter-tuning-8bfe6b8a452c
-https://scikit-learn.org/stable/modules/cross_validation.html
-https://rstudio-pubs-static.s3.amazonaws.com/271792_96b51b7fa2af4b3f808d04f3f3051516.html
-https://towardsdatascience.com/cross-validation-430d9a5fee22
+#Based on https://github.com/BenjaminATaylor/Taylor-et-al-2020-demo
+#https://cran.r-project.org/web/packages/e1071/vignettes/svmdoc.pdf
+#https://towardsdatascience.com/a-guide-to-svm-parameter-tuning-8bfe6b8a452c
+#https://scikit-learn.org/stable/modules/cross_validation.html
+#https://rstudio-pubs-static.s3.amazonaws.com/271792_96b51b7fa2af4b3f808d04f3f3051516.html
+#https://towardsdatascience.com/cross-validation-430d9a5fee22
 
 
 
----
+#---
 ## Objective of analysis
-This is a test script to test the code provided by Ben.
-Our data are read counts provided by RSEM for 6 species, for 3718 orthogroups.
-We use one species as test data, and the five other as training data.
+#This is a test script to test the code provided by Ben.
+#Our data are read counts provided by RSEM for 6 species, for 3718 orthogroups.
+#We use one species as test data, and the three wasp species as training data.
 
 
 ## Analysis steps:
-- Obtaining data
-- Aim 1: Define SVM function
-- Aim 2: Perform initial classification
-- Aim 3: Perform feature selection
+#- Obtaining data
+#- Aim 1: Define SVM function
+#- Aim 2: Perform initial classification
+#- Aim 3: Perform feature selection
 
 
 
 
-```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+#```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
 # get libraries
 basic_libraries <- c("ggplot2",
                      "tidyverse",
@@ -51,11 +51,11 @@ for (lib in basic_libraries) {
 }
 
 #BiocManager::install("limma")
-```
+#```
 
 
 
-```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
+#```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
 # load a gene count df with samples in columns and gene id in rownames (1000 orthogroups, 96 samples)
 
 # matrix with orthogroups as row names, samples are column names
@@ -66,11 +66,11 @@ counts_clean <- read.csv("input/readcounts_3718orthogroups_6species.txt",
 # load a df with columns
 # Species Phenotype SampleName
 pheno_data <- read.delim("input/species-pheno-sampleName.txt", stringsAsFactors = FALSE)
-```
+#```
 
 ## Aim 1: Define SVM function
 
-```{r aim 1 define svm function, eval = TRUE, echo = FALSE, include = TRUE}
+#```{r aim 1 define svm function, eval = TRUE, echo = FALSE, include = TRUE}
 
 ## as a toydataset, subset the data to 1000 orthogroups to start
 row.names(counts_clean) <- counts_clean$orthogroup
@@ -83,10 +83,10 @@ colnames(counts_clean) <- gsub(x = colnames(counts_clean),
                                replacement = "")
 
 # subsample to 1000 orthogroups
-counts_clean_subset <- counts_clean[1:1000, ]
+#counts_clean_subset <- counts_clean[1:1000, ]
 
 #alternatively give all 3718 orthogroups
-#counts_clean_subset <- counts_clean
+counts_clean_subset <- counts_clean
 
 # change to matrix
 counts_clean_subset_mat <- as.matrix(counts_clean_subset)
@@ -95,21 +95,21 @@ counts_clean_subset_mat <- as.matrix(counts_clean_subset)
 # colnames(counts_clean) %in% pheno_data$SampleName
 
 # make a train data: sample labels and reproductives
-# all species except australensis
+# all wasp species
 this_traindata <- pheno_data %>% 
-  filter(Species != "Ceratina australensis") %>% 
+  filter(Species %in% c("Polistes canadensis", "Polistes dominula")) %>% 
   select(SampleName, Phenotype)
 
 # make a test data: sample labels and reproductives
-# just australensis
+# just calcarata
 this_testdata <- pheno_data %>% 
-  filter(Species == "Ceratina australensis") %>% 
+  filter(Species == "Liostenogaster flavolineata") %>% 
   select(SampleName, Phenotype)
 
-# create GeneList for gene list in full model
-GeneList <- "Ceratina_australensis_svm_predicted_gene_list"
-ErrorRateTable <- "Ceratina_australensis_svm_error_rates"
-
+# create filename for gene list in full model
+FileName <- "Liostenogaster_flavolineata_svm_agst_wasp_only_predicted_gene_list"
+plotFileName <- "Liostenogaster_flavolineata_svm_agst_wasp_only_plot.pdf"
+ErrorRateTable <- "Liostenogaster_flavolineata_svm_agst_wasp_only_error_rates"
 #### Define SVM function
 # the intended inputs for this function are a 2xn dataframe,
 # where n is your number of samples. 
@@ -210,40 +210,40 @@ svm.train <- function(readcounts,
   return(svm.result)
 }
 
-```
+#```
 
 
 
 ## Aim 2: Perform initial classification
 
-```{r aim 2 Perform initial classification, eval = TRUE, echo = FALSE, include = TRUE}
+#```{r aim 2 Perform initial classification, eval = TRUE, echo = FALSE, include = TRUE}
 #### Perform initial classification
 # apply svm to entire set of genes
 svm.full <- svm.train(readcounts  = counts_clean_subset_mat,
                       traindata   = this_traindata, 
                       testdata    = this_testdata, 
-                      crossfold   = 3,
+                      crossfold   = 2,
                       vstCheck    = F)
 
 # check 
 print(paste0("Root mean cross-validation error rate for full model: ",
              svm.full$validation_error))
-```
- Root mean cross-validation error rate for full model: 0.2635
+#```
+# Root mean cross-validation error rate for full model: 0.2635
  
- We aim for the lowest root mean cross-validation error rate for full model.
+# We aim for the lowest root mean cross-validation error rate for full model.
 
 
 
 ## Aim 3: Perform feature selection
 
-```{r aim 3 Perform feature selection, eval = TRUE, echo = FALSE, include = TRUE}
+#```{r aim 3 Perform feature selection, eval = TRUE, echo = FALSE, include = TRUE}
 #### Perform feature selection
 
 # for the purpose of testing, 
-# set the number of error estimates made in each loop in the feature selection to 1
+# set the number of error estimates made in each loop in the feature selection 
 # (usually 20)
-err_esti_num <- 1
+err_esti_num <- 20
 
 # create copy of training data that we can subject to repeated trimming
 # while preserving original frame
@@ -278,7 +278,7 @@ while(nfeatures > nfeatures_target){
                                  scale       = FALSE,
                                  kernel      = "radial", 
                                  tunecontrol = tune.control(sampling = "cross", 
-                                                            cross = 3),
+                                                            cross = 2),
                                  ranges = list(gamma = 10^(-5:-7),
                                                cost = 2^(4:6)))
     
@@ -327,7 +327,12 @@ hockeyData_plot <- hockeyData
 
 hockeyData_plot$num <- abs(iterLength - (max(iterLength)+1))
 
+# save pdf of plot
+pdf(file=plotFileName)
+
 plot(hockeyData_plot$num, hockeyData_plot$error, xlim = rev(c(0, 1000)))
+
+dev.off()
 
 # get minimum of this curve to find the point at which the error window is at its minimum
 optimal_removal <- which(moving_avg == min(moving_avg));
@@ -345,7 +350,7 @@ svm.optimal <- svm.train(counts_clean_subsample,
                         referencelevel = "R",
                         this_traindata, 
                         this_testdata,
-                        crossfold = 3,
+                        crossfold = 2,
                         vstCheck = F)
 
 # 
@@ -357,78 +362,12 @@ print(paste0("Root mean cross-validation error rate for optimised model: ",
 
 # the genes taken in the final model are found rownames(svm.optimal$traincounts)
 write.table(x = svm.optimal$traincounts,
-            file = GeneList,
-            quotes = FALSE,
-            row.names = FALSE)  
+            file = FileName,
+            row.names = TRUE)     
 
 # save a table with feature to be removed and error rate associated
 write.table(x = iterations,
             file = ErrorRateTable,
             quotes = FALSE,
             row.names = TRUE)  
-```
-"Number of genes included in optimised model: 100"
-"Root mean cross-validation error rate for optimised model: 0.03979"
 
-Conclusion
-With one iteration on 1000 genes, it takes 15 minutes.
-
-
-```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
-# record versions of R and packages here
-sessionInfo()
-# R version 3.6.3 (2020-02-29)
-# Platform: x86_64-apple-darwin15.6.0 (64-bit)
-# Running under: macOS  10.16
-# 
-# Matrix products: default
-# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
-# 
-# locale:
-# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
-# 
-# attached base packages:
-# [1] parallel  stats4    stats     graphics  grDevices utils     datasets  methods  
-# [9] base     
-# 
-# other attached packages:
-#  [1] limma_3.42.2                pracma_2.3.3                DESeq2_1.26.0              
-#  [4] SummarizedExperiment_1.16.1 DelayedArray_0.12.3         BiocParallel_1.20.1        
-#  [7] matrixStats_0.58.0          Biobase_2.46.0              GenomicRanges_1.38.0       
-# [10] GenomeInfoDb_1.22.1         IRanges_2.20.2              S4Vectors_0.24.4           
-# [13] BiocGenerics_0.32.0         e1071_1.7-4                 forcats_0.5.1              
-# [16] stringr_1.4.0               dplyr_1.0.4                 purrr_0.3.4                
-# [19] readr_1.4.0                 tidyr_1.1.2                 tibble_3.0.6               
-# [22] tidyverse_1.3.0             ggplot2_3.3.3              
-# 
-# loaded via a namespace (and not attached):
-#  [1] bitops_1.0-6           fs_1.5.0               bit64_4.0.5           
-#  [4] lubridate_1.7.9.2      RColorBrewer_1.1-2     httr_1.4.2            
-#  [7] tools_3.6.3            backports_1.2.1        R6_2.5.0              
-# [10] rpart_4.1-15           Hmisc_4.4-2            DBI_1.1.1             
-# [13] colorspace_2.0-0       nnet_7.3-15            withr_2.4.1           
-# [16] tidyselect_1.1.0       gridExtra_2.3          bit_4.0.4             
-# [19] compiler_3.6.3         cli_2.3.0              rvest_0.3.6           
-# [22] htmlTable_2.1.0        xml2_1.3.2             scales_1.1.1          
-# [25] checkmate_2.0.0        genefilter_1.68.0      digest_0.6.27         
-# [28] foreign_0.8-75         XVector_0.26.0         base64enc_0.1-3       
-# [31] jpeg_0.1-8.1           pkgconfig_2.0.3        htmltools_0.5.1.1     
-# [34] dbplyr_2.1.0           htmlwidgets_1.5.3      rlang_0.4.10          
-# [37] readxl_1.3.1           RSQLite_2.2.3          rstudioapi_0.13       
-# [40] generics_0.1.0         jsonlite_1.7.2         RCurl_1.98-1.2        
-# [43] magrittr_2.0.1         GenomeInfoDbData_1.2.2 Formula_1.2-4         
-# [46] Matrix_1.3-2           Rcpp_1.0.6             munsell_0.5.0         
-# [49] fansi_0.4.2            lifecycle_0.2.0        stringi_1.5.3         
-# [52] yaml_2.2.1             zlibbioc_1.32.0        blob_1.2.1            
-# [55] grid_3.6.3             crayon_1.4.1           lattice_0.20-41       
-# [58] haven_2.3.1            splines_3.6.3          annotate_1.64.0       
-# [61] hms_1.0.0              locfit_1.5-9.4         knitr_1.31            
-# [64] pillar_1.4.7           geneplotter_1.64.0     XML_3.99-0.3          
-# [67] reprex_1.0.0           glue_1.4.2             latticeExtra_0.6-29   
-# [70] BiocManager_1.30.10    data.table_1.13.6      modelr_0.1.8          
-# [73] vctrs_0.3.6            png_0.1-7              cellranger_1.1.0      
-# [76] gtable_0.3.0           assertthat_0.2.1       xfun_0.21             
-# [79] xtable_1.8-4           broom_0.7.4            class_7.3-18          
-# [82] survival_3.2-7         memoise_2.0.0          AnnotationDbi_1.48.0  
-# [85] cluster_2.1.0          ellipsis_0.3.1  
-```
