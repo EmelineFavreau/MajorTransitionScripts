@@ -20,5 +20,5 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-Megalopta_genalis.R  
+Rscript leave-one-species-out-svm.R Megalopta_genalis SVM_all_species Polistes_canadensis Polistes_dominula Liostenogaster_flavolineata Ceratina_australensis Ceratina_calcarata
 

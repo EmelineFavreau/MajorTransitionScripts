@@ -49,74 +49,34 @@ We then tested all C. australensis samples against the whole training dataset (a
 
 
 
-We tested C. australensis data against the data from the other five species. We find 551 genes that are included in the optimised model (root mean cross-validation error rate 0.1735). The non-optimed model error rate is 0.1923.
-
-We tested C. calcarata data against the data from the other five species. We find 672 genes that are included in the optimised model (root mean cross-validation error rate 0.1896. The non-optimed model error rate is 0.2423
-
-
-We tested L. flavolineata data against the data from the other five species. We find 497 genes that are included in the optimised model (root mean cross-validation error rate 0.1938). The non-optimed model error rate is 0.2352.
-
-We tested P. dominula data against the data from the other five species. We find 639 genes that are included in the optimised model (root mean cross-validation error rate 0.2672). The non-optimed model error rate is 0.2993.
-
-We tested P. canadensis data against the data from the other five species. We find 537 genes that are included in the optimised model (root mean cross-validation error rate 0.1905). The non-optimed model error rate is 0.2235.
-
-We tested M. genalis data against the data from the other five species. We find 509 genes that are included in the optimised model (root mean cross-validation error rate 0.1769). The non-optimed model error rate is 0.2208.
 
 
 
-# For 5 iterations result
-mkdir result
-
-mkdir result/5-iterations
-
-mv SVM_V1* result/5-iterations/.
-mv *_svm_predicted_gene_list result/5-iterations/.
-mv *_svm_plot.pdf result/5-iterations/.
-
-# make a list of predictor genes per species
-cut -d " " -f 1 result/5-iterations/Ceratina_australensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy
-
-cut -d " " -f 1 result/5-iterations/Ceratina_calcarata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy
-
-cut -d " " -f 1 result/5-iterations/Megalopta_genalis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy
-
-cut -d " " -f 1 result/5-iterations/Polistes_dominula_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Polistes_dominula_svm_predicted_gene_list_tidy
-
-cut -d " " -f 1 result/5-iterations/Polistes_canadensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy
-
-cut -d " " -f 1 result/5-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/5-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy
-
-
-# do we have overlap of svm genes with DEGs? with WGCNAs? (venn diagram)
-# do we have interesting GO Terms enrichment? (TopGO)
-# what is the overall story here? common to wasps? common to bees? common to all (genetic toolkit)?
-2021-05-14-svm-result-analysis.Rmd
-
-# find the 141 common predictor geneson the annotation file (we want GO Terms)
-sed "s/OG/^id: GO:/g" result/5-iterations/141_common_predictor_genes | grep -A 3 -f - ../ortho-enrichment/inputOnScratch/go-basic.obo > result/5-iterations/141_common_predictor_genes_GOTerms
 
 
 # For 20 iterations result
 mkdir result
 
 mkdir result/20-iterations
-
-mv SVM_20rep_*.*71793* result/20-iterations/.
+mv SVM_20rep_Pdom.*7228900 result/20-iterations/.
+mv SVM_20rep_Lfla.*7228902 result/20-iterations/.
+mv SVM_20rep_Pcan.*7228901 result/20-iterations/.
+mv SVM_20rep_*.*72288* result/20-iterations/.
 mv *_svm_predicted_gene_list result/20-iterations/.
 mv *_svm_plot.pdf result/20-iterations/.
 
 # make a list of predictor genes per species
-cut -d " " -f 1 result/20-iterations/Ceratina_australensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy
+cut -d " " -f 1 result/20-iterations/Ceratina_australensis_SVM_all_species_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy
 
-cut -d " " -f 1 result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy
+cut -d " " -f 1 result/20-iterations/Ceratina_calcarata_SVM_all_species_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy
 
-cut -d " " -f 1 result/20-iterations/Megalopta_genalis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy
+cut -d " " -f 1 result/20-iterations/Megalopta_genalis_SVM_all_species_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy
 
-cut -d " " -f 1 result/20-iterations/Polistes_dominula_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Polistes_dominula_svm_predicted_gene_list_tidy
+cut -d " " -f 1 result/20-iterations/Polistes_dominula_SVM_all_species_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Polistes_dominula_svm_predicted_gene_list_tidy
 
-cut -d " " -f 1 result/20-iterations/Polistes_canadensis_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy
+cut -d " " -f 1 result/20-iterations/Polistes_canadensis_SVM_all_species_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy
 
-cut -d " " -f 1 result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy
+cut -d " " -f 1 result/20-iterations/Liostenogaster_flavolineata_SVM_all_species_predicted_gene_list | sed 's/"//g' | tail -n +2 > result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy
 
 
 # do we have overlap of svm genes with DEGs? with WGCNAs? (venn diagram)
@@ -124,8 +84,8 @@ cut -d " " -f 1 result/20-iterations/Liostenogaster_flavolineata_svm_predicted_g
 # what is the overall story here? common to wasps? common to bees? common to all (genetic toolkit)?
 2021-05-14-svm-result-analysis.Rmd
 
-# find the 141 common predictor geneson the annotation file (we want GO Terms)
-sed "s/OG/^id: GO:/g" result/20-iterations/132_common_predictor_genes | grep -A 3 -f - ../ortho-enrichment/inputOnScratch/go-basic.obo > result/20-iterations/132_common_predictor_genes_GOTerms
+# find the 125 common predictor geneson the annotation file (we want GO Terms)
+sed "s/OG/^id: GO:/g" result/20-iterations/125_common_predictor_genes | grep -A 3 -f - ../ortho-enrichment/inputOnScratch/go-basic.obo > result/20-iterations/125_common_predictor_genes_GOTerms
 
 
 
@@ -158,3 +118,10 @@ mkdir result/20-iterations-beeonly
 mv *bee_only* result/20-iterations-beeonly/.
 mv *beeonly* result/20-iterations-beeonly/.
 
+# I changed the code 
+# For 5 iterations result
+mkdir result/5-iterations
+
+mv SVM_V1* result/5-iterations/.
+mv *_svm_predicted_gene_list result/5-iterations/.
+mv *_svm_plot.pdf result/5-iterations/.

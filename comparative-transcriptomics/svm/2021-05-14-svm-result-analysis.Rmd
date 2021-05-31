@@ -16,9 +16,9 @@ Here we compare predictor genes between species: is there an overlap between spe
 
 ## Analysis steps:
 - Obtaining data
-- Aim 1: description
-- Aim 2: description
-- Aim 3: description
+- Aim 1: describe overlap between SVM predictor genes
+- Aim 2: GO Terms associated with those predictor genes
+- Aim 3: GO Terms associated for each species
 - Aim 4: description
 
 
@@ -189,14 +189,14 @@ wide_df$species_count <- wide_df %>%
   select(all_of(all_species)) %>%
   rowSums()
 
-# list genes that are common to all: 141 genes
+# list genes that are common to all: 125 genes
 #wide_df %>% filter(species_count == 6) %>%  nrow()
 common_predictor_genes <- wide_df %>% filter(species_count == 6) %>%
   select(predictor_gene)
 
 # save those genes to explore GO Terms and literature review
 write.table(x = common_predictor_genes,
-            file = "result/20-iterations/132_common_predictor_genes",
+            file = "result/20-iterations/125_common_predictor_genes",
             quote = FALSE,
             row.names = FALSE)
   
@@ -210,7 +210,7 @@ write.table(x = common_predictor_genes,
 #wide_df %>% filter(species_count == 3) %>%  nrow()
 ```
 
-There are 132 predictor genes that are common to all species.
+There are 125 predictor genes that are common to all species.
 
 
 ## Aim 2: GO Terms associated with those predictor genes
@@ -233,7 +233,7 @@ for(gocat in goCategory_vec){
       
       # set data input
       raw_results_file         <- "input/Ceratina_australensis_3718_gene_orthogroups_list" 
-      raw_selectionGenes_file  <- "result/20-iterations/132_common_predictor_genes"
+      raw_selectionGenes_file  <- "result/20-iterations/125_common_predictor_genes"
       raw_blast_results_file   <- "../ortho-enrichment/resultOnScratch/Ceratina_australensis_filtered"
       hash_table <- "../ortho-enrichment/tmp/Ceratina_australensis_protein_gene_hash_table"
       
@@ -391,7 +391,7 @@ for(gocat in goCategory_vec){
 
 ```
 
-## Aim 3: GO Terms associated with those predictor genes
+## Aim 3: GO Terms associated for each species
 
 ```{r aim 3, eval = FALSE, echo = FALSE, include = FALSE}
 # obtain GO Terms associated with the predictor genes

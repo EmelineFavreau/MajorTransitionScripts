@@ -20,5 +20,5 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-bee-only-Liostenogaster_flavolineata.R
+Rscript leave-one-species-out-svm.R Liostenogaster_flavolineata SVM_bees_only Megalopta_genalis Ceratina_australensis Ceratina_calcarata 
 

@@ -20,5 +20,6 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-wasp-only-Polistes_canadensis.R
+Rscript leave-one-species-out-svm.R Polistes_canadensis SVM_wasps_only Polistes_dominula Liostenogaster_flavolineata
+
 

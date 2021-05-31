@@ -20,5 +20,5 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-Liostenogaster_flavolineata.R  
+Rscript leave-one-species-out-svm.R Liostenogaster_flavolineata SVM_all_species Polistes_canadensis Polistes_dominula Ceratina_australensis Ceratina_calcarata Megalopta_genalis
 

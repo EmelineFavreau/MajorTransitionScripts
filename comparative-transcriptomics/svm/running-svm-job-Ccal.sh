@@ -20,5 +20,5 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-Ceratina_calcarata.R
+Rscript leave-one-species-out-svm.R Ceratina_calcarata SVM_all_species Polistes_canadensis Polistes_dominula Liostenogaster_flavolineata Ceratina_australensis Megalopta_genalis
 

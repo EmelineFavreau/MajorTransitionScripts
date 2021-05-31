@@ -20,5 +20,5 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-bee-only-Ceratina_calcarata.R
+Rscript leave-one-species-out-svm.R Ceratina_calcarata SVM_bees_only Ceratina_australensis Megalopta_genalis
 

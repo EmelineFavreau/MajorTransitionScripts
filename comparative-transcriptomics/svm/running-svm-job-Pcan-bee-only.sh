@@ -20,5 +20,5 @@ module unload compilers
 module unload mpi
 module load r/recommended
 
-Rscript run-svm-bee-only-Polistes_canadensis.R
+Rscript leave-one-species-out-svm.R Polistes_canadensis SVM_bees_only Megalopta_genalis Ceratina_australensis Ceratina_calcarata
 

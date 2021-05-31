@@ -100,6 +100,11 @@ ErrorRateTableFileName <- paste(focus_species, experiment_name,
                         "error_rates",
                         sep = "_")
 
+# for prediction probability table
+predictionsTableFileName <- paste(focus_species, experiment_name,
+                                  "prediction_table",
+                                  sep = "_")
+
 # for workspace
 workspaceFileName <- paste(focus_species, experiment_name,
                                 ".R.Data",
@@ -241,7 +246,7 @@ print(paste0("Root mean cross-validation error rate for full model: ",
 
 # set the number of error estimates made in each loop in the feature selection 
 # (usually 20)
-err_esti_num <- 1
+err_esti_num <- 20
 
 # create copy of training data that we can subject to repeated trimming
 # while preserving original frame
@@ -276,7 +281,7 @@ while(nfeatures > nfeatures_target){
   
   #run repeatedly to account for stochasticity in cross-validation
   for(i in 1:err_esti_num){
-    print("starting the loop of 1:1")
+    #print("starting the loop of 1:1")
     # Perform a grid search to optimise SVM parameters
     svm.counts.tuneResult <- tune("svm", 
                           train.x     = t(svm.counts.train.iterate), 
@@ -298,7 +303,7 @@ while(nfeatures > nfeatures_target){
   
   # sample classifier
   svm.counts.classifier <- svm.counts.tuneResult$best.model
-  print("about to start the predit function")
+  #print("about to start the predit function")
   # vector of probability of being reproductive
   predictions <- rbind(predictions,
                        c(nfeatures,
@@ -329,7 +334,7 @@ while(nfeatures > nfeatures_target){
                                          error_before_removal = error))
   # tick down
   nfeatures <- (nfeatures-1)
-  print("finishing the while loop")
+  #print("finishing the while loop")
   # output every 100 runs to track progress
   if((nfeatures/100)%%1==0){print(paste0("Features remaining: ",
                                          nfeatures))
