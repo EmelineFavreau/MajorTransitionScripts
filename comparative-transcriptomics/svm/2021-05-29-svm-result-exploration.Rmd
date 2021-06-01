@@ -144,6 +144,10 @@ ggplot(data = Caus_long,
   xlab("Number of genes in model") +
   theme_bw()
 
+# save the plot as a tiff file
+ggsave("result/20-iterations/Ceratina_australensis_trained_on_5_species.tiff",
+       device = "tiff")
+
 ```
 
 Interestingly, one sample's predicted phenotype does not match the expected phenotype.
@@ -185,6 +189,10 @@ ggplot(data = Ccal_long,
   xlab("Number of genes in model") +
   theme_bw()
 
+# save the plot as a tiff file
+ggsave("result/20-iterations/Ceratina_calcarata_trained_on_5_species.tiff",
+       device = "tiff")
+
 ```
 
 ## Aim 3: Megalopta genalis trained on 5 species
@@ -224,7 +232,9 @@ ggplot(data = Mgen_long,
   xlab("Number of genes in model") +
   theme_bw()
 
-
+# save the plot as a tiff file
+ggsave("result/20-iterations/Megalopta_genalis_trained_on_5_species.tiff",
+       device = "tiff")
 ```
 Conclusion
 
@@ -265,7 +275,9 @@ ggplot(data = Lfla_long,
   xlab("Number of genes in model") +
   theme_bw()
 
-
+# save the plot as a tiff file
+ggsave("result/20-iterations/Liostenogaster_flavolineata_trained_on_5_species.tiff",
+       device = "tiff")
 ```
 Conclusion
 
@@ -306,6 +318,9 @@ ggplot(data = Pcan_long,
   xlab("Number of genes in model") +
   theme_bw()
 
+# save the plot as a tiff file
+ggsave("result/20-iterations/Polistes_canadensis_trained_on_5_species.tiff",
+       device = "tiff")
 ```
 
 ## Aim 6: Polistes dominula trained on 5 species
@@ -345,6 +360,9 @@ ggplot(data = Pdom_long,
   xlab("Number of genes in model") +
   theme_bw()
 
+# save the plot as a tiff file
+ggsave("result/20-iterations/Polistes_dominula_trained_on_5_species.tiff",
+       device = "tiff")
 ```
 Conclusion
 
@@ -383,6 +401,10 @@ ggplot(data = Caus_long,
   ylab("Predicted Reproductive Probability") +
   xlab("Number of genes in model") +
   theme_bw()
+
+# save the plot as a tiff file
+ggsave("result/20-iterations-beeonly/Ceratina_australensis_trained_on_bees.tiff",
+       device = "tiff")
 
 ```
 
