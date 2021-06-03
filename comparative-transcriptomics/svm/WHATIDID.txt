@@ -28,6 +28,9 @@ ln -s ../../orthology-analysis/result/*_3718_gene_orthogroups_list .
 # if a species does not have the orthogroup, the read count for that orthogroup is 10
 make-input-file-for-svm.R
 
+# test between radial and linear kernel (radial had better accuracy rate)
+kernel-selection.R
+
 # test svm code on a subset
 2021-04-30-svm-test-on-gotit-data.Rmd
 
