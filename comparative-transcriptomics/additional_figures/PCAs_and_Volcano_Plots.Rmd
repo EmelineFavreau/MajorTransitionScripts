@@ -1,0 +1,823 @@
+---
+title: "PCAs and Volcano Plots"
+author: "K.S. Geist, Iowa State University"
+date: "6/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Install and load requisite libraries.
+```{r, warning=FALSE, include = FALSE}
+#install.packages("BiocManager")
+#BiocManager::install("WGCNA")
+## This may take a while, as there are a lot of dependencies. I suggest doing this in R rather than R Studio if you run into issues.
+## Note that if you are on a Mac, you may be missing pkg-config and/or zlib. If so, you will need to use Homebrew to get them.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+# Function that loads an RData file, and returns it with your custom name
+loadRData <- function(fileName){    
+    load(fileName)
+    get(ls()[ls() != "fileName"])
+}
+
+## Load libraries
+library(DESeq2)
+library(ggplot2)
+library(EnhancedVolcano)
+
+# setwd("/Users/ksg/Dropbox/0.ISU/0.network_analyses/additional_figures")
+```
+
+## Read in all 6 Species Variance Stabilized Values
+
+##### Read in the metadata:
+```{r}
+meta <- read.csv(file = "../deg-DESeq2/Comparative_Transcriptomics_Metadata.csv", strip.white = T, header = T)
+#str(meta)
+```
+
+Read in the VST expression data (for PCA):
+```{r}
+## Set the species:
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata") 
+wasps <- species[4:6]
+bees <- species[1:3]
+
+Caus.vst <- loadRData(paste("../deg-deseq2/full_set/", species[1], "/", species[1], "_VST.Rdata", sep=""))
+
+Ccal.vst <- loadRData(paste("../deg-deseq2/full_set/", species[2], "/", species[2], "_VST.Rdata", sep=""))
+
+Mgen.vst <- loadRData(paste("../deg-deseq2/full_set/", species[3], "/", species[3], "_VST.Rdata", sep=""))
+
+Pcan.vst <- loadRData(paste("../deg-deseq2/full_set/", species[4], "/", species[4], "_VST.Rdata", sep=""))
+
+Pdom.vst <- loadRData(paste("../deg-deseq2/full_set/", species[5], "/", species[5], "_VST.Rdata", sep=""))
+
+Lfla.vst <- loadRData(paste("../deg-deseq2/full_set/", species[6], "/", species[6], "_VST.Rdata", sep=""))
+
+vst.list <- list(Ccal.vst, Caus.vst, Mgen.vst, Pcan.vst, Pdom.vst, Lfla.vst)
+## Then, to access the data, use the assay() function:
+vst.assay <- list(assay(Ccal.vst), assay(Caus.vst), assay(Mgen.vst), assay(Pcan.vst), assay(Pdom.vst), assay(Lfla.vst))
+```
+
+PCAs
+```{r}
+
+plot_list = list()
+for(i in 1:length(species)) {
+    pca <- plotPCA(vst.list[[i]], intgroup="phenotype")
+
+    ## Boxes without points:
+    # pca + geom_label(aes(label = colnames(vst.list[[i]]))) + 
+            # scale_color_manual(values = c("cornflower blue", "darkgoldenrod2")) + 
+            # theme_classic() + 
+            # xlim(-45, 45)
+
+      ## We can also 'nudge' the points up a bit:
+      nudge <- position_nudge(y = 2.5, x = -1.2)
+
+      ## Boxes with points:
+      # pca + geom_label(aes(label = colnames(vst.list[[i]])), position = nudge) +
+            # scale_color_manual(values = c("cornflower blue", "darkgoldenrod2")) +
+            # theme_classic() +
+            # xlim(-45, 45)
+
+      ## Unboxed labels on points:
+      pca <- pca + geom_text(aes(label = colnames(vst.list[[i]])), size = 3, position = nudge) +
+            geom_point(size = 2.5) + scale_color_manual(values = c("cornflower blue", 
+                                                                   "darkgoldenrod2")) +
+            theme_classic() + 
+            xlim(-45, 45) +
+            ylim(-35,35) +
+            theme(legend.title = element_blank()) +
+            theme(legend.position = "bottom") + 
+            theme(legend.background = element_rect(fill="light yellow",
+                                  size=0.5, linetype="solid", 
+                                  colour ="black")) +
+            # theme(text = element_text(size = 14)) + 
+            ggtitle(species[i])
+
+
+      ## Save the plots to a list:
+      plot_list[[i]] = pca
+}
+
+# Save plots to tiff format, making a separate file for each plot.
+for (i in 1:length(species)) {
+    tiff(paste(species[i], "_PCA.tiff", sep=""), units="in", width=6, height=8, res=300)
+    print(plot_list[[i]])
+    dev.off()
+}
+
+for (i in 1:length(species)) {
+    par(mar=c(2,2,2,2))
+    print(plot_list[[i]])
+}
+```
+
+PCA: Ceratina calcarata
+```{r}
+tiff("Ccalcarata_PCA.tiff", units="in", width=6, height=6, res=300)
+p1 <- plotPCA(Ccal.vst, intgroup="phenotype")
+## Boxes without points:
+# p1 + geom_label(aes(label = colnames(Ccal.vst))) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-25, 25)
+## or 'nudge' the points up a bit
+nudge <- position_nudge(y = 1.5, x = 1)
+## Boxes with points:
+# p1 + geom_label(aes(label = colnames(Ccal.vst)), position = nudge) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-25, 25)
+## Unboxed labels on points:
+p1 + geom_text(aes(label = colnames(Ccal.vst)), position = nudge) + geom_point(size = 2.5) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-45, 45) + theme(legend.title = element_blank()) + ggtitle("Ceratina calcarata")
+dev.off()
+```
+
+
+PCA: Megalopta genalis
+```{r}
+tiff("Mgenalis_PCA.tiff", units="in", width=6, height=6, res=300)
+df <- 
+
+p1 <- plotPCA(Mgen.vst, intgroup="phenotype")
+## Boxes without points:
+# p1 + geom_label(aes(label = colnames(Lfla.vst))) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-25, 25)
+## or 'nudge' the points up a bit
+nudge <- position_nudge(y = 1.5, x = 1)
+## Boxes with points:
+# p1 + geom_label(aes(label = colnames(Lfla.vst)), position = nudge) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-25, 25)
+## Unboxed labels on points:
+p1 + geom_text(aes(label = colnames(Mgen.vst)), position = nudge) + geom_point(size = 2.5) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-45, 45) + theme(legend.title = element_blank()) + ggtitle("Liostenogaster flavolineata")
+dev.off()
+```
+
+PCA: Liostenogaster flavolineata
+```{r}
+tiff("Lflavolineata_PCA.tiff", units="in", width=6, height=6, res=300)
+p1 <- plotPCA(Lfla.vst, intgroup="phenotype")
+## Boxes without points:
+# p1 + geom_label(aes(label = colnames(Lfla.vst))) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-25, 25)
+## or 'nudge' the points up a bit
+nudge <- position_nudge(y = 1.5, x = 1)
+## Boxes with points:
+# p1 + geom_label(aes(label = colnames(Lfla.vst)), position = nudge) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-25, 25)
+## Unboxed labels on points:
+p1 + geom_text(aes(label = colnames(Lfla.vst)), position = nudge) + geom_point(size = 2.5) + scale_color_manual(values = c("darkgoldenrod2", "cornflower blue")) + theme_classic() + xlim(-45, 45) + theme(legend.title = element_blank()) + ggtitle("Liostenogaster flavolineata")
+dev.off()
+```
+
+
+
+## Volcano Plots
+Read in the DESeq2 results tables:
+```{r}
+Caus.lfcShrink <- loadRData(paste("../deg-DESeq2/full_set/", species[1], "/", species[1], "_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+Ccal.lfcShrink <- loadRData(paste("../deg-DESeq2/full_set/", species[2], "/", species[2], "_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+Mgen.lfcShrink <- loadRData(paste("../deg-DESeq2/full_set/", species[3], "/", species[3], "_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+Pcan.lfcShrink <- loadRData(paste("../deg-DESeq2/full_set/", species[4], "/", species[4], "_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+Pdom.lfcShrink <- loadRData(paste("../deg-DESeq2/full_set/", species[5], "/", species[5], "_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+Lfla.lfcShrink <- loadRData(paste("../deg-DESeq2/full_set/", species[6], "/", species[6], "_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+```
+
+
+Load the DEGs for each species:
+```{r}
+Caus.DEG <- read.table(file = paste("../deg-DESeq2/full_set/", species[1], "/", species[1], "_all_DEGs.txt", sep=""), sep="\t",  header = F)
+Ccal.DEG <- read.table(file = paste("../deg-DESeq2/full_set/", species[2], "/", species[2], "_all_DEGs.txt", sep=""), sep="\t",  header = F)
+Mgen.DEG <- read.table(file = paste("../deg-DESeq2/full_set/", species[3], "/", species[3], "_all_DEGs.txt", sep=""), sep="\t",  header = F)
+Pcan.DEG <- read.table(file = paste("../deg-DESeq2/full_set/", species[4], "/", species[4], "_all_DEGs.txt", sep=""), sep="\t",  header = F)
+Pdom.DEG <- read.table(file = paste("../deg-DESeq2/full_set/", species[5], "/", species[5], "_all_DEGs.txt", sep=""), sep="\t",  header = F)
+Lfla.DEG <- read.table(file = paste("../deg-DESeq2/full_set/", species[6], "/", species[6], "_all_DEGs.txt", sep=""), sep="\t",  header = F)
+
+DEG.counts <- c(nrow(Ccal.DEG), nrow(Caus.DEG), nrow(Mgen.DEG), nrow(Pcan.DEG), nrow(Pdom.DEG), nrow(Lfla.DEG))
+```
+
+Load the WGCNA trait-associated genes for each species:
+```{r}
+Caus.wgcna <- read.table(file = paste("../WGCNA/full_set/", species[1], "/GO_Gene_Lists/", species[1], "_WGCNA_Significant_Module_Genes.txt", sep=""), sep="\t",  header = F)
+Ccal.wgcna <- read.table(file = paste("../WGCNA/full_set/", species[2], "/GO_Gene_Lists/", species[2], "_WGCNA_Significant_Module_Genes.txt", sep=""), sep="\t",  header = F)
+Mgen.wgcna <- read.table(file = paste("../WGCNA/full_set/", species[3], "/GO_Gene_Lists/", species[3], "_WGCNA_Significant_Module_Genes.txt", sep=""), sep="\t",  header = F)
+Pcan.wgcna <- read.table(file = paste("../WGCNA/full_set/", species[4], "/GO_Gene_Lists/", species[4], "_WGCNA_Significant_Module_Genes.txt", sep=""), sep="\t",  header = F)
+Pdom.wgcna <- read.table(file = paste("../WGCNA/full_set/", species[5], "/GO_Gene_Lists/", species[5], "_WGCNA_Significant_Module_Genes.txt", sep=""), sep="\t",  header = F)
+Lfla.wgcna <- read.table(file = paste("../WGCNA/full_set/", species[6], "/GO_Gene_Lists/", species[6], "_WGCNA_Significant_Module_Genes.txt", sep=""), sep="\t",  header = F)
+
+wgcna.counts <- c(nrow(Ccal.wgcna), nrow(Caus.wgcna), nrow(Mgen.wgcna), nrow(Pcan.wgcna), nrow(Pdom.wgcna), nrow(Lfla.wgcna))
+```
+
+Load in the SVM genes:
+```{r}
+Caus.SVM <- read.table(file = paste("~/Dropbox/0.Github.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/", species[1], "_svm_predicted_gene_list_tidy", sep=""), sep="\t",  header = F)
+Ccal.SVM <- read.table(file = paste("~/Dropbox/0.Github.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/", species[2], "_svm_predicted_gene_list_tidy", sep=""), sep="\t",  header = F)
+Mgen.SVM <- read.table(file = paste("~/Dropbox/0.Github.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/", species[3], "_svm_predicted_gene_list_tidy", sep=""), sep="\t",  header = F)
+Pcan.SVM <- read.table(file = paste("~/Dropbox/0.Github.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/", species[4], "_svm_predicted_gene_list_tidy", sep=""), sep="\t",  header = F)
+Pdom.SVM <- read.table(file = paste("~/Dropbox/0.Github.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/", species[5], "_svm_predicted_gene_list_tidy", sep=""), sep="\t",  header = F)
+Lfla.SVM <- read.table(file = paste("~/Dropbox/0.Github.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/", species[6], "_svm_predicted_gene_list_tidy", sep=""), sep="\t",  header = F)
+
+SVM.counts <- c(nrow(Ccal.SVM), nrow(Caus.SVM), nrow(Mgen.SVM), nrow(Pcan.SVM), nrow(Pdom.SVM), nrow(Lfla.SVM))
+```
+
+## Load in the orthologs:
+```{r}
+Caus.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Ceratina_australensis_5787_gene_orthogroups_list", sep = "\t", header = F)
+Ccal.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Ceratina_calcarata_5787_gene_orthogroups_list", sep = "\t", header = F)
+beesOrthoData <- merge(Caus.ortho, Ccal.ortho, by = "V1")
+colnames(beesOrthoData) <- c("Orthogroup", species[1], species[2])
+nrow(beesOrthoData)
+# beesOrthoData
+Mgen.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Megalopta_genalis_5787_gene_orthogroups_list", sep = "\t", header = F)
+beesOrthoData <- merge(beesOrthoData, Mgen.ortho, by.x = "Orthogroup", by.y = "V1")
+colnames(beesOrthoData) <- c("Orthogroup", species[1], species[2], species[3])
+nrow(beesOrthoData)
+# beesOrthoData
+
+Pcan.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Polistes_canadensis_6983_gene_orthogroups_list", sep = "\t", header = F)
+Pdom.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Polistes_dominula_6983_gene_orthogroups_list", sep = "\t", header = F)
+waspsOrthoData <- merge(Pcan.ortho, Pdom.ortho, by = "V1")
+colnames(waspsOrthoData) <- c("Orthogroup", species[4], species[5])
+nrow(waspsOrthoData)
+# waspsOrthoData
+Lfla.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Liostenogaster_flavolineata_6983_gene_orthogroups_list", sep = "\t", header = F)
+waspsOrthoData <- merge(waspsOrthoData, Lfla.ortho, by.x = "Orthogroup", by.y = "V1")
+colnames(waspsOrthoData) <- c("Orthogroup", species[4], species[5], species[6])
+nrow(waspsOrthoData)
+# waspsOrthoData
+
+head(beesOrthoData)
+head(waspsOrthoData)
+
+## Also, read in and create a hymenoptera orthogroup df:
+Caus.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Ceratina_australensis_3718_gene_orthogroups_list", sep = "\t", header = F)
+Ccal.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Ceratina_calcarata_3718_gene_orthogroups_list", sep = "\t", header = F)
+hymnOrthoData <- merge(Caus.ortho, Ccal.ortho, by = "V1")
+colnames(hymnOrthoData) <- c("Orthogroup", species[1], species[2])
+nrow(hymnOrthoData)
+
+Mgen.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Megalopta_genalis_3718_gene_orthogroups_list", sep = "\t", header = F)
+hymnOrthoData <- merge(hymnOrthoData, Mgen.ortho, by.x = "Orthogroup", by.y = "V1")
+colnames(hymnOrthoData) <- c("Orthogroup", species[1], species[2], species[3])
+nrow(hymnOrthoData)
+
+Pcan.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Polistes_canadensis_3718_gene_orthogroups_list", sep = "\t", header = F)
+hymnOrthoData <- merge(hymnOrthoData, Pcan.ortho, by.x = "Orthogroup", by.y = "V1")
+colnames(hymnOrthoData) <- c("Orthogroup", species[1], species[2], species[3], species[4])
+nrow(hymnOrthoData)
+
+Pdom.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Polistes_dominula_3718_gene_orthogroups_list", sep = "\t", header = F)
+hymnOrthoData <- merge(hymnOrthoData, Pdom.ortho, by.x = "Orthogroup", by.y = "V1")
+colnames(hymnOrthoData) <- c("Orthogroup", species[1], species[2], species[3], species[4], species[5])
+nrow(hymnOrthoData)
+
+Lfla.ortho <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/result/Liostenogaster_flavolineata_3718_gene_orthogroups_list", sep = "\t", header = F)
+hymnOrthoData <- merge(hymnOrthoData, Lfla.ortho, by.x = "Orthogroup", by.y = "V1")
+colnames(hymnOrthoData) <- c("Orthogroup", species[1], species[2], species[3], species[4], species[5], species[6])
+nrow(hymnOrthoData)
+head(hymnOrthoData)
+```
+
+Now that we have the reference dataframes for the orthogroups, we need to attach these to SVM dataframes:
+```{r}
+Caus.SVM <- merge(Caus.SVM, hymnOrthoData[,c("Orthogroup", species[1])], by.x = "V1", by.y = "Orthogroup", all.x = T)
+
+Ccal.SVM <- merge(Ccal.SVM, hymnOrthoData[,c("Orthogroup", species[2])], by.x = "V1", by.y = "Orthogroup", all.x = T)
+
+Mgen.SVM <- merge(Mgen.SVM, hymnOrthoData[,c("Orthogroup", species[3])], by.x = "V1", by.y = "Orthogroup", all.x = T)
+
+Pcan.SVM <- merge(Pcan.SVM, hymnOrthoData[,c("Orthogroup", species[4])], by.x = "V1", by.y = "Orthogroup", all.x = T)
+
+Pdom.SVM <- merge(Pdom.SVM, hymnOrthoData[,c("Orthogroup", species[5])], by.x = "V1", by.y = "Orthogroup", all.x = T)
+
+Lfla.SVM <- merge(Lfla.SVM, hymnOrthoData[,c("Orthogroup", species[6])], by.x = "V1", by.y = "Orthogroup", all.x = T)
+```
+
+
+
+```{r}
+par(mfrow=c(2,3))
+
+## Ceratina australensis
+with(Caus.lfcShrink, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[1], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+## Now mark the orthogroups:
+symbols <- hymnOrthoData$Ceratina_australensis
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.OGsubset <- subset(Caus.lfcShrink, rownames(Caus.lfcShrink) %in% symbols) ## This creates a smaller df for future use
+Caus.lfcShrink$orthogroup <- symbols
+with(subset(Caus.lfcShrink, orthogroup > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="gray27"))
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+## Ceratina calcarata
+with(Ccal.lfcShrink, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[2], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+## Now mark the orthogroups:
+symbols <- hymnOrthoData$Ceratina_calcarata
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.OGsubset <- subset(Ccal.lfcShrink, rownames(Ccal.lfcShrink) %in% symbols) ## This creates a smaller df for future use
+Ccal.lfcShrink$orthogroup <- symbols
+with(subset(Ccal.lfcShrink, orthogroup > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="gray27"))
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+## Megalopta genalis
+with(Mgen.lfcShrink, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[3], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+## Now mark the orthogroups:
+symbols <- hymnOrthoData$Megalopta_genalis
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.OGsubset <- subset(Mgen.lfcShrink, rownames(Mgen.lfcShrink) %in% symbols) ## This creates a smaller df for future use
+Mgen.lfcShrink$orthogroup <- symbols
+with(subset(Mgen.lfcShrink, orthogroup > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="gray27"))
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+## Polistes canadensis
+with(Pcan.lfcShrink, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[4], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+## Now mark the orthogroups:
+symbols <- hymnOrthoData$Polistes_canadensis
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.OGsubset <- subset(Pcan.lfcShrink, rownames(Pcan.lfcShrink) %in% symbols) ## This creates a smaller df for future use
+Pcan.lfcShrink$orthogroup <- symbols
+with(subset(Pcan.lfcShrink, orthogroup > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="gray27"))
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+## Polistes dominula
+with(Pdom.lfcShrink, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[5], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+## Now mark the orthogroups:
+symbols <- hymnOrthoData$Polistes_dominula
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.OGsubset <- subset(Pdom.lfcShrink, rownames(Pdom.lfcShrink) %in% symbols) ## This creates a smaller df for future use
+Pdom.lfcShrink$orthogroup <- symbols
+with(subset(Pdom.lfcShrink, orthogroup > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="gray27"))
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+## Liostenogaster flavolineata
+with(Lfla.lfcShrink, plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[6], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+## Now mark the orthogroups:
+symbols <- hymnOrthoData$Liostenogaster_flavolineata
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.OGsubset <- subset(Lfla.lfcShrink, rownames(Lfla.lfcShrink) %in% symbols) ## This creates a smaller df for future use
+Lfla.lfcShrink$orthogroup <- symbols
+with(subset(Lfla.lfcShrink, orthogroup > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="gray27"))
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+```
+##### Now, we'll just start from the orthogroups (hymenoptera):
+Filtering for DE genes too:
+```{r}
+par(mfrow=c(2,3))
+
+##########################################
+# Ceratina australensis
+with(subset(Caus.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[1], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Caus.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Caus.wgcna$V1
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.lfcShrink$wgcna <- symbols
+with(subset(Caus.lfcShrink, orthogroup > 0 & padj<.05 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Caus.SVM[,2]
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.lfcShrink$svm <- symbols
+with(subset(Caus.lfcShrink, orthogroup > 0 & padj<.05 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Ceratina calcarata
+with(subset(Ccal.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[2], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Ccal.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Ccal.wgcna$V1
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.lfcShrink$wgcna <- symbols
+with(subset(Ccal.lfcShrink, orthogroup > 0 & padj<.05 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Ccal.SVM[,2]
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.lfcShrink$svm <- symbols
+with(subset(Ccal.lfcShrink, orthogroup > 0 & padj<.05 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Megalopta genalis
+with(subset(Mgen.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[3], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Mgen.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Mgen.wgcna$V1
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.lfcShrink$wgcna <- symbols
+with(subset(Mgen.lfcShrink, orthogroup > 0 & padj<.05 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Mgen.SVM[,2]
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.lfcShrink$svm <- symbols
+with(subset(Mgen.lfcShrink, orthogroup > 0 & padj<.05 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Polistes canadensis
+with(subset(Pcan.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[4], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Pcan.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Pcan.wgcna$V1
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.lfcShrink$wgcna <- symbols
+with(subset(Pcan.lfcShrink, orthogroup > 0 & padj<.05 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Pcan.SVM[,2]
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.lfcShrink$svm <- symbols
+with(subset(Pcan.lfcShrink, orthogroup > 0 & padj<.05 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+# Polistes dominula
+with(subset(Pdom.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[5], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Pdom.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Pdom.wgcna$V1
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.lfcShrink$wgcna <- symbols
+with(subset(Pdom.lfcShrink, orthogroup > 0 & padj<.05 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Pdom.SVM[,2]
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.lfcShrink$svm <- symbols
+with(subset(Pdom.lfcShrink, orthogroup > 0 & padj<.05 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Liostenogaster flavolineata
+with(subset(Lfla.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[6], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Lfla.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Lfla.wgcna$V1
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.lfcShrink$wgcna <- symbols
+with(subset(Lfla.lfcShrink, orthogroup > 0 & padj<.05 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Lfla.SVM[,2]
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.lfcShrink$svm <- symbols
+with(subset(Lfla.lfcShrink, orthogroup > 0 & padj<.05 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+```
+
+Not filtering for DE Genes, just showing all orthogroups:
+```{r}
+par(mfrow=c(2,3))
+
+##########################################
+# Ceratina australensis
+with(subset(Caus.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[1], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Caus.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Caus.wgcna$V1
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.lfcShrink$wgcna <- symbols
+with(subset(Caus.lfcShrink, orthogroup > 0 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Caus.SVM[,2]
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.lfcShrink$svm <- symbols
+with(subset(Caus.lfcShrink, orthogroup > 0 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Ceratina calcarata
+with(subset(Ccal.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[2], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Ccal.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Ccal.wgcna$V1
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.lfcShrink$wgcna <- symbols
+with(subset(Ccal.lfcShrink, orthogroup > 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Ccal.SVM[,2]
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.lfcShrink$svm <- symbols
+with(subset(Ccal.lfcShrink, orthogroup > 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Megalopta genalis
+with(subset(Mgen.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[3], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Mgen.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Mgen.wgcna$V1
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.lfcShrink$wgcna <- symbols
+with(subset(Mgen.lfcShrink, orthogroup > 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Mgen.SVM[,2]
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.lfcShrink$svm <- symbols
+with(subset(Mgen.lfcShrink, orthogroup > 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Polistes canadensis
+with(subset(Pcan.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[4], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Pcan.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Pcan.wgcna$V1
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.lfcShrink$wgcna <- symbols
+with(subset(Pcan.lfcShrink, orthogroup > 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Pcan.SVM[,2]
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.lfcShrink$svm <- symbols
+with(subset(Pcan.lfcShrink, orthogroup > 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+# Polistes dominula
+with(subset(Pdom.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[5], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Pdom.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Pdom.wgcna$V1
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.lfcShrink$wgcna <- symbols
+with(subset(Pdom.lfcShrink, orthogroup > 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Pdom.SVM[,2]
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.lfcShrink$svm <- symbols
+with(subset(Pdom.lfcShrink, orthogroup > 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Liostenogaster flavolineata
+with(subset(Lfla.lfcShrink, orthogroup > 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[6], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Lfla.lfcShrink, orthogroup > 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Lfla.wgcna$V1
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.lfcShrink$wgcna <- symbols
+with(subset(Lfla.lfcShrink, orthogroup > 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Lfla.SVM[,2]
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.lfcShrink$svm <- symbols
+with(subset(Lfla.lfcShrink, orthogroup > 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+```
+
+Showing all genes in that species' transcriptome, not just orthogroups:
+```{r}
+par(mfrow=c(2,3))
+
+##########################################
+# Ceratina australensis
+with(subset(Caus.lfcShrink, orthogroup >= 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[1], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Caus.lfcShrink, orthogroup >= 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Caus.wgcna$V1
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.lfcShrink$wgcna <- symbols
+with(subset(Caus.lfcShrink, orthogroup >= 0 & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Caus.SVM[,2]
+symbols <- symbols[match(rownames(Caus.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Caus.lfcShrink$svm <- symbols
+with(subset(Caus.lfcShrink, orthogroup >= 0 & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Ceratina calcarata
+with(subset(Ccal.lfcShrink, orthogroup >= 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[2], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Ccal.lfcShrink, orthogroup >= 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Ccal.wgcna$V1
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.lfcShrink$wgcna <- symbols
+with(subset(Ccal.lfcShrink, orthogroup >= 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Ccal.SVM[,2]
+symbols <- symbols[match(rownames(Ccal.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Ccal.lfcShrink$svm <- symbols
+with(subset(Ccal.lfcShrink, orthogroup >= 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Megalopta genalis
+with(subset(Mgen.lfcShrink, orthogroup >= 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[3], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Mgen.lfcShrink, orthogroup >= 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Mgen.wgcna$V1
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.lfcShrink$wgcna <- symbols
+with(subset(Mgen.lfcShrink, orthogroup >= 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Mgen.SVM[,2]
+symbols <- symbols[match(rownames(Mgen.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Mgen.lfcShrink$svm <- symbols
+with(subset(Mgen.lfcShrink, orthogroup >= 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Polistes canadensis
+with(subset(Pcan.lfcShrink, orthogroup >= 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[4], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Pcan.lfcShrink, orthogroup >= 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Pcan.wgcna$V1
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.lfcShrink$wgcna <- symbols
+with(subset(Pcan.lfcShrink, orthogroup >= 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Pcan.SVM[,2]
+symbols <- symbols[match(rownames(Pcan.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pcan.lfcShrink$svm <- symbols
+with(subset(Pcan.lfcShrink, orthogroup >= 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+# Polistes dominula
+with(subset(Pdom.lfcShrink, orthogroup >= 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[5], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Pdom.lfcShrink, orthogroup >= 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Pdom.wgcna$V1
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.lfcShrink$wgcna <- symbols
+with(subset(Pdom.lfcShrink, orthogroup >= 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Pdom.SVM[,2]
+symbols <- symbols[match(rownames(Pdom.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Pdom.lfcShrink$svm <- symbols
+with(subset(Pdom.lfcShrink, orthogroup >= 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+
+##########################################
+# Liostenogaster flavolineata
+with(subset(Lfla.lfcShrink, orthogroup >= 0), plot(log2FoldChange, -log10(pvalue), pch=20, cex = 1, main=species[6], xlim=c(-3,3), col ="light gray", ylim=c(0,25)))
+
+## Now make the DE genes:
+with(subset(Lfla.lfcShrink, orthogroup >= 0 & padj<.05), points(log2FoldChange, -log10(pvalue), pch=20, cex = 1, col="black"))
+
+## Now mark the WGCNA genes:
+symbols <- Lfla.wgcna$V1
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.lfcShrink$wgcna <- symbols
+with(subset(Lfla.lfcShrink, orthogroup >= 0  & wgcna > 0), points(log2FoldChange, -log10(pvalue), pch=20, cex = 0.5, col="cornflower blue"))
+
+## Now mark the SVM genes:
+symbols <- Lfla.SVM[,2]
+symbols <- symbols[match(rownames(Lfla.lfcShrink), symbols)]
+symbols <- ifelse(is.na(symbols), 0, 1)
+Lfla.lfcShrink$svm <- symbols
+with(subset(Lfla.lfcShrink, orthogroup >= 0  & svm > 0), points(log2FoldChange, -log10(pvalue), pch=21, cex = 1.1, col="darkgoldenrod2"))
+
+abline(v=c(-2, 2), col = "black", lty = 2)
+abline(h=-log10(0.01), col = "black", lty = 2)
+```
