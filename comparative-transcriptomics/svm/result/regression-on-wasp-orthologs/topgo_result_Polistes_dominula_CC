@@ -1,0 +1,625 @@
+GO.ID	Term	Annotated	Significant	Expected	pvalue	species	goCategory
+GO:0070469	respiratory chain	38	12	1.3	0.29	Polistes_dominula	CC
+GO:0005746	mitochondrial respiratory chain	36	11	1.23	0.35	Polistes_dominula	CC
+GO:1990204	oxidoreductase complex	48	14	1.64	0.39	Polistes_dominula	CC
+GO:0030312	external encapsulating structure	5	2	0.17	0.40	Polistes_dominula	CC
+GO:0005747	mitochondrial respiratory chain complex I	23	7	0.79	0.41	Polistes_dominula	CC
+GO:0030964	NADH dehydrogenase complex	23	7	0.79	0.41	Polistes_dominula	CC
+GO:0045271	respiratory chain complex I	23	7	0.79	0.41	Polistes_dominula	CC
+GO:0098803	respiratory chain complex	35	10	1.2	0.45	Polistes_dominula	CC
+GO:0005750	mitochondrial respiratory chain complex III	6	2	0.21	0.50	Polistes_dominula	CC
+GO:0031080	nuclear pore outer ring	6	2	0.21	0.50	Polistes_dominula	CC
+GO:0045275	respiratory chain complex III	6	2	0.21	0.50	Polistes_dominula	CC
+GO:0070069	cytochrome complex	10	3	0.34	0.52	Polistes_dominula	CC
+GO:0032154	cleavage furrow	18	5	0.62	0.54	Polistes_dominula	CC
+GO:0071203	WASH complex	7	2	0.24	0.59	Polistes_dominula	CC
+GO:0032155	cell division site part	26	6	0.89	0.72	Polistes_dominula	CC
+GO:0098800	inner mitochondrial membrane protein complex	51	12	1.74	0.73	Polistes_dominula	CC
+GO:0032153	cell division site	27	6	0.92	0.76	Polistes_dominula	CC
+GO:0005967	mitochondrial pyruvate dehydrogenase complex	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0016528	sarcoplasm	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0016593	Cdc73/Paf1 complex	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0030062	mitochondrial tricarboxylic acid cycle enzyme complex	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0031414	N-terminal protein acetyltransferase complex	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0042555	MCM complex	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0045254	pyruvate dehydrogenase complex	5	1	0.17	0.78	Polistes_dominula	CC
+GO:0031010	ISWI-type complex	10	2	0.34	0.79	Polistes_dominula	CC
+GO:0005744	TIM23 mitochondrial import inner membrane translocase complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0005753	mitochondrial proton-transporting ATP synthase complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0008278	cohesin complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0009295	nucleoid	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0030667	secretory granule membrane	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0030677	ribonuclease P complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0031261	DNA replication preinitiation complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0032982	myosin filament	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0042645	mitochondrial nucleoid	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0044545	NSL complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0045239	tricarboxylic acid cycle enzyme complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0071162	CMG complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:1990071	TRAPPII protein complex	6	1	0.21	0.84	Polistes_dominula	CC
+GO:0005643	nuclear pore	27	5	0.92	0.88	Polistes_dominula	CC
+GO:0000940	condensed chromosome outer kinetochore	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0016586	RSC-type complex	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0030894	replisome	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0033177	proton-transporting two-sector ATPase complex, proton-transporting domain	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0043601	nuclear replisome	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0045121	membrane raft	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0045259	proton-transporting ATP synthase complex	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0048188	Set1C/COMPASS complex	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0070938	contractile ring	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0098857	membrane microdomain	7	1	0.24	0.88	Polistes_dominula	CC
+GO:1990072	TRAPPIII protein complex	7	1	0.24	0.88	Polistes_dominula	CC
+GO:0005665	RNA polymerase II, core complex	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0005844	polysome	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0005852	eukaryotic translation initiation factor 3 complex	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0009897	external side of plasma membrane	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0017101	aminoacyl-tRNA synthetase multienzyme complex	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0030688	preribosome, small subunit precursor	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0030867	rough endoplasmic reticulum membrane	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0033290	eukaryotic 48S preinitiation complex	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0044666	MLL3/4 complex	8	1	0.27	0.91	Polistes_dominula	CC
+GO:0000777	condensed chromosome kinetochore	14	2	0.48	0.92	Polistes_dominula	CC
+GO:0005758	mitochondrial intermembrane space	15	2	0.51	0.94	Polistes_dominula	CC
+GO:0031970	organelle envelope lumen	15	2	0.51	0.94	Polistes_dominula	CC
+GO:0005671	Ada2/Gcn5/Ada3 transcription activator complex	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0005701	polytene chromosome chromocenter	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0005721	pericentric heterochromatin	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0010369	chromocenter	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0016282	eukaryotic 43S preinitiation complex	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0030008	TRAPP complex	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0031225	anchored component of membrane	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0033178	proton-transporting two-sector ATPase complex, catalytic domain	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0035060	brahma complex	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0042575	DNA polymerase complex	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0098589	membrane region	9	1	0.31	0.94	Polistes_dominula	CC
+GO:0000792	heterochromatin	21	3	0.72	0.94	Polistes_dominula	CC
+GO:0070993	translation preinitiation complex	10	1	0.34	0.95	Polistes_dominula	CC
+GO:0030141	secretory granule	17	2	0.58	0.96	Polistes_dominula	CC
+GO:0000124	SAGA complex	11	1	0.38	0.97	Polistes_dominula	CC
+GO:0031312	extrinsic component of organelle membrane	11	1	0.38	0.97	Polistes_dominula	CC
+GO:0044665	MLL1/2 complex	11	1	0.38	0.97	Polistes_dominula	CC
+GO:0070461	SAGA-type complex	11	1	0.38	0.97	Polistes_dominula	CC
+GO:0000779	condensed chromosome, centromeric region	18	2	0.62	0.97	Polistes_dominula	CC
+GO:0034399	nuclear periphery	18	2	0.62	0.97	Polistes_dominula	CC
+GO:0045179	apical cortex	18	2	0.62	0.97	Polistes_dominula	CC
+GO:0005703	polytene chromosome puff	24	3	0.82	0.97	Polistes_dominula	CC
+GO:0005705	polytene chromosome interband	30	4	1.03	0.97	Polistes_dominula	CC
+GO:0030864	cortical actin cytoskeleton	12	1	0.41	0.97	Polistes_dominula	CC
+GO:0043596	nuclear replication fork	12	1	0.41	0.97	Polistes_dominula	CC
+GO:0005604	basement membrane	13	1	0.44	0.98	Polistes_dominula	CC
+GO:0005791	rough endoplasmic reticulum	13	1	0.44	0.98	Polistes_dominula	CC
+GO:0030426	growth cone	13	1	0.44	0.98	Polistes_dominula	CC
+GO:0030427	site of polarized growth	13	1	0.44	0.98	Polistes_dominula	CC
+GO:0030687	preribosome, large subunit precursor	13	1	0.44	0.98	Polistes_dominula	CC
+GO:0051233	spindle midzone	13	1	0.44	0.98	Polistes_dominula	CC
+GO:1902555	endoribonuclease complex	13	1	0.44	0.98	Polistes_dominula	CC
+GO:1905348	endonuclease complex	13	1	0.44	0.98	Polistes_dominula	CC
+GO:0032993	protein-DNA complex	20	2	0.68	0.98	Polistes_dominula	CC
+GO:0008287	protein serine/threonine phosphatase complex	14	1	0.48	0.99	Polistes_dominula	CC
+GO:0045178	basal part of cell	14	1	0.48	0.99	Polistes_dominula	CC
+GO:1903293	phosphatase complex	14	1	0.48	0.99	Polistes_dominula	CC
+GO:0044455	mitochondrial membrane part	80	13	2.74	0.99	Polistes_dominula	CC
+GO:0000118	histone deacetylase complex	15	1	0.51	0.99	Polistes_dominula	CC
+GO:0005778	peroxisomal membrane	15	1	0.51	0.99	Polistes_dominula	CC
+GO:0031903	microbody membrane	15	1	0.51	0.99	Polistes_dominula	CC
+GO:0070160	tight junction	15	1	0.51	0.99	Polistes_dominula	CC
+GO:0000776	kinetochore	23	2	0.79	0.99	Polistes_dominula	CC
+GO:0031902	late endosome membrane	23	2	0.79	0.99	Polistes_dominula	CC
+GO:0000794	condensed nuclear chromosome	16	1	0.55	0.99	Polistes_dominula	CC
+GO:0005881	cytoplasmic microtubule	16	1	0.55	0.99	Polistes_dominula	CC
+GO:0016459	myosin complex	16	1	0.55	0.99	Polistes_dominula	CC
+GO:0044438	microbody part	16	1	0.55	0.99	Polistes_dominula	CC
+GO:0044439	peroxisomal part	16	1	0.55	0.99	Polistes_dominula	CC
+GO:0048786	presynaptic active zone	16	1	0.55	0.99	Polistes_dominula	CC
+GO:0016469	proton-transporting two-sector ATPase complex	17	1	0.58	0.99	Polistes_dominula	CC
+GO:0030496	midbody	17	1	0.58	0.99	Polistes_dominula	CC
+GO:0005814	centriole	25	2	0.85	1.00	Polistes_dominula	CC
+GO:0099738	cell cortex region	25	2	0.85	1.00	Polistes_dominula	CC
+GO:0005684	U2-type spliceosomal complex	18	1	0.62	1.00	Polistes_dominula	CC
+GO:0016592	mediator complex	18	1	0.62	1.00	Polistes_dominula	CC
+GO:0044447	axoneme part	18	1	0.62	1.00	Polistes_dominula	CC
+GO:0000315	organellar large ribosomal subunit	26	2	0.89	1.00	Polistes_dominula	CC
+GO:0005762	mitochondrial large ribosomal subunit	26	2	0.89	1.00	Polistes_dominula	CC
+GO:0016323	basolateral plasma membrane	19	1	0.65	1.00	Polistes_dominula	CC
+GO:0030863	cortical cytoskeleton	19	1	0.65	1.00	Polistes_dominula	CC
+GO:0031201	SNARE complex	19	1	0.65	1.00	Polistes_dominula	CC
+GO:0042734	presynaptic membrane	19	1	0.65	1.00	Polistes_dominula	CC
+GO:0031227	intrinsic component of endoplasmic reticulum membrane	40	4	1.37	1.00	Polistes_dominula	CC
+GO:0070603	SWI/SNF superfamily-type complex	34	3	1.16	1.00	Polistes_dominula	CC
+GO:0098798	mitochondrial protein complex	114	18	3.9	1.00	Polistes_dominula	CC
+GO:0005741	mitochondrial outer membrane	20	1	0.68	1.00	Polistes_dominula	CC
+GO:0019867	outer membrane	20	1	0.68	1.00	Polistes_dominula	CC
+GO:0031968	organelle outer membrane	20	1	0.68	1.00	Polistes_dominula	CC
+GO:0005657	replication fork	21	1	0.72	1.00	Polistes_dominula	CC
+GO:0022627	cytosolic small ribosomal subunit	21	1	0.72	1.00	Polistes_dominula	CC
+GO:0062023	collagen-containing extracellular matrix	21	1	0.72	1.00	Polistes_dominula	CC
+GO:0008023	transcription elongation factor complex	29	2	0.99	1.00	Polistes_dominula	CC
+GO:0031965	nuclear membrane	30	2	1.03	1.00	Polistes_dominula	CC
+GO:0030176	integral component of endoplasmic reticulum membrane	39	3	1.33	1.00	Polistes_dominula	CC
+GO:0009986	cell surface	24	1	0.82	1.00	Polistes_dominula	CC
+GO:0005635	nuclear envelope	70	8	2.39	1.00	Polistes_dominula	CC
+GO:0000793	condensed chromosome	41	3	1.4	1.00	Polistes_dominula	CC
+GO:1904949	ATPase complex	41	3	1.4	1.00	Polistes_dominula	CC
+GO:0048471	perinuclear region of cytoplasm	48	4	1.64	1.00	Polistes_dominula	CC
+GO:0030016	myofibril	26	1	0.89	1.00	Polistes_dominula	CC
+GO:0005777	peroxisome	55	5	1.88	1.00	Polistes_dominula	CC
+GO:0042579	microbody	55	5	1.88	1.00	Polistes_dominula	CC
+GO:0005930	axoneme	35	2	1.2	1.00	Polistes_dominula	CC
+GO:0097014	ciliary plasm	35	2	1.2	1.00	Polistes_dominula	CC
+GO:0009898	cytoplasmic side of plasma membrane	27	1	0.92	1.00	Polistes_dominula	CC
+GO:0035097	histone methyltransferase complex	27	1	0.92	1.00	Polistes_dominula	CC
+GO:0016591	RNA polymerase II, holoenzyme	36	2	1.23	1.00	Polistes_dominula	CC
+GO:0018995	host	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0033643	host cell part	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0033646	host intracellular part	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0033647	host intracellular organelle	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0033648	host intracellular membrane-bounded organelle	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0034703	cation channel complex	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0042025	host cell nucleus	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0043292	contractile fiber	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0043656	intracellular region of host	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0043657	host cell	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0044215	other organism	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0044216	other organism cell	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0044217	other organism part	28	1	0.96	1.00	Polistes_dominula	CC
+GO:1902562	H4 histone acetyltransferase complex	28	1	0.96	1.00	Polistes_dominula	CC
+GO:0044450	microtubule organizing center part	37	2	1.27	1.00	Polistes_dominula	CC
+GO:0000775	chromosome, centromeric region	45	3	1.54	1.00	Polistes_dominula	CC
+GO:0005911	cell-cell junction	38	2	1.3	1.00	Polistes_dominula	CC
+GO:0005802	trans-Golgi network	30	1	1.03	1.00	Polistes_dominula	CC
+GO:0045177	apical part of cell	84	9	2.87	1.00	Polistes_dominula	CC
+GO:0000313	organellar ribosome	40	2	1.37	1.00	Polistes_dominula	CC
+GO:0005761	mitochondrial ribosome	40	2	1.37	1.00	Polistes_dominula	CC
+GO:0098552	side of membrane	40	2	1.37	1.00	Polistes_dominula	CC
+GO:0044448	cell cortex part	48	3	1.64	1.00	Polistes_dominula	CC
+GO:0005743	mitochondrial inner membrane	114	14	3.9	1.00	Polistes_dominula	CC
+GO:0034708	methyltransferase complex	32	1	1.09	1.00	Polistes_dominula	CC
+GO:0098562	cytoplasmic side of membrane	32	1	1.09	1.00	Polistes_dominula	CC
+GO:0005759	mitochondrial matrix	104	12	3.56	1.00	Polistes_dominula	CC
+GO:0015629	actin cytoskeleton	56	4	1.92	1.00	Polistes_dominula	CC
+GO:0055029	nuclear DNA-directed RNA polymerase complex	49	3	1.68	1.00	Polistes_dominula	CC
+GO:0031252	cell leading edge	33	1	1.13	1.00	Polistes_dominula	CC
+GO:0000428	DNA-directed RNA polymerase complex	50	3	1.71	1.00	Polistes_dominula	CC
+GO:0030880	RNA polymerase complex	50	3	1.71	1.00	Polistes_dominula	CC
+GO:0008021	synaptic vesicle	34	1	1.16	1.00	Polistes_dominula	CC
+GO:0099023	tethering complex	34	1	1.16	1.00	Polistes_dominula	CC
+GO:0010008	endosome membrane	51	3	1.74	1.00	Polistes_dominula	CC
+GO:0030684	preribosome	44	2	1.5	1.00	Polistes_dominula	CC
+GO:1990351	transporter complex	44	2	1.5	1.00	Polistes_dominula	CC
+GO:0031248	protein acetyltransferase complex	52	3	1.78	1.00	Polistes_dominula	CC
+GO:0099503	secretory vesicle	52	3	1.78	1.00	Polistes_dominula	CC
+GO:1902493	acetyltransferase complex	52	3	1.78	1.00	Polistes_dominula	CC
+GO:0015935	small ribosomal subunit	35	1	1.2	1.00	Polistes_dominula	CC
+GO:0019866	organelle inner membrane	120	14	4.1	1.00	Polistes_dominula	CC
+GO:0044440	endosomal part	61	4	2.09	1.00	Polistes_dominula	CC
+GO:0005769	early endosome	46	2	1.57	1.00	Polistes_dominula	CC
+GO:0043195	terminal bouton	37	1	1.27	1.00	Polistes_dominula	CC
+GO:0000123	histone acetyltransferase complex	47	2	1.61	1.00	Polistes_dominula	CC
+GO:0016324	apical plasma membrane	47	2	1.61	1.00	Polistes_dominula	CC
+GO:0070382	exocytic vesicle	38	1	1.3	1.00	Polistes_dominula	CC
+GO:0032838	plasma membrane bounded cell projection cytoplasm	48	2	1.64	1.00	Polistes_dominula	CC
+GO:0005912	adherens junction	39	1	1.33	1.00	Polistes_dominula	CC
+GO:0034702	ion channel complex	39	1	1.33	1.00	Polistes_dominula	CC
+GO:0070161	anchoring junction	39	1	1.33	1.00	Polistes_dominula	CC
+GO:0005813	centrosome	65	4	2.22	1.00	Polistes_dominula	CC
+GO:0043679	axon terminus	40	1	1.37	1.00	Polistes_dominula	CC
+GO:0044306	neuron projection terminus	40	1	1.37	1.00	Polistes_dominula	CC
+GO:1902495	transmembrane transporter complex	40	1	1.37	1.00	Polistes_dominula	CC
+GO:1905368	peptidase complex	40	1	1.37	1.00	Polistes_dominula	CC
+GO:0005770	late endosome	50	2	1.71	1.00	Polistes_dominula	CC
+GO:0043235	receptor complex	41	1	1.4	1.00	Polistes_dominula	CC
+GO:0097060	synaptic membrane	41	1	1.4	1.00	Polistes_dominula	CC
+GO:0015934	large ribosomal subunit	51	2	1.74	1.00	Polistes_dominula	CC
+GO:0150034	distal axon	52	2	1.78	1.00	Polistes_dominula	CC
+GO:0005700	polytene chromosome	101	9	3.45	1.00	Polistes_dominula	CC
+GO:0005819	spindle	70	4	2.39	1.00	Polistes_dominula	CC
+GO:0044441	ciliary part	63	3	2.15	1.00	Polistes_dominula	CC
+GO:0031966	mitochondrial membrane	141	15	4.82	1.00	Polistes_dominula	CC
+GO:0005795	Golgi stack	46	1	1.57	1.00	Polistes_dominula	CC
+GO:0031012	extracellular matrix	56	2	1.92	1.00	Polistes_dominula	CC
+GO:0005874	microtubule	81	5	2.77	1.00	Polistes_dominula	CC
+GO:0022626	cytosolic ribosome	48	1	1.64	1.00	Polistes_dominula	CC
+GO:0043025	neuronal cell body	58	2	1.98	1.00	Polistes_dominula	CC
+GO:0033267	axon part	59	2	2.02	1.00	Polistes_dominula	CC
+GO:0005740	mitochondrial envelope	147	15	5.03	1.00	Polistes_dominula	CC
+GO:0000323	lytic vacuole	60	2	2.05	1.00	Polistes_dominula	CC
+GO:0005764	lysosome	60	2	2.05	1.00	Polistes_dominula	CC
+GO:0044297	cell body	61	2	2.09	1.00	Polistes_dominula	CC
+GO:0030659	cytoplasmic vesicle membrane	51	1	1.74	1.00	Polistes_dominula	CC
+GO:0090575	RNA polymerase II transcription factor complex	51	1	1.74	1.00	Polistes_dominula	CC
+GO:0000790	nuclear chromatin	78	4	2.67	1.00	Polistes_dominula	CC
+GO:0098687	chromosomal region	100	7	3.42	1.00	Polistes_dominula	CC
+GO:0012506	vesicle membrane	55	1	1.88	1.00	Polistes_dominula	CC
+GO:0019898	extrinsic component of membrane	55	1	1.88	1.00	Polistes_dominula	CC
+GO:0044454	nuclear chromosome part	118	9	4.04	1.00	Polistes_dominula	CC
+GO:0005667	transcription factor complex	83	4	2.84	1.00	Polistes_dominula	CC
+GO:0005938	cell cortex	91	5	3.11	1.00	Polistes_dominula	CC
+GO:0099513	polymeric cytoskeletal fiber	91	5	3.11	1.00	Polistes_dominula	CC
+GO:0030425	dendrite	56	1	1.92	1.00	Polistes_dominula	CC
+GO:0097447	dendritic tree	56	1	1.92	1.00	Polistes_dominula	CC
+GO:0044798	nuclear transcription factor complex	58	1	1.98	1.00	Polistes_dominula	CC
+GO:0000228	nuclear chromosome	129	10	4.41	1.00	Polistes_dominula	CC
+GO:0030133	transport vesicle	59	1	2.02	1.00	Polistes_dominula	CC
+GO:0005815	microtubule organizing center	104	6	3.56	1.00	Polistes_dominula	CC
+GO:0061695	transferase complex, transferring phosphorus-containing groups	90	4	3.08	1.00	Polistes_dominula	CC
+GO:0000139	Golgi membrane	92	4	3.15	1.00	Polistes_dominula	CC
+GO:0044391	ribosomal subunit	84	3	2.87	1.00	Polistes_dominula	CC
+GO:0031967	organelle envelope	217	23	7.42	1.00	Polistes_dominula	CC
+GO:0031975	envelope	217	23	7.42	1.00	Polistes_dominula	CC
+GO:0044433	cytoplasmic vesicle part	113	6	3.86	1.00	Polistes_dominula	CC
+GO:0005840	ribosome	89	3	3.04	1.00	Polistes_dominula	CC
+GO:0000151	ubiquitin ligase complex	73	1	2.5	1.00	Polistes_dominula	CC
+GO:0005929	cilium	103	4	3.52	1.00	Polistes_dominula	CC
+GO:0099512	supramolecular fiber	119	6	4.07	1.00	Polistes_dominula	CC
+GO:0044445	cytosolic part	85	2	2.91	1.00	Polistes_dominula	CC
+GO:0099081	supramolecular polymer	121	6	4.14	1.00	Polistes_dominula	CC
+GO:0005768	endosome	143	9	4.89	1.00	Polistes_dominula	CC
+GO:0099080	supramolecular complex	122	6	4.17	1.00	Polistes_dominula	CC
+GO:0044429	mitochondrial part	243	25	8.31	1.00	Polistes_dominula	CC
+GO:0000785	chromatin	145	9	4.96	1.00	Polistes_dominula	CC
+GO:0005773	vacuole	89	2	3.04	1.00	Polistes_dominula	CC
+GO:0071013	catalytic step 2 spliceosome	89	2	3.04	1.00	Polistes_dominula	CC
+GO:0030054	cell junction	102	3	3.49	1.00	Polistes_dominula	CC
+GO:0030424	axon	102	3	3.49	1.00	Polistes_dominula	CC
+GO:0036477	somatodendritic compartment	93	2	3.18	1.00	Polistes_dominula	CC
+GO:0099568	cytoplasmic region	137	7	4.69	1.00	Polistes_dominula	CC
+GO:0098590	plasma membrane region	145	8	4.96	1.00	Polistes_dominula	CC
+GO:0071011	precatalytic spliceosome	98	2	3.35	1.00	Polistes_dominula	CC
+GO:0098791	Golgi subcompartment	134	6	4.58	1.00	Polistes_dominula	CC
+GO:0044431	Golgi apparatus part	148	7	5.06	1.00	Polistes_dominula	CC
+GO:0098793	presynapse	115	3	3.93	1.00	Polistes_dominula	CC
+GO:0005730	nucleolus	125	4	4.27	1.00	Polistes_dominula	CC
+GO:0005615	extracellular space	134	5	4.58	1.00	Polistes_dominula	CC
+GO:0005681	spliceosomal complex	125	3	4.27	1.00	Polistes_dominula	CC
+GO:0015630	microtubule cytoskeleton	188	10	6.43	1.00	Polistes_dominula	CC
+GO:0044430	cytoskeletal part	232	16	7.93	1.00	Polistes_dominula	CC
+GO:0098805	whole membrane	161	6	5.51	1.00	Polistes_dominula	CC
+GO:0044427	chromosomal part	244	16	8.34	1.00	Polistes_dominula	CC
+GO:0005575	cellular_component	4373	207	149.55	1.00	Polistes_dominula	CC
+GO:0005576	extracellular region	267	13	9.13	1.00	Polistes_dominula	CC
+GO:0005622	intracellular	3258	146	111.42	1.00	Polistes_dominula	CC
+GO:0005623	cell	3678	165	125.78	1.00	Polistes_dominula	CC
+GO:0005634	nucleus	1464	61	50.07	1.00	Polistes_dominula	CC
+GO:0005654	nucleoplasm	353	16	12.07	1.00	Polistes_dominula	CC
+GO:0005694	chromosome	307	18	10.5	1.00	Polistes_dominula	CC
+GO:0005737	cytoplasm	2259	100	77.25	1.00	Polistes_dominula	CC
+GO:0005739	mitochondrion	409	32	13.99	1.00	Polistes_dominula	CC
+GO:0005783	endoplasmic reticulum	277	8	9.47	1.00	Polistes_dominula	CC
+GO:0005789	endoplasmic reticulum membrane	162	4	5.54	1.00	Polistes_dominula	CC
+GO:0005794	Golgi apparatus	213	7	7.28	1.00	Polistes_dominula	CC
+GO:0005829	cytosol	516	18	17.65	1.00	Polistes_dominula	CC
+GO:0005856	cytoskeleton	300	21	10.26	1.00	Polistes_dominula	CC
+GO:0005886	plasma membrane	626	29	21.41	1.00	Polistes_dominula	CC
+GO:0005887	integral component of plasma membrane	200	7	6.84	1.00	Polistes_dominula	CC
+GO:0012505	endomembrane system	647	28	22.13	1.00	Polistes_dominula	CC
+GO:0016020	membrane	1615	86	55.23	1.00	Polistes_dominula	CC
+GO:0016021	integral component of membrane	1115	60	38.13	1.00	Polistes_dominula	CC
+GO:0031090	organelle membrane	395	26	13.51	1.00	Polistes_dominula	CC
+GO:0031224	intrinsic component of membrane	1126	60	38.51	1.00	Polistes_dominula	CC
+GO:0031226	intrinsic component of plasma membrane	204	7	6.98	1.00	Polistes_dominula	CC
+GO:0031410	cytoplasmic vesicle	257	12	8.79	1.00	Polistes_dominula	CC
+GO:0031974	membrane-enclosed lumen	675	40	23.08	1.00	Polistes_dominula	CC
+GO:0031981	nuclear lumen	541	25	18.5	1.00	Polistes_dominula	CC
+GO:0031982	vesicle	279	12	9.54	1.00	Polistes_dominula	CC
+GO:0031984	organelle subcompartment	272	8	9.3	1.00	Polistes_dominula	CC
+GO:0032991	protein-containing complex	1467	70	50.17	1.00	Polistes_dominula	CC
+GO:0042175	nuclear outer membrane-endoplasmic reticulum membrane network	163	4	5.57	1.00	Polistes_dominula	CC
+GO:0042995	cell projection	323	8	11.05	1.00	Polistes_dominula	CC
+GO:0043005	neuron projection	185	4	6.33	1.00	Polistes_dominula	CC
+GO:0043226	organelle	2767	130	94.63	1.00	Polistes_dominula	CC
+GO:0043227	membrane-bounded organelle	2472	115	84.54	1.00	Polistes_dominula	CC
+GO:0043228	non-membrane-bounded organelle	824	41	28.18	1.00	Polistes_dominula	CC
+GO:0043229	intracellular organelle	2726	129	93.22	1.00	Polistes_dominula	CC
+GO:0043231	intracellular membrane-bounded organelle	2331	108	79.72	1.00	Polistes_dominula	CC
+GO:0043232	intracellular non-membrane-bounded organelle	824	41	28.18	1.00	Polistes_dominula	CC
+GO:0043233	organelle lumen	675	40	23.08	1.00	Polistes_dominula	CC
+GO:0044421	extracellular region part	185	7	6.33	1.00	Polistes_dominula	CC
+GO:0044422	organelle part	1698	86	58.07	1.00	Polistes_dominula	CC
+GO:0044424	intracellular part	3258	146	111.42	1.00	Polistes_dominula	CC
+GO:0044425	membrane part	1369	75	46.82	1.00	Polistes_dominula	CC
+GO:0044428	nuclear part	754	33	25.79	1.00	Polistes_dominula	CC
+GO:0044432	endoplasmic reticulum part	188	4	6.43	1.00	Polistes_dominula	CC
+GO:0044444	cytoplasmic part	1701	79	58.17	1.00	Polistes_dominula	CC
+GO:0044446	intracellular organelle part	1664	86	56.91	1.00	Polistes_dominula	CC
+GO:0044451	nucleoplasm part	207	8	7.08	1.00	Polistes_dominula	CC
+GO:0044456	synapse part	144	3	4.92	1.00	Polistes_dominula	CC
+GO:0044459	plasma membrane part	363	14	12.41	1.00	Polistes_dominula	CC
+GO:0044463	cell projection part	199	6	6.81	1.00	Polistes_dominula	CC
+GO:0044464	cell part	3678	165	125.78	1.00	Polistes_dominula	CC
+GO:0045202	synapse	202	3	6.91	1.00	Polistes_dominula	CC
+GO:0070013	intracellular organelle lumen	675	40	23.08	1.00	Polistes_dominula	CC
+GO:0071944	cell periphery	683	33	23.36	1.00	Polistes_dominula	CC
+GO:0097458	neuron part	269	6	9.2	1.00	Polistes_dominula	CC
+GO:0097708	intracellular vesicle	257	12	8.79	1.00	Polistes_dominula	CC
+GO:0098588	bounding membrane of organelle	237	10	8.1	1.00	Polistes_dominula	CC
+GO:0098796	membrane protein complex	255	16	8.72	1.00	Polistes_dominula	CC
+GO:0098827	endoplasmic reticulum subcompartment	164	4	5.61	1.00	Polistes_dominula	CC
+GO:0120025	plasma membrane bounded cell projection	314	8	10.74	1.00	Polistes_dominula	CC
+GO:0120038	plasma membrane bounded cell projection part	199	6	6.81	1.00	Polistes_dominula	CC
+GO:1902494	catalytic complex	543	30	18.57	1.00	Polistes_dominula	CC
+GO:1990234	transferase complex	267	9	9.13	1.00	Polistes_dominula	CC
+GO:1990904	ribonucleoprotein complex	342	12	11.7	1.00	Polistes_dominula	CC
+GO:0000137	Golgi cis cisterna	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0000138	Golgi trans cisterna	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0000145	exocyst	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0000152	nuclear ubiquitin ligase complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0000159	protein phosphatase type 2A complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0000235	astral microtubule	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0000242	pericentriolar material	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0000307	cyclin-dependent protein kinase holoenzyme complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0000314	organellar small ribosomal subunit	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0000346	transcription export complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0000347	THO complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0000407	phagophore assembly site	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0000421	autophagosome membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000439	transcription factor TFIIH core complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000445	THO complex part of transcription export complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000502	proteasome complex	27	0	0.92	1.00	Polistes_dominula	CC
+GO:0000506	glycosylphosphatidylinositol-N-acetylglucosaminyltransferase (GPI-GnT) complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000780	condensed nuclear chromosome, centromeric region	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000781	chromosome, telomeric region	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0000784	nuclear chromosome, telomeric region	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000791	euchromatin	14	0	0.48	1.00	Polistes_dominula	CC
+GO:0000796	condensin complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0000813	ESCRT I complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000922	spindle pole	27	0	0.92	1.00	Polistes_dominula	CC
+GO:0000923	equatorial microtubule organizing center	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0000930	gamma-tubulin complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0000932	P-body	19	0	0.65	1.00	Polistes_dominula	CC
+GO:0000974	Prp19 complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0001674	female germ cell nucleus	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005637	nuclear inner membrane	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005652	nuclear lamina	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005666	RNA polymerase III complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0005669	transcription factor TFIID complex	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0005675	transcription factor TFIIH holo complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0005680	anaphase-promoting complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005682	U5 snRNP	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0005685	U1 snRNP	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0005686	U2 snRNP	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0005687	U4 snRNP	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005689	U12-type spliceosomal complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005704	polytene chromosome band	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005719	nuclear euchromatin	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0005720	nuclear heterochromatin	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005732	small nucleolar ribonucleoprotein complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0005736	RNA polymerase I complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005763	mitochondrial small ribosomal subunit	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0005765	lysosomal membrane	21	0	0.72	1.00	Polistes_dominula	CC
+GO:0005767	secondary lysosome	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0005771	multivesicular body	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005774	vacuolar membrane	39	0	1.33	1.00	Polistes_dominula	CC
+GO:0005776	autophagosome	29	0	0.99	1.00	Polistes_dominula	CC
+GO:0005779	integral component of peroxisomal membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005788	endoplasmic reticulum lumen	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0005793	endoplasmic reticulum-Golgi intermediate compartment	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005797	Golgi medial cisterna	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0005798	Golgi-associated vesicle	32	0	1.09	1.00	Polistes_dominula	CC
+GO:0005801	cis-Golgi network	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005811	lipid droplet	16	0	0.55	1.00	Polistes_dominula	CC
+GO:0005818	aster	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005828	kinetochore microtubule	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0005832	chaperonin-containing T-complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005834	heterotrimeric G-protein complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0005838	proteasome regulatory particle	16	0	0.55	1.00	Polistes_dominula	CC
+GO:0005839	proteasome core complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0005847	mRNA cleavage and polyadenylation specificity factor complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005849	mRNA cleavage factor complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0005858	axonemal dynein complex	14	0	0.48	1.00	Polistes_dominula	CC
+GO:0005869	dynactin complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005871	kinesin complex	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0005875	microtubule associated complex	46	0	1.57	1.00	Polistes_dominula	CC
+GO:0005876	spindle microtubule	21	0	0.72	1.00	Polistes_dominula	CC
+GO:0005884	actin filament	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0005891	voltage-gated calcium channel complex	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005892	acetylcholine-gated channel complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005902	microvillus	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0005903	brush border	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005905	clathrin-coated pit	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005913	cell-cell adherens junction	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0005918	septate junction	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0005924	cell-substrate adherens junction	14	0	0.48	1.00	Polistes_dominula	CC
+GO:0005925	focal adhesion	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0005927	muscle tendon junction	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0005942	phosphatidylinositol 3-kinase complex	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0008180	COP9 signalosome	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0008250	oligosaccharyltransferase complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0008305	integrin complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0008540	proteasome regulatory particle, base subcomplex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0008541	proteasome regulatory particle, lid subcomplex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0009925	basal plasma membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0010494	cytoplasmic stress granule	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0012507	ER to Golgi transport vesicle membrane	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0014069	postsynaptic density	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0015030	Cajal body	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0016028	rhabdomere	19	0	0.65	1.00	Polistes_dominula	CC
+GO:0016272	prefoldin complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0016327	apicolateral plasma membrane	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0016328	lateral plasma membrane	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0016363	nuclear matrix	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0016471	vacuolar proton-transporting V-type ATPase complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0016514	SWI/SNF complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0016604	nuclear body	34	0	1.16	1.00	Polistes_dominula	CC
+GO:0016607	nuclear speck	18	0	0.62	1.00	Polistes_dominula	CC
+GO:0017053	transcriptional repressor complex	17	0	0.58	1.00	Polistes_dominula	CC
+GO:0017119	Golgi transport complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0019005	SCF ubiquitin ligase complex	29	0	0.99	1.00	Polistes_dominula	CC
+GO:0019012	virion	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0019028	viral capsid	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0019897	extrinsic component of plasma membrane	23	0	0.79	1.00	Polistes_dominula	CC
+GO:0022624	proteasome accessory complex	17	0	0.58	1.00	Polistes_dominula	CC
+GO:0022625	cytosolic large ribosomal subunit	26	0	0.89	1.00	Polistes_dominula	CC
+GO:0030014	CCR4-NOT complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0030015	CCR4-NOT core complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0030017	sarcomere	19	0	0.65	1.00	Polistes_dominula	CC
+GO:0030018	Z disc	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0030027	lamellipodium	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0030055	cell-substrate junction	14	0	0.48	1.00	Polistes_dominula	CC
+GO:0030117	membrane coat	24	0	0.82	1.00	Polistes_dominula	CC
+GO:0030118	clathrin coat	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0030119	AP-type membrane coat adaptor complex	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0030120	vesicle coat	18	0	0.62	1.00	Polistes_dominula	CC
+GO:0030125	clathrin vesicle coat	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030126	COPI vesicle coat	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030127	COPII vesicle coat	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030131	clathrin adaptor complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030132	clathrin coat of coated pit	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030134	COPII-coated ER to Golgi transport vesicle	17	0	0.58	1.00	Polistes_dominula	CC
+GO:0030135	coated vesicle	43	0	1.47	1.00	Polistes_dominula	CC
+GO:0030136	clathrin-coated vesicle	20	0	0.68	1.00	Polistes_dominula	CC
+GO:0030137	COPI-coated vesicle	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030139	endocytic vesicle	19	0	0.65	1.00	Polistes_dominula	CC
+GO:0030173	integral component of Golgi membrane	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0030175	filopodium	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0030286	dynein complex	18	0	0.62	1.00	Polistes_dominula	CC
+GO:0030532	small nuclear ribonucleoprotein complex	40	0	1.37	1.00	Polistes_dominula	CC
+GO:0030658	transport vesicle membrane	27	0	0.92	1.00	Polistes_dominula	CC
+GO:0030660	Golgi-associated vesicle membrane	22	0	0.75	1.00	Polistes_dominula	CC
+GO:0030662	coated vesicle membrane	27	0	0.92	1.00	Polistes_dominula	CC
+GO:0030663	COPI-coated vesicle membrane	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0030665	clathrin-coated vesicle membrane	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0030672	synaptic vesicle membrane	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0030681	multimeric ribonuclease P complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0030686	90S preribosome	16	0	0.55	1.00	Polistes_dominula	CC
+GO:0030897	HOPS complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0030990	intraciliary transport particle	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0030991	intraciliary transport particle A	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0030992	intraciliary transport particle B	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0031011	Ino80 complex	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0031082	BLOC complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0031083	BLOC-1 complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0031228	intrinsic component of Golgi membrane	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0031231	intrinsic component of peroxisomal membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0031234	extrinsic component of cytoplasmic side of plasma membrane	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0031253	cell projection membrane	29	0	0.99	1.00	Polistes_dominula	CC
+GO:0031256	leading edge membrane	18	0	0.62	1.00	Polistes_dominula	CC
+GO:0031300	intrinsic component of organelle membrane	47	0	1.61	1.00	Polistes_dominula	CC
+GO:0031301	integral component of organelle membrane	43	0	1.47	1.00	Polistes_dominula	CC
+GO:0031304	intrinsic component of mitochondrial inner membrane	17	0	0.58	1.00	Polistes_dominula	CC
+GO:0031305	integral component of mitochondrial inner membrane	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0031314	extrinsic component of mitochondrial inner membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0031461	cullin-RING ubiquitin ligase complex	49	0	1.68	1.00	Polistes_dominula	CC
+GO:0031514	motile cilium	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0031519	PcG protein complex	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0031523	Myb complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0031528	microvillus membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0031594	neuromuscular junction	45	0	1.54	1.00	Polistes_dominula	CC
+GO:0031672	A band	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0031674	I band	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0031985	Golgi cisterna	27	0	0.92	1.00	Polistes_dominula	CC
+GO:0032021	NELF complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0032039	integrator complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0032040	small-subunit processome	22	0	0.75	1.00	Polistes_dominula	CC
+GO:0032279	asymmetric synapse	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0032580	Golgi cisterna membrane	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0032589	neuron projection membrane	17	0	0.58	1.00	Polistes_dominula	CC
+GO:0032590	dendrite membrane	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0032592	integral component of mitochondrial membrane	18	0	0.62	1.00	Polistes_dominula	CC
+GO:0032783	ELL-EAF complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0032806	carboxy-terminal domain protein kinase complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0033176	proton-transporting V-type ATPase complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0033180	proton-transporting V-type ATPase, V1 domain	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0033181	plasma membrane proton-transporting V-type ATPase complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0033202	DNA helicase complex	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0033263	CORVET complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0033583	rhabdomere membrane	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0034045	phagophore assembly site membrane	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0034704	calcium channel complex	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0034705	potassium channel complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0035032	phosphatidylinositol 3-kinase complex, class III	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0035145	exon-exon junction complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0035267	NuA4 histone acetyltransferase complex	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0035327	transcriptionally active chromatin	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0035363	histone locus body	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0035371	microtubule plus-end	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0035770	ribonucleoprotein granule	39	0	1.33	1.00	Polistes_dominula	CC
+GO:0035859	Seh1-associated complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0035861	site of double-strand break	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0035869	ciliary transition zone	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0035996	rhabdomere microvillus	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0036038	MKS complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0036062	presynaptic periactive zone	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0036064	ciliary basal body	22	0	0.75	1.00	Polistes_dominula	CC
+GO:0036156	inner dynein arm	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0036157	outer dynein arm	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0036452	ESCRT complex	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0036464	cytoplasmic ribonucleoprotein granule	38	0	1.3	1.00	Polistes_dominula	CC
+GO:0038201	TOR complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0042383	sarcolemma	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0043073	germ cell nucleus	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0043186	P granule	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0043189	H4/H2A histone acetyltransferase complex	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0043204	perikaryon	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0043230	extracellular organelle	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0043296	apical junction complex	22	0	0.75	1.00	Polistes_dominula	CC
+GO:0044295	axonal growth cone	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0044423	virion part	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0044437	vacuolar part	42	0	1.44	1.00	Polistes_dominula	CC
+GO:0044449	contractile fiber part	22	0	0.75	1.00	Polistes_dominula	CC
+GO:0044452	nucleolar part	29	0	0.99	1.00	Polistes_dominula	CC
+GO:0044754	autolysosome	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0044815	DNA packaging complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0045169	fusome	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0045171	intercellular bridge	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0045172	germline ring canal	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0045211	postsynaptic membrane	24	0	0.82	1.00	Polistes_dominula	CC
+GO:0045334	clathrin-coated endocytic vesicle	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0045495	pole plasm	22	0	0.75	1.00	Polistes_dominula	CC
+GO:0046540	U4/U6 x U5 tri-snRNP complex	14	0	0.48	1.00	Polistes_dominula	CC
+GO:0048475	coated membrane	24	0	0.82	1.00	Polistes_dominula	CC
+GO:0048770	pigment granule	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0055037	recycling endosome	23	0	0.79	1.00	Polistes_dominula	CC
+GO:0060293	germ plasm	16	0	0.55	1.00	Polistes_dominula	CC
+GO:0061174	type I terminal bouton	13	0	0.44	1.00	Polistes_dominula	CC
+GO:0061700	GATOR2 complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0070062	extracellular exosome	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0070775	H3 histone acetyltransferase complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0070822	Sin3-type complex	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0070847	core mediator complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0070971	endoplasmic reticulum exit site	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0071004	U2-type prespliceosome	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0071010	prespliceosome	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0071014	post-mRNA release spliceosomal complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0071212	subsynaptic reticulum	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0071254	cytoplasmic U snRNP body	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0071683	sensory dendrite	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0072546	ER membrane protein complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0072686	mitotic spindle	23	0	0.79	1.00	Polistes_dominula	CC
+GO:0080008	Cul4-RING E3 ubiquitin ligase complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0090443	FAR/SIN/STRIPAK complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:0090568	nuclear transcriptional repressor complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0090571	RNA polymerase II transcription repressor complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0090576	RNA polymerase III transcription factor complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0090734	site of DNA damage	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0097346	INO80-type complex	11	0	0.38	1.00	Polistes_dominula	CC
+GO:0097525	spliceosomal snRNP complex	34	0	1.16	1.00	Polistes_dominula	CC
+GO:0097526	spliceosomal tri-snRNP complex	16	0	0.55	1.00	Polistes_dominula	CC
+GO:0097730	non-motile cilium	15	0	0.51	1.00	Polistes_dominula	CC
+GO:0098573	intrinsic component of mitochondrial membrane	21	0	0.72	1.00	Polistes_dominula	CC
+GO:0098595	perivitelline space	6	0	0.21	1.00	Polistes_dominula	CC
+GO:0098636	protein complex involved in cell adhesion	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0098794	postsynapse	35	0	1.2	1.00	Polistes_dominula	CC
+GO:0098797	plasma membrane protein complex	72	0	2.46	1.00	Polistes_dominula	CC
+GO:0098802	plasma membrane receptor complex	19	0	0.65	1.00	Polistes_dominula	CC
+GO:0098831	presynaptic active zone cytoplasmic component	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0098852	lytic vacuole membrane	21	0	0.72	1.00	Polistes_dominula	CC
+GO:0098858	actin-based cell projection	25	0	0.85	1.00	Polistes_dominula	CC
+GO:0098862	cluster of actin-based cell projections	9	0	0.31	1.00	Polistes_dominula	CC
+GO:0098878	neurotransmitter receptor complex	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0098975	postsynapse of neuromuscular junction	5	0	0.17	1.00	Polistes_dominula	CC
+GO:0098984	neuron to neuron synapse	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0099501	exocytic vesicle membrane	10	0	0.34	1.00	Polistes_dominula	CC
+GO:0099572	postsynaptic specialization	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0101031	chaperone complex	8	0	0.27	1.00	Polistes_dominula	CC
+GO:0120111	neuron projection cytoplasm	12	0	0.41	1.00	Polistes_dominula	CC
+GO:0120114	Sm-like protein family complex	41	0	1.4	1.00	Polistes_dominula	CC
+GO:1902554	serine/threonine protein kinase complex	21	0	0.72	1.00	Polistes_dominula	CC
+GO:1902911	protein kinase complex	27	0	0.92	1.00	Polistes_dominula	CC
+GO:1903561	extracellular vesicle	7	0	0.24	1.00	Polistes_dominula	CC
+GO:1904115	axon cytoplasm	7	0	0.24	1.00	Polistes_dominula	CC
+GO:1905360	GTPase complex	7	0	0.24	1.00	Polistes_dominula	CC
+GO:1905369	endopeptidase complex	27	0	0.92	1.00	Polistes_dominula	CC
+GO:1990023	mitotic spindle midzone	5	0	0.17	1.00	Polistes_dominula	CC
+GO:1990124	messenger ribonucleoprotein complex	6	0	0.21	1.00	Polistes_dominula	CC
+GO:1990391	DNA repair complex	10	0	0.34	1.00	Polistes_dominula	CC
+GO:1990752	microtubule end	6	0	0.21	1.00	Polistes_dominula	CC
