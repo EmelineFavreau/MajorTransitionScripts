@@ -1,0 +1,31 @@
+# number of orthogroups in DEGs?
+
+# 567 for Ceratina australensis
+grep -f dge-DESeq2/full_set/Ceratina_australensis/Ceratina_australensis_all_DEGs.txt orthology-analysis/result/Ceratina_australensis_5787_gene_orthogroups_list | wc -l
+
+# 241 for Ceratina calcarata
+grep -f dge-DESeq2/full_set/Ceratina_calcarata/Ceratina_calcarata_all_DEGs.txt orthology-analysis/result/Ceratina_calcarata_5787_gene_orthogroups_list | wc -l
+
+# 1071 for Megalopta genalis
+grep -f dge-DESeq2/full_set/Megalopta_genalis/Megalopta_genalis_all_DEGs.txt orthology-analysis/result/Megalopta_genalis_5787_gene_orthogroups_list | wc -l
+
+# 17 for Polistes canadensis
+grep -f dge-DESeq2/full_set/Polistes_canadensis/Polistes_canadensis_all_DEGs.txt orthology-analysis/result/Polistes_canadensis_6983_gene_orthogroups_list | wc -l
+
+# 705 for Polistes dominula
+grep -f dge-DESeq2/full_set/Polistes_dominula/Polistes_dominula_all_DEGs.txt orthology-analysis/result/Polistes_dominula_6983_gene_orthogroups_list | wc -l
+
+# 248 for Liostenogaster flavolineata
+grep -f dge-DESeq2/full_set/Liostenogaster_flavolineata/Liostenogaster_flavolineata_all_DEGs.txt orthology-analysis/result/Liostenogaster_flavolineata_6983_gene_orthogroups_list | wc -l
+
+
+
+####################################
+# Variant-stabilized read count from each species
+# this is the input of the heatmap
+input/Ceratina_australensis_VST.txt        
+input/Ceratina_calcarata_VST.txt           
+input/Liostenogaster_flavolineata_VST.txt
+input/Megalopta_genalis_VST.txt
+input/Polistes_dominula_VST.txt
+input/Polistes_canadensis_VST.txt
