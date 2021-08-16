@@ -1,0 +1,674 @@
+---
+title: "TopGo analysis of DEG using GO Slim Terms"
+author: "Emeline Favreau"
+date: "06/05/2021"
+output: html_document
+---
+Copyright 2021 Emeline Favreau, University College London.
+
+
+###### Objective of analysis: Among the 3 wasp and 3 bee species, are there common pattern of GO Slim term enrichment?
+
+We obtained GO Slim terms that are significantly enriched in our dataset subsets. Specifically, we focused on genes that are differentially expressed between reproductives and non-reproductives in _Ceratina australensis_, _C. calcarata_, _Megalopta genalis_, _Polistes canadensis_, _P. dominula_ and _Liostenogaster flavolineata_.
+
+
+###### Analysis steps:
+- Obtaining data
+- Aim 1: Biological processes enrichment in all DEG
+- Aim 2: Molecular function enrichment in all DEG
+- Aim 3: Cellular component enrichment in all DEG
+
+
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "tidyverse",
+                     "readr")
+
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+```{r common groups}
+
+
+# the groups that we are testing
+all_species <- c("Polistes_canadensis",
+          "Polistes_dominula",
+          "Liostenogaster_flavolineata",
+          "Ceratina_australensis",
+          "Ceratina_calcarata" ,
+          "Megalopta_genalis")
+
+wasp <- c("Polistes_canadensis",
+          "Polistes_dominula",
+          "Liostenogaster_flavolineata")
+
+bee <- c("Ceratina_australensis",
+          "Ceratina_calcarata" ,
+          "Megalopta_genalis")
+
+```
+
+##### Aim 1: Biological processes enrichment in all significant DEG
+
+
+```{r import data BP all sig DEG, eval = TRUE, echo = FALSE, include = FALSE}
+# GO terms enrichment result tables
+# file obtained by TopGO, containing data description
+# GO.ID	Term	Annotated	Significant	Expected	pvalue	species	dataSubset	goCategory
+# these are Biological processes for DEG upregulated in Reproductives
+Ceratina_australensis_BP <- read_delim("resultOnScratch/topgo_result_slimTerms_Ceratina_australensis_BP",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Ceratina_calcarata_BP <- read_delim("resultOnScratch/topgo_result_slimTerms_Ceratina_calcarata_BP",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Megalopta_genalis_BP <- read_delim("resultOnScratch/topgo_result_slimTerms_Megalopta_genalis_BP",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Polistes_dominula_BP <- read_delim("resultOnScratch/topgo_result_slimTerms_Polistes_dominula_BP",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Polistes_canadensis_BP <- read_delim("resultOnScratch/topgo_result_slimTerms_Polistes_canadensis_BP",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Liostenogaster_flavolineata_BP <- read_delim("resultOnScratch/topgo_result_slimTerms_Liostenogaster_flavolineata_BP",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+```{r make table BP , eval = TRUE, echo = FALSE, include = TRUE}
+# subset for the important data 
+australensis_table_BP <- Ceratina_australensis_BP %>% 
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+dominula_table_BP <- Polistes_dominula_BP %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+genalis_table_BP <- Megalopta_genalis_BP %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+canadensis_table_BP <- Polistes_canadensis_BP %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+calcarata_table_BP <- Ceratina_calcarata_BP %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+flavolineata_table_BP <- Liostenogaster_flavolineata_BP %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+# result table: number of significant GO Terms for each species
+result_BP_df  <-  as.data.frame(rbind(c("Ceratina_australensis",
+                                        nrow(australensis_table_BP)),
+                                      c("Ceratina_calcarata",
+                                        nrow(calcarata_table_BP)),
+                                      c("Megalopta_genalis",
+                                        nrow(genalis_table_BP)),
+                                      c("Polistes_dominula",
+                                        nrow(dominula_table_BP)),
+                                      c("Polistes_canadensis",
+                                        nrow(canadensis_table_BP)),
+                                      c("Liostenogaster_flavolineata",
+                                        nrow(flavolineata_table_BP))),
+    stringsAsFactors = FALSE)
+
+colnames(result_BP_df) <- c("species", "Sig_GO_Term_in_BP")
+
+result_BP_df
+
+# obtain vector of all GO
+GO.ID_BP <- unique(c(australensis_table_BP$GO.ID,
+                     dominula_table_BP$GO.ID,
+                     genalis_table_BP$GO.ID,
+                     canadensis_table_BP$GO.ID,
+                     calcarata_table_BP$GO.ID,
+                     flavolineata_table_BP$GO.ID))
+
+
+# make a new table
+# columns: GOID, Terms, species
+stacked_result_BP <- rbind(australensis_table_BP,
+                  dominula_table_BP,
+                  genalis_table_BP,
+                  canadensis_table_BP,
+                  calcarata_table_BP,
+                  flavolineata_table_BP)
+
+# obtain frequencies of GO Terms for all aspecies
+test <- stacked_result_BP
+
+# dataframe
+# GOID | Species 1 | Species 2 | Species 3 | 
+wide_df <- as.data.frame(matrix(NA, nrow = length(unique(test$GO.ID)),
+                                ncol = 7))
+# name the columns
+colnames(wide_df) <- c("GO.ID", all_species)
+
+# make a vector with all GO terms
+go_vec <- unique(test$GO.ID)
+
+# assign thios go terms to the column
+wide_df$GO.ID <- go_vec
+
+# set all species column count to 0
+wide_df$Polistes_canadensis         <- 0
+wide_df$Polistes_dominula           <- 0
+wide_df$Liostenogaster_flavolineata <- 0
+wide_df$Ceratina_australensis       <- 0
+wide_df$Ceratina_calcarata          <- 0
+wide_df$Megalopta_genalis           <- 0
+
+for(i in go_vec){
+  
+  # subset data for a given GO Term ID
+  this_subset <- test %>% filter(GO.ID == i)
+  
+  # assign 1 if present in this species
+  if("Ceratina_australensis" %in% this_subset$species){
+    wide_df$Ceratina_australensis[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Polistes_canadensis" %in% this_subset$species){
+    wide_df$Polistes_canadensis[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Polistes_dominula" %in% this_subset$species){
+    wide_df$Polistes_dominula[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Liostenogaster_flavolineata" %in% this_subset$species){
+    wide_df$Liostenogaster_flavolineata[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Ceratina_calcarata" %in% this_subset$species){
+    wide_df$Ceratina_calcarata[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Megalopta_genalis" %in% this_subset$species){
+    wide_df$Megalopta_genalis[wide_df$GO.ID == i] <- 1
+  }
+}
+
+
+# add a column with count of species that have that GO term  
+wide_df$species_count <- wide_df %>%
+  select(all_of(all_species)) %>%
+  rowSums()
+
+# add a column with Term
+wide_df$GOTerm <- test$Term[match(wide_df$GO.ID, test$GO.ID)]
+
+# add a column for BP
+wide_df$GOCategory <- "BP"
+
+# save for supplementary info
+write.table(x         = wide_df,
+            file      = "resultOnScratch/all_BP_GOSlimTerms.csv",
+            quote     = FALSE,
+            row.names = FALSE,
+            sep       = ",")
+```
+
+No overlap between species in GO Slim Terms.
+
+```{r exploration of BP results}
+## exploration of BP results
+# No overlap between species in GO Slim Terms.
+# unique(str(wide_df$species_count))
+
+
+```
+
+
+##### Aim 2: Molecular Functions enrichment in all significant DEG
+
+
+
+```{r import data MF all sig DEG, eval = TRUE, echo = FALSE, include = FALSE}
+# GO terms enrichment result tables
+# file obtained by TopGO, containing data description
+# GO.ID	Term	Annotated	Significant	Expected	pvalue	species	dataSubset	goCategory
+# these are Biological processes for DEG upregulated in Reproductives
+Ceratina_australensis_MF <- read_delim("resultOnScratch/topgo_result_slimTerms_Ceratina_australensis_MF",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Ceratina_calcarata_MF <- read_delim("resultOnScratch/topgo_result_slimTerms_Ceratina_calcarata_MF",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Megalopta_genalis_MF <- read_delim("resultOnScratch/topgo_result_slimTerms_Megalopta_genalis_MF",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Polistes_dominula_MF <- read_delim("resultOnScratch/topgo_result_slimTerms_Polistes_dominula_MF",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Polistes_canadensis_MF <- read_delim("resultOnScratch/topgo_result_slimTerms_Polistes_canadensis_MF",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Liostenogaster_flavolineata_MF <- read_delim("resultOnScratch/topgo_result_slimTerms_Liostenogaster_flavolineata_MF",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+```{r make table MF , eval = TRUE, echo = FALSE, include = TRUE}
+# subset for the important data 
+australensis_table_MF <- Ceratina_australensis_MF %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+dominula_table_MF <- Polistes_dominula_MF %>% 
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+genalis_table_MF <- Megalopta_genalis_MF %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+canadensis_table_MF <- Polistes_canadensis_MF %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+calcarata_table_MF <- Ceratina_calcarata_MF %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+flavolineata_table_MF <- Liostenogaster_flavolineata_MF %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+# result table: number of significant GO Terms for each species
+result_MF_df  <-  as.data.frame(rbind(c("Ceratina_australensis",
+                                        nrow(australensis_table_MF)),
+                                      c("Ceratina_calcarata",
+                                        nrow(calcarata_table_MF)),
+                                      c("Megalopta_genalis",
+                                        nrow(genalis_table_MF)),
+                                      c("Polistes_dominula",
+                                        nrow(dominula_table_MF)),
+                                      c("Polistes_canadensis",
+                                        nrow(canadensis_table_MF)),
+                                      c("Liostenogaster_flavolineata",
+                                        nrow(flavolineata_table_MF))),
+    stringsAsFactors = FALSE)
+
+colnames(result_MF_df) <- c("species", "Sig_GO_Term_in_MF")
+
+result_MF_df
+
+# obtain vector of all GO
+GO.ID_MF <- unique(c(australensis_table_MF$GO.ID,
+                     dominula_table_MF$GO.ID,
+                     genalis_table_MF$GO.ID,
+                     canadensis_table_MF$GO.ID,
+                     calcarata_table_MF$GO.ID,
+                     flavolineata_table_MF$GO.ID))
+
+
+# make a new table
+# columns: GOID, Terms, species
+stacked_result_MF <- rbind(australensis_table_MF,
+                  dominula_table_MF,
+                  genalis_table_MF,
+                  canadensis_table_MF,
+                  calcarata_table_MF,
+                  flavolineata_table_MF)
+
+# obtain frequencies of GO Terms for all aspecies
+test <- stacked_result_MF
+
+# dataframe
+# GOID | Species 1 | Species 2 | Species 3 | 
+wide_df <- as.data.frame(matrix(NA, nrow = length(unique(test$GO.ID)),
+                                ncol = 7))
+# name the columns
+colnames(wide_df) <- c("GO.ID", all_species)
+
+# make a vector with all GO terms
+go_vec <- unique(test$GO.ID)
+
+# assign thios go terms to the column
+wide_df$GO.ID <- go_vec
+
+# set all species column count to 0
+wide_df$Polistes_canadensis         <- 0
+wide_df$Polistes_dominula           <- 0
+wide_df$Liostenogaster_flavolineata <- 0
+wide_df$Ceratina_australensis       <- 0
+wide_df$Ceratina_calcarata          <- 0
+wide_df$Megalopta_genalis           <- 0
+
+for(i in go_vec){
+  
+  this_subset <- test %>% filter(GO.ID == i)
+  
+  if("Ceratina_australensis" %in% this_subset$species){
+    wide_df$Ceratina_australensis[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Polistes_canadensis" %in% this_subset$species){
+    wide_df$Polistes_canadensis[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Polistes_dominula" %in% this_subset$species){
+    wide_df$Polistes_dominula[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Liostenogaster_flavolineata" %in% this_subset$species){
+    wide_df$Liostenogaster_flavolineata[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Ceratina_calcarata" %in%this_subset$species){
+    wide_df$Ceratina_calcarata[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Megalopta_genalis" %in%this_subset$species){
+    wide_df$Megalopta_genalis[wide_df$GO.ID == i] <- 1
+  }
+}
+
+
+# add a column with count of species that have that GO term  
+wide_df$species_count <- wide_df %>% select(all_of(all_species)) %>% rowSums()
+
+# add a column with Term
+wide_df$GOTerm <- test$Term[match(wide_df$GO.ID, test$GO.ID)]
+
+# add a column for MF
+wide_df$GOCategory <- "MF"
+
+# save for supplementary info
+write.table(x         = wide_df,
+            file      = "resultOnScratch/all_MF_GOSlimTerms.csv",
+            quote     = FALSE,
+            row.names = FALSE,
+            sep       = ",")
+```
+
+.
+
+
+```{r exploration of MF results}
+## exploration of MF results
+# there are 3 cases with 2 species that have common GO Terms
+# summary(wide_df$species_count)
+wide_df %>% filter(species_count == 2)
+
+# Liostenogaster shares 1 GO Slim Term with australensis (GO:0016491, oxidoreductase activity), and 2 with Megalopta (GO:0005215 transporter activity, GO:0022857 transmembrane transporter activity)
+
+
+# list of 3 GO ID that are important for 2 or 3  species
+common_MF_GO_vec <- unique(c("GO:0016491", "GO:0005215", "GO:0022857"))
+
+
+test <- wide_df %>% 
+  filter(GO.ID %in% common_MF_GO_vec) 
+
+# check description (expectation: sensory mechanisms)
+# but we see mainly synaptic and cellular processes
+common_MF_GOTerms_df <- stacked_result_MF %>% 
+  filter(GO.ID %in% common_MF_GO_vec) 
+
+# save this list
+write.table(x    = common_MF_GOTerms_df,
+            file = "resultOnScratch/common_MF_GOSlimTerms.csv",
+            quote = FALSE,
+            row.names = FALSE,
+            sep = ",")
+```
+3 GO Slim Terms of Molecular Function are shared by 2 species (wasp and bee).
+
+
+
+##### Aim 3: Cellular component enrichment in all significant DEG
+
+
+
+```{r import data CC all sig DEG, eval = TRUE, echo = FALSE, include = FALSE}
+# GO terms enrichment result tables
+# file obtained by TopGO, containing data description
+# GO.ID	Term	Annotated	Significant	Expected	pvalue	species	dataSubset	goCategory
+# these are Biological processes for DEG upregulated in Reproductives
+Ceratina_australensis_CC <- read_delim("resultOnScratch/topgo_result_slimTerms_Ceratina_australensis_CC",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Ceratina_calcarata_CC <- read_delim("resultOnScratch/topgo_result_slimTerms_Ceratina_calcarata_CC",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Megalopta_genalis_CC <- read_delim("resultOnScratch/topgo_result_slimTerms_Megalopta_genalis_CC",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Polistes_dominula_CC <- read_delim("resultOnScratch/topgo_result_slimTerms_Polistes_dominula_CC",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Polistes_canadensis_CC <- read_delim("resultOnScratch/topgo_result_slimTerms_Polistes_canadensis_CC",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+Liostenogaster_flavolineata_CC <- read_delim("resultOnScratch/topgo_result_slimTerms_Liostenogaster_flavolineata_CC",
+                                    "\t", escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+```{r make table CC , eval = TRUE, echo = FALSE, include = TRUE}
+# subset for the important data 
+australensis_table_CC <- Ceratina_australensis_CC %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+dominula_table_CC <- Polistes_dominula_CC %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+genalis_table_CC <- Megalopta_genalis_CC %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+canadensis_table_CC <- Polistes_canadensis_CC %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+calcarata_table_CC <- Ceratina_calcarata_CC %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+flavolineata_table_CC <- Liostenogaster_flavolineata_CC %>%
+  filter(pvalue < 0.05) %>%
+  select(GO.ID, species, Term)
+
+# result table: number of significant GO Terms for each species
+result_CC_df  <-  as.data.frame(rbind(c("Ceratina_australensis",
+                                        nrow(australensis_table_CC)),
+                                      c("Ceratina_calcarata",
+                                        nrow(calcarata_table_CC)),
+                                      c("Megalopta_genalis",
+                                        nrow(genalis_table_CC)),
+                                      c("Polistes_dominula",
+                                        nrow(dominula_table_CC)),
+                                      c("Polistes_canadensis",
+                                        nrow(canadensis_table_CC)),
+                                      c("Liostenogaster_flavolineata",
+                                        nrow(flavolineata_table_CC))),
+    stringsAsFactors = FALSE)
+
+colnames(result_CC_df) <- c("species", "Sig_GO_Term_in_CC")
+
+result_CC_df
+
+# obtain vector of all GO
+GO.ID_CC <- unique(c(australensis_table_CC$GO.ID,
+                     dominula_table_CC$GO.ID,
+                     genalis_table_CC$GO.ID,
+                     canadensis_table_CC$GO.ID,
+                     calcarata_table_CC$GO.ID,
+                     flavolineata_table_CC$GO.ID))
+
+
+# make a new table
+# columns: GOID, Terms, species
+stacked_result_CC <- rbind(australensis_table_CC,
+                  dominula_table_CC,
+                  genalis_table_CC,
+                  canadensis_table_CC,
+                  calcarata_table_CC,
+                  flavolineata_table_CC)
+
+# obtain frequencies of GO Terms for all aspecies
+test <- stacked_result_CC
+
+# dataframe
+# GOID | Species 1 | Species 2 | Species 3 | 
+wide_df <- as.data.frame(matrix(NA, nrow = length(unique(test$GO.ID)),
+                                ncol = 7))
+# name the columns
+colnames(wide_df) <- c("GO.ID", all_species)
+
+# make a vector with all GO terms
+go_vec <- unique(test$GO.ID)
+
+# assign thios go terms to the column
+wide_df$GO.ID <- go_vec
+
+# set all species column count to 0
+wide_df$Polistes_canadensis         <- 0
+wide_df$Polistes_dominula           <- 0
+wide_df$Liostenogaster_flavolineata <- 0
+wide_df$Ceratina_australensis       <- 0
+wide_df$Ceratina_calcarata          <- 0
+wide_df$Megalopta_genalis           <- 0
+
+for(i in go_vec){
+  
+  this_subset <- test %>% filter(GO.ID == i)
+  
+  if("Ceratina_australensis" %in% this_subset$species){
+    wide_df$Ceratina_australensis[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Polistes_canadensis" %in% this_subset$species){
+    wide_df$Polistes_canadensis[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Polistes_dominula" %in% this_subset$species){
+    wide_df$Polistes_dominula[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Liostenogaster_flavolineata" %in% this_subset$species){
+    wide_df$Liostenogaster_flavolineata[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Ceratina_calcarata" %in%this_subset$species){
+    wide_df$Ceratina_calcarata[wide_df$GO.ID == i] <- 1
+  }
+  
+  if("Megalopta_genalis" %in%this_subset$species){
+    wide_df$Megalopta_genalis[wide_df$GO.ID == i] <- 1
+  }
+}
+
+
+# add a column with count of species that have that GO term  
+wide_df$species_count <- wide_df %>% 
+  select(all_of(all_species)) %>% rowSums()
+
+
+# add a column with Term
+wide_df$GOTerm <- test$Term[match(wide_df$GO.ID, test$GO.ID)]
+
+# add a column for CC
+wide_df$GOCategory <- "CC"
+
+# save for supplementary info
+write.table(x         = wide_df,
+            file      = "resultOnScratch/all_CC_GOSlimTerms.csv",
+            quote     = FALSE,
+            row.names = FALSE,
+            sep       = ",")
+```
+
+
+
+
+```{r exploration of CC results}
+## exploration of CC results
+# there is 1 GO Slim Term shared between three species
+# summary(wide_df$species_count)
+# save GO:0031012 extracellular matrix between Pdom, Caus and Mgen
+wide_df %>% filter(species_count == 3) 
+
+# GO:0005576 extracellular region between Caus and Mgen
+# GO:0044421 extracellular region part between Caus and Mgen
+# GO:0005615 extracellular space between Caus and Mgen
+# GO:0045202 synapse between Ccal and Mgen
+wide_df %>% filter(species_count == 2) 
+
+# list of 5 GO ID that are important for 2 or 3  species
+common_CC_GO_vec <- unique(c("GO:0031012", "GO:0005576", "GO:0044421",
+                             "GO:0005615", "GO:0045202"))
+
+
+test <- wide_df %>% 
+  filter(GO.ID %in% common_CC_GO_vec) 
+
+# check description (expectation: sensory mechanisms)
+# but we see mainly synaptic and cellular processes
+common_CC_GOTerms_df <- stacked_result_CC %>% 
+  filter(GO.ID %in% common_CC_GO_vec) 
+
+
+```
+5 GO Terms of Cellular Component  are shared by 2 or 3 species (never 3 species from same lineage).
+
+
+
+
+
+**Conclusion**
+
+
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```
