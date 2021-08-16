@@ -6,10 +6,21 @@ OrthoFinder runs:
   * allBees: C. australensis, C. calcarata, M. genalis, A. mellifera (539 orthologs)
   * allWasps: P. dominula, P. canadensis, L. flavolineata, A. mellifera (1053 orthologs)
 
-Filtering orthologs with a relaxed rule (up to 3 copies per species, absence of copy in one species out of six)
+Filtered orthologs with the relaxed rule (up to 3 copies per species, absence of copy in one species) 
+For the set with six species (3718 orthogroups):
   - result/Ceratina_australensis_3718_orthogroups_list
   - result/Ceratina_calcarata_3718_orthogroups_list
   - result/Liostenogaster_flavolineata_3718_orthogroups_list
   - result/Megalopta_genalis_3718_orthogroups_list
   - result/Polistes_canadensis_3718_orthogroups_list
   - result/Polistes_dominula_3718_orthogroups_list
+
+For the set with 3 wasps only (6983 orthogroups)
+  - result/Liostenogaster_flavolineata_6983_orthogroups_list
+  - result/Polistes_canadensis_6983_orthogroups_list
+  - result/Polistes_dominula_6983_orthogroups_list
+
+for the set with 3 bees only (5787 orthogroups)
+  - result/Ceratina_australensis_5787_orthogroups_list
+  - result/Ceratina_calcarata_5787_orthogroups_list
+  - result/Megalopta_genalis_5787_orthogroups_list

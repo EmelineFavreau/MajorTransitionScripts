@@ -31,6 +31,7 @@ cd ../../
 # check that gff is NCBI format (RefSeq)
 # zcat inputOnScratch/gff/${thisspecies}.gff.gz | head
 # here maybe I need to include only gene from third column
+# protein name is in this format: XP_026675650.1
 zcat inputOnScratch/gff/${thisspecies}.gff.gz | grep "CDS" | head
 head inputOnScratch/${thisspecies}.faa
 

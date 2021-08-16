@@ -2,13 +2,10 @@
 
 # Calculate sequence number after Nextflow Trimming step
 
-
 # Copyright Emeline Favreau, UCL
 
-
-
 # files/path needed as input
-thispath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Liostenogaster-flavolineata/result/qc-after-trim"
+thispath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Liostenogaster-flavolineata/result/Taylor/qc-after-trim"
 
 speciespath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Liostenogaster-flavolineata"
 
@@ -16,7 +13,7 @@ speciespath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-tr
 thisanalysis="qc-after-trim"
 
 # dataset name
-datasetname="thirty-eight"
+datasetname="Taylor"
 
 # make a directory for these calculations
 mkdir -p tmp/${datasetname}/${thisanalysis}/
@@ -36,13 +33,13 @@ done
 
 cd ${speciespath}
 
-# obtain list of files
+# obtain list of files e.g. SocF10_1_val_1
 ls tmp/${datasetname}/${thisanalysis}/*_fastqc.zip \
 	| cut -d "/" -f 4 \
 	| cut -d "_" -f 1,2,3,4 \
 	> tmp/${datasetname}/${thisanalysis}/file-list
 
-# run a loop to obtain number of reads
+# run a loop to obtain number of reads eg Total Sequences	25150569
 
 for sample in `cat tmp/${datasetname}/${thisanalysis}/file-list`; do
 	grep "Total Sequences" tmp/${datasetname}/${thisanalysis}/${sample}_fastqc/fastqc_data.txt >> tmp/${datasetname}/${thisanalysis}/number-reads-in-file

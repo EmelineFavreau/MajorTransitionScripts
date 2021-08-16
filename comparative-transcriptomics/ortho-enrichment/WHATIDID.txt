@@ -8,6 +8,10 @@
 # Aim 2: make hash table for each species (protein sequence name | gene name)
 # Aim 3: Run GO Term enrichment for each species (DEG genes as focus loci)
 # Aim 4: Run GO Term enrichment for each species (WGCNA genes as focus loci)
+# Aim 5: Obtain gene annotation file for GO Slim (GO Slimmer, DEG genes as focus loci)
+# Aim 6 : Obtain gene annotation file for GO Slim (GO Slimmer, WGCNA genes as focus loci)
+# Aim 7: Overrepresentation test for GO Slim (PANTHER, DEG genes as focus loci)
+# Aim 8: Overrepresentation test for GO Slim (PANTHER, WGCNA genes as focus loci)
 
 ###############################################################################
 # Obtaining data
@@ -93,6 +97,7 @@ qsub blastp-fly-agst-flavolineata.sh
 qsub blastp-fly-agst-calcarata.sh
 qsub blastp-fly-agst-dominula.sh
 qsub blastp-fly-agst-genalis.sh
+qsub blastp-fly-agst-mellifera.sh 
 
 # this gives multiple hits per query (bee/wasp)
 # keep the hit that has the lowest p value
@@ -201,7 +206,158 @@ ls -lrth resultOnScratch/topgo_result_WGCNA*
 2021-05-04-analysis-GOTerms-WGCNA.Rmd
 
 
+######################################################################################
+# Aim 5: GO Slim Term enrichment analysis for DEG
+
+cd inputOnScratch
+
+# need a GO Slim file for Drosophila
+wget http://current.geneontology.org/ontology/subsets/goslim_drosophila.obo
+
+# need the current ontology (full set, not slim) from FlyBase
+wget http://ftp.flybase.org/releases/FB2021_02/precomputed_files/ontologies/go-basic.obo.gz
+gzip -d go-basic.obo.gz
+
+
+cd ..
+
+# make data input for GOSlimmer (on Galaxy)
+make-data-input-for-gosilmmer.R
+
+# Run Galaxy GOSLimmer, obtain resulting file with gene names and GO Slim Term
+# GOSlimmer converts a set of annotation from GO to a given GOSlim version (Galaxy Version 1.0.1)
+# Afgan E et al. 2016 The Galaxy platform for accessible, reproducible and collaborative biomedical analyses: 2016 update.
+Nucleic Acids Res. 44, W3–W10
+doi:10.1093/nar/gkw343
+# The Galaxy server that was used for some calculations is in part funded by Collaborative Research Centre 992 Medical Epigenetics (DFG grant SFB 992/1 2012) and German Federal Ministry of Education and Research (BMBF grants 031 A538A/A538C RBC, 031L0101B/031L0101C de.NBI-epi, 031L0106 de.STAIR (de.NBI)).
+# https://usegalaxy.eu/, search for GOSLimmer, add following inputs, run tool for each species (total run 10 min)
+goslim_drosophila.obo
+go-basic.obo
+Genus_species_gene2GoSlim.txt
+
+# run topgo with GO Slim Terms (this script is slow)
+makeGOSlimTermsTable-no-directionality-DEG.R
+
+# check results
+2021-05-06-analysis-GOSlimTerms-DEG.Rmd
+
+
+######################################################################################
+# Aim 6: GO Slim Term enrichment analysis for WGCNA
+
+# run topgo with GO Slim Terms (this script is slow)
+makeGOSlimTermsTable-no-directionality-WGCNA.R
+
+# check results
+2021-05-06-analysis-GOSlimTerms-WGCNA.Rmd
+
+
+##############################################################
+# Aim 7: Overrepresentation test for GO Slim (PANTHER, DEG genes as focus loci)
+
+# PANTHER can calculate the enrichment for GO Slim Terms
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6519457/#BX5
+
+# make the input files for PANTHER
+make-data-input-for-PANTHER-GOSlim.R
+
+# input needed:
+# list of all Drosophila protein names associated with Ceratina australensis
+*Dmel_genes_SlimPanther.txt
+
+# list of all Drosophila protein names associated with Ceratina australensis (DEGs)
+*Dmel_genes_DEGs_SlimPanther.txt
+
+
+# input in PANTHER Overrepresentation Test (Released 20210224) with Annotation Data Set PANTHER GO-Slim Biological Process, Fisher's Exact test, FDR correction, analysed list (Dmel genes with Blast it for C. australensis DEGs), reference list (Dmel genes with Blast hit for all C. australensis genes)http://pantherdb.org/
+
+
+# result: a file called analysis with GO Slim Biological Processes GO ID, GO Terms, over or under representation in my subset.
+
+# Megalopta genalis: no gene under FDR < 0.05
+# Polistes canadensis: no gene under FDR < 0.05
+# Polistes dominula: no gene under FDR < 0.05
+resultOnScratch/DEGs-*_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt
+
+# remove the first 12 lines
+sed 1,12d resultOnScratch/DEGs-Ceratina_australensis_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt > resultOnScratch/DEGs-Ceratina_australensis_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results-trimmed.txt
+
+sed 1,12d resultOnScratch/DEGs-Ceratina_calcarata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt > resultOnScratch/DEGs-Ceratina_calcarata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results-trimmed.txt
+
+
+sed 1,12d resultOnScratch/DEGs-Liostenogaster_flavolineata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt > resultOnScratch/DEGs-Liostenogaster_flavolineata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results-trimmed.txt
+
+
+# analysis of results 
+2021-05-11-analysis-GOSlimTerms-DEG-PANTHER.Rmd
+resultOnScratch/2021-05-11-DEGs-PANTHER-GOSlim_BP-result-overview
+
+##############################################################
+# Aim 8: Overrepresentation test for GO Slim (PANTHER, WGCNA genes as focus loci)
+
+# make the input files for PANTHER
+make-data-input-for-PANTHER-GOSlim-WGCNA.R
+
+# input needed:
+# list of all Drosophila protein names associated with a given species
+*Dmel_genes_SlimPanther.txt
+
+# list of all Drosophila protein names associated with a given species (WGCNA)
+*Dmel_genes_WGCNA_SlimPanther.txt
+
+
+# input in PANTHER (http://pantherdb.org/) Overrepresentation Test (Released 20210224) with Annotation Data Set PANTHER GO-Slim Biological Process, Fisher's Exact test, FDR correction, analysed list (Dmel genes with Blast it for C. australensis WGCNA), reference list (Dmel genes with Blast hit for all C. australensis genes)
+
+
+# result: a file called analysis with GO Slim Biological Processes GO ID, GO Terms, over or under representation in my subset. Only Pdom dataset got significant results
+
+# C. australensis: no gene under FDR < 0.05
+# C. calcarata: no gene under FDR < 0.05
+# Megalopta genalis: no gene under FDR < 0.05
+# Polistes canadensis: no gene under FDR < 0.05
+# Polistes dominula: no gene under FDR < 0.05
+resultOnScratch/WGCNA-*_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt
+
+# remove the first 12 lines
+sed 1,12d resultOnScratch/WGCNA-Polistes_dominula_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt > resultOnScratch/WGCNA-Polistes_dominula_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results-trimmed.txt
+
+sed 1,12d resultOnScratch/WGCNA-Ceratina_calcarata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt > resultOnScratch/WGCNA-Ceratina_calcarata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results-trimmed.txt
+
+
+sed 1,12d resultOnScratch/WGCNA-Liostenogaster_flavolineata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results.txt > resultOnScratch/WGCNA-Liostenogaster_flavolineata_PANTHER-GOSlim-BP-overrepresentation-test-FDR-results-trimmed.txt
+
+
+# analysis of results 
+2021-05-11-analysis-GOSlimTerms-WGCNA-PANTHER.Rmd
+resultOnScratch/2021-05-11-WGCNA-PANTHER-GOSlim_BP-result-overview
+
 ##############################################################
 # DRAFT
 # get enriched GO terms - this is not working and I do not know why
 qsub get-GO-terms-for-all-species.sh
+
+
+
+cd inputOnScratch
+
+# need a GO Slim file for Drosophila
+wget http://current.geneontology.org/ontology/subsets/goslim_drosophila.obo
+
+
+# need the gene association file for Drosophila
+# http://current.geneontology.org/products/pages/downloads.html
+wget http://current.geneontology.org/annotations/fb.gaf.gz
+gzip -d fb.gaf.gz
+
+# need the current ontology (full set, not slim) from FlyBase
+wget http://ftp.flybase.org/releases/FB2021_02/precomputed_files/ontologies/go-basic.obo.gz
+gzip -d go-basic.obo.gz
+
+# get a list of the terms
+grep "id: GO:" goslim_drosophila.obo | grep -v alt | cut -d" " -f 2 > goslim_terms.txt
+
+cd ..
+
+# obtain gene annotation file with GO slim terms
+# runs under 1 minute
+owltools inputOnScratch/go-basic.obo --gaf inputOnScratch/fb.gaf --map2slim --idfile inputOnScratch/goslim_terms.txt --write-gaf resultOnScratch/drosophila_go_slim.gaf

@@ -83,4 +83,129 @@ Vespa-crabro 10
 Vespula-vulgaris 5
 
 
-# for each species, how many raw sequences per sample
+####################
+# Ceratina australensis
+# mapping range: 73.83% - 83.70%
+# total features: 5287515
+
+# list of samples analysed (NR and R)
+vim R-NR-samples-list
+
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Uniquely mapped reads %"  result/Rehan2018/mapping/${sample}_1Log.final.out
+done | cut -f 2 | sort
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Assigned" result/Rehan2018/mapping/${sample}_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary
+done | awk '{sum=+$2}END{print sum}'
+
+
+
+####################
+# Ceratina calcarata
+# mapping range: 64.46% - 86.86%
+# total features: 11887571
+
+# list of samples analysed (NR and R)
+vim R-NR-samples-list
+
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Uniquely mapped reads %"  result/ShellRehan2019/mapping/${sample}_1Log.final.out
+done | cut -f 2 | sort
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Assigned" result/ShellRehan2019/mapping/${sample}_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary
+done | awk '{sum=+$2}END{print sum}'
+
+
+
+####################
+# Megalopta genalis
+# mapping range: 72.62% - 78.84%
+# total features: 7391644
+
+# list of samples analysed (NR and R)
+vim R-NR-samples-list
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Uniquely mapped reads %"  result/*/mapping/${sample}_1Log.final.out
+done | cut -f 2 | sort
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Assigned" result/*/mapping/${sample}_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary
+done | awk '{sum=+$2}END{print sum}'
+
+
+####################
+# Polistes canadensis
+# mapping range: 92.85% - 95.56%
+# total features: 12548424
+
+# list of samples analysed (NR and R)
+vim R-NR-samples-list
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Uniquely mapped reads %"  result/*/mapping/${sample}_1Log.final.out
+done | cut -f 2 | sort
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Assigned" result/*/mapping/${sample}_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary
+done | awk '{sum=+$2}END{print sum}'
+
+
+
+####################
+# Polistes dominula
+# mapping range: 85.83% - 90.27%
+# total features: 7980078
+
+# list of samples analysed (NR and R)
+vim R-NR-samples-list
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Uniquely mapped reads %"  result/*/mapping/${sample}_1Log.final.out
+done | cut -f 2 | sort
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Assigned" result/*/mapping/${sample}_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary
+done | awk '{sum=+$2}END{print sum}'
+
+
+####################
+# Liostenogaster flavolineata
+# mapping range: 75.17% - 85.52%
+# total features: 15689353
+
+# list of samples analysed (NR and R)
+vim R-NR-samples-list
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Uniquely mapped reads %"  result/*/mapping/${sample}_1Log.final.out
+done | cut -f 2 | sort
+
+for sample in $(cat R-NR-samples-list); do
+	grep "Assigned" result/*/mapping/${sample}_1Aligned.sortedByCoord.out_gene.featureCounts.txt.summary
+done | awk '{sum=+$2}END{print sum}'
+
+
+##########################
+# comparing gff files
+# Liostenogaster 309,177
+zcat Liostenogaster_flavolineata.gff3.gz | wc -l
+
+# Polistes-canadensis 396,601
+zcat GCF_001313835.1_ASM131383v1_genomic.gff.gz | grep -v "#" | wc -l
+
+# Polistes dominula 435,757
+zcat GCF_001465965.1_Pdom_r1.2_genomic.gff.gz | grep -v "#" | wc -l
+
+# Ceratina australensis 341,469
+zcat *gff* | wc -l
+
+# Ceratina calcarata 488,992
+zcat *gff* | grep -v "#"| wc -l
+
+# Megalopta genalis 472,253
+zcat *gff* | grep -v "#"| wc -l

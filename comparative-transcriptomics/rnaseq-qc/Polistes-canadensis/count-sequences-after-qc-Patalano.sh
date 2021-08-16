@@ -5,10 +5,8 @@
 
 # Copyright Emeline Favreau, UCL
 
-
-
 # files/path needed as input
-thispath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis/result/qc-after-trim"
+thispath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis/result/Patalano/qc-after-trim"
 
 speciespath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-canadensis"
 
@@ -39,7 +37,7 @@ cd ${speciespath}
 # obtain list of files
 ls tmp/${datasetname}/${thisanalysis}/*_fastqc.zip \
 	| cut -d "/" -f 4 \
-	| cut -d "_" -f 1,2,3,4,5 \
+	| cut -d "_" -f 1,2,3,4 \
 	> tmp/${datasetname}/${thisanalysis}/file-list
 
 # run a loop to obtain number of reads

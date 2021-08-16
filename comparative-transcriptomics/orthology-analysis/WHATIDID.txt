@@ -354,6 +354,8 @@ We could include more orthologous genes if we relaxed our filtering:
  - allow 1, 2, 3 copies in a given species
  - allow 1:1 orthologs present in all but one species 
 
+This relaxed filtering approach is common in phyloegentically-driven orthology analysis (Smith and Hahn, 2020 https://doi.org/10.1016/j.tig.2020.08.012). For instance, between Monomorium and Apis, Warren et al (2019) report 7460 1:1 orthologs (using blastp hits from RefSeq protein sequences against OrthoDB9 aculeata species map). We expect around 4,000 orthogroups between our 6 species, based on similar value between 6 hymenoptera on orthovenn2 website (https://orthovenn2.bioinfotoolkits.net).
+
 
 # there is a list of orthogroups for which each species has between 0 and 3 copies
 # the aim is to obtain the name of the gene that has the highest read count in each species
@@ -387,7 +389,8 @@ done < orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy
 # check that it is 3718 lines
 wc -l orthology-analysis/result/Liostenogaster_flavolineata_3718_orthogroups_list
 
-
+# add the orthogroup
+paste orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy orthology-analysis/result/Liostenogaster_flavolineata_3718_orthogroups_list > orthology-analysis/result/Liostenogaster_flavolineata_3718_gene_orthogroups_list
 
 
 
@@ -404,7 +407,8 @@ done < orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy
 wc -l orthology-analysis/result/Ceratina_calcarata_3718_orthogroups_list
 
 
-
+# add the orthogroup
+paste orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy orthology-analysis/result/Ceratina_calcarata_3718_orthogroups_list > orthology-analysis/result/Ceratina_calcarata_3718_gene_orthogroups_list
 
 
 
@@ -418,6 +422,9 @@ done < orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy
 
 # check that it is 3718 lines
 wc -l orthology-analysis/result/Ceratina_australensis_3718_orthogroups_list
+
+# add the orthogroup
+paste orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy orthology-analysis/result/Ceratina_australensis_3718_orthogroups_list > orthology-analysis/result/Ceratina_australensis_3718_gene_orthogroups_list
 
 
 
@@ -433,6 +440,8 @@ done < orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy
 # check that it is 3718 lines
 wc -l orthology-analysis/result/Megalopta_genalis_3718_orthogroups_list
 
+# add the orthogroup
+paste orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy orthology-analysis/result/Megalopta_genalis_3718_orthogroups_list > orthology-analysis/result/Megalopta_genalis_3718_gene_orthogroups_list
 
 
 
@@ -446,6 +455,9 @@ done < orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy
 
 # check that it is 3718 lines
 wc -l orthology-analysis/result/Polistes_canadensis_3718_orthogroups_list
+
+# add the orthogroup
+paste orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy orthology-analysis/result/Polistes_canadensis_3718_orthogroups_list > orthology-analysis/result/Polistes_canadensis_3718_gene_orthogroups_list
 
 
 
@@ -462,3 +474,114 @@ done < orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy
 
 # check that it is 3718 lines
 wc -l orthology-analysis/result/Polistes_dominula_3718_orthogroups_list
+
+# add the orthogroup
+paste orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list-tidy orthology-analysis/result/Polistes_dominula_3718_orthogroups_list > orthology-analysis/result/Polistes_dominula_3718_gene_orthogroups_list
+
+
+
+
+
+#### Now obtain same lists for the lineage subsets
+# that is: 6983 in wasps, 5787 in bees
+
+# tidy things for wasp
+cut -d " " -f1 orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps | tail -n +2  > orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy
+
+# create a result file per species
+touch orthology-analysis/result/Liostenogaster_flavolineata_6983_orthogroups_list
+
+while read orthogroup 
+do
+	grep ${orthogroup} orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv | cut -f 6 | sed "s/, /\n/g" | grep -f - ortho-enrichment/result/hash_tables/Liostenogaster_flavolineata_protein_gene_hash_table_complete | cut -f 2 -d " " | grep -f - rnaseq-qc/Liostenogaster-flavolineata/result/Taylor/merged_gene_counts.txt | awk '{sum=0; for (i=3; i<=NF; i++) { sum+= $i } print $1, sum}' | sort -n -k 2 | tail -1 | cut -d " " -f 1 >> orthology-analysis/result/Liostenogaster_flavolineata_6983_orthogroups_list
+done < orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy
+
+
+paste orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy orthology-analysis/result/Liostenogaster_flavolineata_6983_orthogroups_list > orthology-analysis/result/Liostenogaster_flavolineata_6983_gene_orthogroups_list
+
+
+# create a result file for Polistes canadensis
+touch orthology-analysis/result/Polistes_canadensis_6983_orthogroups_list
+
+while read orthogroup 
+do
+	grep ${orthogroup} orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv | cut -f 8 | sed "s/, /\n/g" | grep -f - ortho-enrichment/result/hash_tables/Polistes_canadensis_protein_gene_hash_table | cut -f 2 | grep -f - rnaseq-qc/Polistes-canadensis/result/Patalano/merged_gene_counts.txt | awk '{sum=0; for (i=3; i<=NF; i++) { sum+= $i } print $1, sum}' | sort -n -k 2 | tail -1 | cut -d " " -f 1 >> orthology-analysis/result/Polistes_canadensis_6983_orthogroups_list
+done < orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy
+
+
+paste orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy orthology-analysis/result/Polistes_canadensis_6983_orthogroups_list > orthology-analysis/result/Polistes_canadensis_6983_gene_orthogroups_list
+
+
+# create a result file for Polistes dominula
+touch orthology-analysis/result/Polistes_dominula_6983_orthogroups_list
+
+# last column of tsv from orthofinder contains a return carriage, only visible to sed "s/\r/here/g" and not to my human eyes. Please send me this message half an hour ago.
+
+while read orthogroup 
+do
+	grep ${orthogroup} orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv | cut -f 9 | sed "s/, /\n/g" | sed "s/\r//g" | grep -f - ortho-enrichment/result/hash_tables/Polistes_dominula_protein_gene_hash_table | cut -f 2 | grep -f - rnaseq-qc/Polistes-dominula/result/Taylor/merged_gene_counts.txt | awk '{sum=0; for (i=3; i<=NF; i++) { sum+= $i } print $1, sum}' | sort -n -k 2 | tail -1 | cut -d " " -f 1 >> orthology-analysis/result/Polistes_dominula_6983_orthogroups_list
+done < orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy
+
+paste orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy orthology-analysis/result/Polistes_dominula_6983_orthogroups_list > orthology-analysis/result/Polistes_dominula_6983_gene_orthogroups_list
+
+
+#### Now obtain same lists for the lineage subsets
+# that is: 6983 in wasps, 5787 in bees
+
+# tidy things for bees
+cut -d " " -f1 orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees | tail -n +2  > orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy
+
+
+# create a result file for Ceratina calcarata
+touch orthology-analysis/result/Ceratina_calcarata_5787_orthogroups_list
+
+while read orthogroup 
+do
+	grep ${orthogroup} orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv | cut -f 4 | sed "s/, /\n/g" | grep -f - ortho-enrichment/result/hash_tables/Ceratina_calcarata_protein_gene_hash_table | cut -f 2 | grep -f - rnaseq-qc/Ceratina-calcarata/result/ShellRehan2019/merged_gene_counts.txt | awk '{sum=0; for (i=3; i<=NF; i++) { sum+= $i } print $1, sum}' | sort -n -k 2 | tail -1 | cut -d " " -f 1 >> orthology-analysis/result/Ceratina_calcarata_5787_orthogroups_list
+done < orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy
+
+
+paste orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy orthology-analysis/result/Ceratina_calcarata_5787_orthogroups_list > orthology-analysis/result/Ceratina_calcarata_5787_gene_orthogroups_list
+
+# create a result file for Ceratina australensis
+touch orthology-analysis/result/Ceratina_australensis_5787_orthogroups_list
+
+while read orthogroup 
+do
+	grep ${orthogroup} orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv | cut -f 3 | sed "s/, /\n/g" | grep -f - rnaseq-qc/Ceratina-australensis/result/Rehan2018/merged_gene_counts.txt | awk '{sum=0; for (i=3; i<=NF; i++) { sum+= $i } print $1, sum}' | sort -n -k 2 | tail -1 | cut -d " " -f 1 >> orthology-analysis/result/Ceratina_australensis_5787_orthogroups_list
+done < orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy
+
+paste orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy orthology-analysis/result/Ceratina_australensis_5787_orthogroups_list > orthology-analysis/result/Ceratina_australensis_5787_gene_orthogroups_list
+
+
+
+
+# create a result file for Megalopta genalis
+touch orthology-analysis/result/Megalopta_genalis_5787_orthogroups_list
+
+while read orthogroup 
+do
+	grep ${orthogroup} orthology-analysis/result/allSpecies/Orthogroups/Orthogroups.tsv | cut -f 7 | sed "s/, /\n/g" | grep -f - ortho-enrichment/result/hash_tables/Megalopta_genalis_protein_gene_hash_table | cut -f 2 | grep -f - rnaseq-qc/Megalopta-genalis/result/merged_gene_counts.txt | awk '{sum=0; for (i=3; i<=NF; i++) { sum+= $i } print $1, sum}' | sort -n -k 2 | tail -1 | cut -d " " -f 1 >> orthology-analysis/result/Megalopta_genalis_5787_orthogroups_list
+done < orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy
+
+paste orthology-analysis/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy orthology-analysis/result/Megalopta_genalis_5787_orthogroups_list > orthology-analysis/result/Megalopta_genalis_5787_gene_orthogroups_list
+
+
+# check results
+wc -l orthology-analysis/result/*_6983_gene_orthogroups_list
+wc -l orthology-analysis/result/*_5787_gene_orthogroups_list
+
+
+
+# how many genes are unique to wasps?
+sort -n 2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy > tmp/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy-sorted
+sort -n 2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy > tmp/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy-sorted 
+
+# 4809 common to all (higher than 3718, because the rule of only one species without orthogroup is not respected here)
+comm -12 tmp/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy-sorted tmp/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy-sorted |  wc -l
+
+# 2174 in wasps
+comm -23 tmp/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy-sorted tmp/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy-sorted |  wc -l
+
+# 978 in bees
+comm -13 tmp/2021-04-26-relaxed-filtered-orthogroup-list-wasps-tidy-sorted tmp/2021-04-26-relaxed-filtered-orthogroup-list-bees-tidy-sorted |  wc -l

@@ -2,13 +2,10 @@
 
 # Calculate sequence number after Nextflow Trimming step
 
-
 # Copyright Emeline Favreau, UCL
 
-
-
 # files/path needed as input
-thispath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-dominula/result/qc-after-trim"
+thispath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-dominula/result/Taylor/qc-after-trim"
 
 speciespath="/lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/rnaseq-qc/Polistes-dominula"
 
