@@ -1,0 +1,148 @@
+---
+title: "OrthoFinder explore"
+author: "Emeline Favreau"
+date: "02/03/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+Copyright 2021 Emeline Favreau, University College London.
+
+
+#### Objective of analysis
+
+Exploring the results of OrthoFinder analyses.
+
+#### Analysis steps:
+- Obtaining data
+- Aim 1: Wasps, Apis and Drosophila
+- Aim 2: Bees, Apis and Drosophila
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "tidyverse")
+
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+
+```{r import  data, eval = TRUE, echo = FALSE, include = FALSE}
+
+# list all files with the extension
+bee_orthogroups_gene_gene_df <- read.delim("result/BeesDrosoApis/Orthogroups/Orthogroups.tsv")
+bee_gene_counts_df <- read.delim("result/BeesDrosoApis/Orthogroups/Orthogroups.GeneCount.tsv")
+
+# list all files with the extension
+wasp_orthogroups_gene_gene_df <- read.delim("result/WaspsDrosoApis/Orthogroups/Orthogroups.tsv")
+wasp_gene_counts_df <- read.delim("result/WaspsDrosoApis/Orthogroups/Orthogroups.GeneCount.tsv")
+```
+
+
+### Bees
+
+```{r bees, eval = TRUE, echo = FALSE, include = TRUE}
+# orthogroups with only 1 opies for the focal species
+focal_species <- c("Ceratina_australensis.longest.isoforms",
+                   "Ceratina_calcarata.longest.isoforms",
+                   "Megalopta_genalis.longest.isoforms")
+#5260
+bee_gene_counts_df %>%
+  filter(Ceratina_australensis.longest.isoforms == 1) %>%  nrow()
+
+#3392
+bee_gene_counts_df %>%
+  filter(Ceratina_calcarata.longest.isoforms == 1) %>%  nrow()
+
+#4495
+bee_gene_counts_df %>%
+  filter(Megalopta_genalis.longest.isoforms == 1) %>%  nrow()
+
+#1834
+bee_gene_counts_df %>%
+  filter(Megalopta_genalis.longest.isoforms == 1) %>%  filter(Ceratina_calcarata.longest.isoforms == 1) %>% nrow()
+
+#1162
+bee_gene_counts_df %>%
+  filter(Megalopta_genalis.longest.isoforms == 1) %>%  filter(Ceratina_calcarata.longest.isoforms == 1) %>% 
+  filter(Ceratina_australensis.longest.isoforms == 1) %>% nrow()
+```
+
+1,162 orthogroups contain one single copy in the three focal species: _Megalopta genalis_, _Ceratina australensis_ and _C.calcarata_.
+
+
+### Wasps
+
+```{r Wasps, eval = TRUE, echo = FALSE, include = TRUE}
+# orthogroups with only 1 opies for the focal species
+wasp_focal_species <- c("Liostenogaster_flavolineata.longest.isoforms",
+                   "Polistes_canadensis.longest.isoforms",
+                   "Polistes_dominula.longest.isoforms")
+#7419
+wasp_gene_counts_df %>%
+  filter(Liostenogaster_flavolineata.longest.isoforms == 1) %>%  nrow()
+
+#5098
+wasp_gene_counts_df %>%
+  filter(Polistes_canadensis.longest.isoforms == 1) %>%  nrow()
+
+#4722
+wasp_gene_counts_df %>%
+  filter(Polistes_dominula.longest.isoforms == 1) %>%  nrow()
+
+#4338
+wasp_gene_counts_df %>%
+  filter(Liostenogaster_flavolineata.longest.isoforms == 1) %>%  filter(Polistes_canadensis.longest.isoforms == 1) %>% nrow()
+
+#2476
+wasp_gene_counts_df %>%
+  filter(Liostenogaster_flavolineata.longest.isoforms == 1) %>%  filter(Polistes_canadensis.longest.isoforms == 1) %>% 
+  filter(Polistes_dominula.longest.isoforms == 1) %>% nrow()
+```
+2,476 orthogroups contain one single copy in the three focal species: _Liostenogaster flavolineata_, _Polistes canadensis_ and _P. dominula_.
+
+
+
+
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```
