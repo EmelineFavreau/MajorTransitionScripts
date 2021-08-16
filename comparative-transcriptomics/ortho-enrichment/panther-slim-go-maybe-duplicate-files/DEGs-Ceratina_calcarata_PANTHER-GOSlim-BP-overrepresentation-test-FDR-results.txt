@@ -1,0 +1,16 @@
+
+
+
+
+
+Analysis Type:	PANTHER Overrepresentation Test (Released 20210224)
+Annotation Version and Release Date:	PANTHER version 16.0 Released 2020-12-01
+Analyzed List:	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (Drosophila melanogaster)	There are duplicate IDs in the file. The unique set of IDs will be used.
+Reference List:	Ceratina_calcarata_Dmel_genes_SlimPanther.txt (Drosophila melanogaster)	There are duplicate IDs in the file. The unique set of IDs will be used.
+Test Type:	FISHER
+Correction:	FDR
+PANTHER GO-Slim Biological Process	Ceratina_calcarata_Dmel_genes_SlimPanther.txt - REFLIST (5127)	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (348)	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (expected)	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (over/under)	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (fold Enrichment)	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (raw P-value)	Ceratina_calcarata_Dmel_genes_DEGs_SlimPanther.txt (FDR)
+chemical synaptic transmission (GO:0007268)	44	14	2.99	+	4.69	1.05E-05	1.88E-02
+trans-synaptic signaling (GO:0099537)	44	14	2.99	+	4.69	1.05E-05	9.38E-03
+anterograde trans-synaptic signaling (GO:0098916)	44	14	2.99	+	4.69	1.05E-05	6.25E-03
+synaptic signaling (GO:0099536)	45	14	3.05	+	4.58	1.30E-05	5.80E-03
