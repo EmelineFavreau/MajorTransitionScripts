@@ -44,34 +44,34 @@ for (lib in basic_libraries) {
 ```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
 # list of predicted genes in C.aus
 # obtained by SVM 
-Ceratina_australensis_svm_gene <- read.table("result/20-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy",
+Ceratina_australensis_svm_gene <- read.table("../result/20-iterations/Ceratina_australensis_svm_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in C.cal
-Ceratina_calcarata_svm_gene <- read.table("result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy",
+Ceratina_calcarata_svm_gene <- read.table("../result/20-iterations/Ceratina_calcarata_svm_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in M.gen
 # obtained by SVM 
-Megalopta_genalis_svm_gene <- read.table("result/20-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy",
+Megalopta_genalis_svm_gene <- read.table("../result/20-iterations/Megalopta_genalis_svm_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in Pdom
-Polistes_dominula_svm_gene <- read.table("result/20-iterations/Polistes_dominula_svm_predicted_gene_list_tidy",
+Polistes_dominula_svm_gene <- read.table("../result/20-iterations/Polistes_dominula_svm_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in LF
 # obtained by SVM 
-Liostenogaster_flavolineata_svm_gene <- read.table("result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy",
+Liostenogaster_flavolineata_svm_gene <- read.table("../result/20-iterations/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in Pcan
-Polistes_canadensis_svm_gene <- read.table("result/20-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy",
+Polistes_canadensis_svm_gene <- read.table("../result/20-iterations/Polistes_canadensis_svm_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
@@ -555,7 +555,7 @@ saveRDS(PredictorGenes_for_revigo_fig,
 
 ## Aim 3: GO Terms associated for each species
 
-```{r aim 3, eval = FALSE, echo = FALSE, include = FALSE}
+```{r aim 3, eval = TRUE, echo = FALSE, include = TRUE}
 # obtain GO Terms associated with the predictor genes
 # all_predictor_genes_vec
 library("biomaRt")
@@ -577,12 +577,12 @@ for(myspecies in all_species){
       # set experiment details (species, GO Category)
       this_species     <- args[1]
       this_goCategory  <- args[2]
-      
+
       # set species data input
       raw_results_file         <- paste("input/", this_species,
                                         "_3718_gene_orthogroups_list", 
                                         sep = "")
-      raw_selectionGenes_file  <- paste("result/5-iterations/", this_species,
+      raw_selectionGenes_file  <- paste("result/20-iterations/", this_species,
                                         "_svm_predicted_gene_list_tidy", 
                                         sep = "")
       raw_blast_results_file   <- paste("../ortho-enrichment/resultOnScratch/",
@@ -726,7 +726,7 @@ for(myspecies in all_species){
       myTable$goCategory <- this_goCategory
       
       # make a file name
-      this_file_name <- paste("result/5-iterations/topgo_result",
+      this_file_name <- paste("result/20-iterations/topgo_result",
                               this_species,
                               this_goCategory,
                               sep = "_")
