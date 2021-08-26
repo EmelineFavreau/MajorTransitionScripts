@@ -209,3 +209,62 @@ zcat *gff* | grep -v "#"| wc -l
 
 # Megalopta genalis 472,253
 zcat *gff* | grep -v "#"| wc -l
+
+
+# For supplementary table 3
+# calculate total FPKM for the samples that we want
+
+###############################################################################
+# Caus SRR2917198, SRR2917152, SRR2916699, SRR2916026, SRR2916025, SRR2915407
+
+for sample in SRR2917198 SRR2917152 SRR2916699 SRR2916026 SRR2916025 SRR2915407
+do
+  tail -n+2 Ceratina-australensis/result/Rehan2018/FPKM/${sample}_1Aligned.sortedByCoord.out.gene_abund.txt | awk '{ sum += $8}; END { print sum }'
+done
+
+
+
+###############################################################################
+# Ccal SRR13281988 SRR13281982 SRR13281995 SRR13282007 SRR13281993 SRR13282006
+
+for sample in SRR13281988 SRR13281982 SRR13281995 SRR13282007 SRR13281993 SRR13282006
+do
+  tail -n+2 Ceratina-calcarata/result/ShellRehan2019/FPKM/${sample}_1Aligned.sortedByCoord.out.gene_abund.txt | awk '{ sum += $8}; END { print sum }'
+done
+
+
+###############################################################################
+# LF SocF10 SocF11 SocF12 SocF14 SocF4 SocF5 SocF6 SocF7 SocF8 SocF9 SocR10 SocR1 SocR2 SocR3 SocR4 SocR5 SocR6 SocR7 SocR8
+
+for sample in SocF10 SocF11 SocF12 SocF14 SocF4 SocF5 SocF6 SocF7 SocF8 SocF9 SocR10 SocR1 SocR2 SocR3 SocR4 SocR5 SocR6 SocR7 SocR8
+do
+  tail -n+2 Liostenogaster-flavolineata/result/Taylor/FPKM/${sample}_1Aligned.sortedByCoord.out.gene_abund.txt | awk '{ sum += $8}; END { print sum }'
+done
+
+###############################################################################
+# Mgen SRR3948522 SRR3948580 SRR3948532 SRR3948545 SRR3948559 SRR3948571 SRR3948576 SRR3948549 SRR3948582 SRR3948523 SRR3948530 SRR3948535 SRR3948538 SRR3948546 SRR3948551 SRR3948569
+
+for sample in SRR3948522 SRR3948580 SRR3948532 SRR3948545 SRR3948559 SRR3948571 SRR3948576 SRR3948549 SRR3948582 SRR3948523 SRR3948530 SRR3948535 SRR3948538 SRR3948546 SRR3948551 SRR3948569
+do
+  tail -n+2 Megalopta-genalis/result/*/FPKM/${sample}_1Aligned.sortedByCoord.out.gene_abund.txt | awk '{ sum += $8}; END { print sum }'
+done
+
+###############################################################################
+# Pcan SRR1519108 SRR1519109 SRR1519110 SRR1519111 SRR1519112 SRR1519113 SRR1519114 SRR1519115 SRR1519116 SRR1519117
+
+for sample in SRR1519108 SRR1519109 SRR1519110 SRR1519111 SRR1519112 SRR1519113 SRR1519114 SRR1519115 SRR1519116 SRR1519117
+do
+  tail -n+2 Polistes-canadensis/result/Patalano/FPKM/${sample}_1Aligned.sortedByCoord.out.gene_abund.txt | awk '{ sum += $8}; END { print sum }'
+done
+
+###############################################################################
+# Pdom F03BL F14GR F38BL F42OR F45OR F47RD F48SL F51RD F65ORWH F67YLBL F69OR F71BL W01RDYL W08RDOR W09RDOR W13YLSL W28ORYL W40GROR W46ORYL W49RDYL W54ORYL W56YLBL W58BLWH W70RDYL
+
+for sample in F03BL F14GR F38BL F42OR F45OR F47RD F48SL F51RD F65ORWH F67YLBL F69OR F71BL W01RDYL W08RDOR W09RDOR W13YLSL W28ORYL W40GROR W46ORYL W49RDYL W54ORYL W56YLBL W58BLWH W70RDYL
+do
+  tail -n+2 Polistes-dominula/result/Taylor/FPKM/${sample}_1Aligned.sortedByCoord.out.gene_abund.txt | awk '{ sum += $8}; END { print sum }'
+done
+
+
+###############################################################################
+Rscript calculate-FPKM-for-six-species
