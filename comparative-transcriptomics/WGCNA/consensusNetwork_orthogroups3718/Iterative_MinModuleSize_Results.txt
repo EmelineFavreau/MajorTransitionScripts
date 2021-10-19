@@ -1,0 +1,6 @@
+minModSizes	grayModSizes	moduleCounts	mergedModuleCounts
+30	599	5	5
+25	597	8	7
+20	597	11	11
+15	470	22	22
+10	310	41	39
