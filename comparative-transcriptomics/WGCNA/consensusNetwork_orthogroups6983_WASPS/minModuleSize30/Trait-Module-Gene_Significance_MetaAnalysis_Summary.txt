@@ -5,3 +5,4 @@ MElightgreen	847	191	191	NA
 MElightyellow	1458	327	327	NA
 MEpurple	1255	312	NA	312
 MEtan	1378	285	285	NA
+Total	7159	1733	1128	605
