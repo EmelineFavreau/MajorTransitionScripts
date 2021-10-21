@@ -1,0 +1,2 @@
+Num.Uniq.Genes.Sig.Module	Num.Uniq.Genes.Sig.Module.Sig.Trait	R.Uniq.Genes.Sig.Module.Sig.Trait	NR.Uniq.Genes.Sig.Module.Sig.Trait
+568	137	137	0
