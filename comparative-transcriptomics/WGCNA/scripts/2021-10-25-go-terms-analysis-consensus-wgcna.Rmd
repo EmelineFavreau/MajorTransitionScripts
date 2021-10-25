@@ -1,0 +1,470 @@
+---
+title: "GO Terms in WGCNA consensus"
+author: "Emeline Favreau"
+date: "2021-10-25"
+output: html_document
+---
+
+Copyright 2021 Emeline Favreau, University College London.
+
+TopGO results from orthogroups from WGCNA consensus method, in which species' read counts were pooled together: either all six species, or all bees (three species) or all wasps (three species). We extended the analysis by allowing two sizes of WGCNA modules: the standard (n = 30 genes) and a lower threshold (n = 10 genes).
+
+Here we test for significance of GO term enrichment.
+
+---
+# Objective of analysis
+
+## Analysis steps:
+- Aim 1: Significant GO Terms associated with consensus WGCNA module size 30, all species (BP, CC, MF)
+- Aim 2: Significant GO Terms associated with consensus WGCNA module size 10, all species (BP, CC, MF)
+- Aim 3: Significant GO Terms associated with consensus WGCNA module size 30, wasps only (BP, CC, MF)
+- Aim 4: Significant GO Terms associated with consensus WGCNA module size 10, wasps only (BP, CC, MF)
+- Aim 5: Significant GO Terms associated with consensus WGCNA module size 30, bees only (BP, CC, MF)
+- Aim 6: Significant GO Terms associated with consensus WGCNA module size 10, beess only (BP, CC, MF)
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = TRUE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "tidyverse",
+                     "dplyr")
+
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+## Aim 1: Consensus with all six species (module size = 30 genes)
+
+```{r 30 all BP, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, BP, module size 30
+thirty_all_BP <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/all/topgo_result_BP")
+
+# change class
+thirty_all_BP$GO.ID <- as.character(thirty_all_BP$GO.ID)
+thirty_all_BP$Term <- as.character(thirty_all_BP$Term)
+
+# adjust for multiple comparison
+thirty_all_BP$padj <- p.adjust(p = thirty_all_BP$pvalue, method = "BH")
+summary(thirty_all_BP$padj)
+
+```
+
+```{r 30 all CC, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, CC, module size 30
+thirty_all_CC <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/all/topgo_result_CC")
+
+# change class
+thirty_all_CC$GO.ID <- as.character(thirty_all_CC$GO.ID)
+thirty_all_CC$Term <- as.character(thirty_all_CC$Term)
+
+# adjust for multiple comparison
+thirty_all_CC$padj <- p.adjust(p = thirty_all_CC$pvalue, method = "BH")
+summary(thirty_all_CC$padj)
+thirty_all_CC[thirty_all_CC$padj <= 0.05, ]
+
+# add a column for module size
+thirty_all_CC$module_size <- 30
+
+# save significant results to a summary table
+significant_results <- thirty_all_CC[thirty_all_CC$padj <= 0.05, ]
+```
+
+
+```{r 30 all MF, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, MF, module size 30
+thirty_all_MF <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/all/topgo_result_MF")
+
+# change class
+thirty_all_MF$GO.ID <- as.character(thirty_all_MF$GO.ID)
+thirty_all_MF$Term <- as.character(thirty_all_MF$Term)
+
+# adjust for multiple comparison
+thirty_all_MF$padj <- p.adjust(p = thirty_all_MF$pvalue, method = "BH")
+summary(thirty_all_MF$padj)
+thirty_all_MF[thirty_all_MF$padj <= 0.05, ]
+
+# add a column for module size
+thirty_all_MF$module_size <- 30
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             thirty_all_MF[thirty_all_MF$padj <= 0.05, ])
+
+```
+
+In the consensus of all six species, there are no significant BP terms that are enriched. There are however some significant CC and MF enriched terms ("cellular compenent", very vague!)
+
+
+## Aim 2: Consensus with all six species (module size = 10 genes)
+
+```{r 10 all BP, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, BP, module size 30
+ten_all_BP <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/all/topgo_result_BP")
+
+# change class
+ten_all_BP$GO.ID <- as.character(ten_all_BP$GO.ID)
+ten_all_BP$Term <- as.character(ten_all_BP$Term)
+
+# adjust for multiple comparison
+ten_all_BP$padj <- p.adjust(p = ten_all_BP$pvalue, method = "BH")
+summary(ten_all_BP$padj)
+ten_all_BP[ten_all_BP$padj <= 0.05, ]
+
+# add a column for module size
+ten_all_BP$module_size <- 10
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             ten_all_BP[ten_all_BP$padj <= 0.05, ])
+
+```
+
+```{r 10 all CC, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, CC, module size 30
+ten_all_CC <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/all/topgo_result_CC")
+
+# change class
+ten_all_CC$GO.ID <- as.character(ten_all_CC$GO.ID)
+ten_all_CC$Term <- as.character(ten_all_CC$Term)
+
+# adjust for multiple comparison
+ten_all_CC$padj <- p.adjust(p = ten_all_CC$pvalue, method = "BH")
+summary(ten_all_CC$padj)
+ten_all_CC[ten_all_CC$padj <= 0.05, ]
+
+# add a column for module size
+ten_all_CC$module_size <- 10
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             ten_all_CC[ten_all_BP$padj <= 0.05, ])
+
+```
+
+```{r 10 all MF, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, MF, module size 30
+ten_all_MF <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/all/topgo_result_MF")
+
+# change class
+ten_all_MF$GO.ID <- as.character(ten_all_MF$GO.ID)
+ten_all_MF$Term <- as.character(ten_all_MF$Term)
+
+# adjust for multiple comparison
+ten_all_MF$padj <- p.adjust(p = ten_all_MF$pvalue, method = "BH")
+summary(ten_all_MF$padj)
+ten_all_MF[ten_all_MF$padj <= 0.05, ]
+
+# add a column for module size
+ten_all_MF$module_size <- 10
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             ten_all_MF[ten_all_MF$padj <= 0.05, ])
+
+```
+
+In the consensus of all six species with a module size of 10 genes, there are nine significant BP terms that are enriched (metabolic, cellular component, regulation of chromatin assembly). There are also some significant CC and MF enriched terms ("cellular compenent", very vague!)
+
+## Aim 3: Consensus with all wasp species (module size = 30 genes)
+
+```{r 30 wasps BP, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, BP, module size 30
+thirty_wasps_BP <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/wasps/topgo_result_BP")
+thirty_wasps_BP$species <- "all wasps"
+# change class
+thirty_wasps_BP$GO.ID <- as.character(thirty_wasps_BP$GO.ID)
+thirty_wasps_BP$Term <- as.character(thirty_wasps_BP$Term)
+
+# adjust for multiple comparison
+thirty_wasps_BP$padj <- p.adjust(p = thirty_wasps_BP$pvalue, method = "BH")
+summary(thirty_wasps_BP$padj)
+
+```
+
+```{r 30 wasps CC, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, CC, module size 30
+thirty_wasps_CC <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/wasps/topgo_result_CC")
+thirty_wasps_CC$species <- "all wasps"
+# change class
+thirty_wasps_CC$GO.ID <- as.character(thirty_wasps_CC$GO.ID)
+thirty_wasps_CC$Term <- as.character(thirty_wasps_CC$Term)
+
+# adjust for multiple comparison
+thirty_wasps_CC$padj <- p.adjust(p = thirty_wasps_CC$pvalue, method = "BH")
+summary(thirty_wasps_CC$padj)
+#thirty_wasps_CC[thirty_wasps_CC$padj <= 0.05, ]
+
+```
+```{r 30 wasps MF, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, MF, module size 30
+thirty_wasps_MF <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/wasps/topgo_result_MF")
+thirty_wasps_MF$species <- "all wasps"
+# change class
+thirty_wasps_MF$GO.ID <- as.character(thirty_wasps_MF$GO.ID)
+thirty_wasps_MF$Term <- as.character(thirty_wasps_MF$Term)
+
+# adjust for multiple comparison
+thirty_wasps_MF$padj <- p.adjust(p = thirty_wasps_MF$pvalue, method = "BH")
+summary(thirty_wasps_MF$padj)
+#thirty_wasps_CC[thirty_wasps_MF$padj <= 0.05, ]
+
+```
+
+In the consensus of all wasps species, there are no significant GO terms that are enriched.
+
+
+## Aim 4: Consensus with all wasps species (module size = 10 genes)
+
+```{r 10 wasps BP, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, BP, module size 30
+ten_wasps_BP <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/wasps/topgo_result_BP")
+ten_wasps_BP$species <- "all wasps"
+# change class
+ten_wasps_BP$GO.ID <- as.character(ten_wasps_BP$GO.ID)
+ten_wasps_BP$Term <- as.character(ten_wasps_BP$Term)
+
+# adjust for multiple comparison
+ten_wasps_BP$padj <- p.adjust(p = ten_wasps_BP$pvalue, method = "BH")
+summary(ten_wasps_BP$padj)
+#ten_wasps_BP[ten_wasps_BP$padj <= 0.05, ]
+
+```
+
+```{r 10 wasps CC, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, CC, module size 30
+ten_wasps_CC <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/wasps/topgo_result_CC")
+ten_wasps_CC$species <- "all wasps"
+# change class
+ten_wasps_CC$GO.ID <- as.character(ten_wasps_CC$GO.ID)
+ten_wasps_CC$Term <- as.character(ten_wasps_CC$Term)
+
+# adjust for multiple comparison
+ten_wasps_CC$padj <- p.adjust(p = ten_wasps_CC$pvalue, method = "BH")
+summary(ten_wasps_CC$padj)
+#ten_wasps_CC[ten_wasps_CC$padj <= 0.05, ]
+
+```
+
+```{r 10 wasps MF, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, MF, module size 30
+ten_wasps_MF <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/wasps/topgo_result_MF")
+ten_wasps_MF$species <- "all wasps"
+# change class
+ten_wasps_MF$GO.ID <- as.character(ten_wasps_MF$GO.ID)
+ten_wasps_MF$Term <- as.character(ten_wasps_MF$Term)
+
+# adjust for multiple comparison
+ten_wasps_MF$padj <- p.adjust(p = ten_wasps_MF$pvalue, method = "BH")
+summary(ten_wasps_MF$padj)
+#ten_wasps_MF[ten_wasps_MF$padj <= 0.05, ]
+
+```
+
+In the consensus of all wasps species with a module size of 10 genes, there is no significant GO Terms that are enriched.
+
+
+## Aim 5: Consensus with all bees species (module size = 30 genes)
+
+```{r 30 bees BP, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, BP, module size 30
+thirty_bees_BP <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/bees/topgo_result_BP")
+thirty_bees_BP$species <- "all bees"
+# change class
+thirty_bees_BP$GO.ID <- as.character(thirty_bees_BP$GO.ID)
+thirty_bees_BP$Term <- as.character(thirty_bees_BP$Term)
+
+# adjust for multiple comparison
+thirty_bees_BP$padj <- p.adjust(p = thirty_bees_BP$pvalue, method = "BH")
+summary(thirty_bees_BP$padj)
+thirty_bees_BP[thirty_bees_BP$padj <= 0.05, ]
+
+# add a column for module size
+thirty_bees_BP$module_size <- 30
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             thirty_bees_BP[thirty_bees_BP$padj <= 0.05, ])
+```
+
+```{r 30 bees CC, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, CC, module size 30
+thirty_bees_CC <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/bees/topgo_result_CC")
+thirty_bees_CC$species <- "all bees"
+# change class
+thirty_bees_CC$GO.ID <- as.character(thirty_bees_CC$GO.ID)
+thirty_bees_CC$Term <- as.character(thirty_bees_CC$Term)
+
+# adjust for multiple comparison
+thirty_bees_CC$padj <- p.adjust(p = thirty_bees_CC$pvalue, method = "BH")
+summary(thirty_bees_CC$padj)
+thirty_bees_CC[thirty_bees_CC$padj <= 0.05, ]
+
+# add a column for module size
+thirty_bees_CC$module_size <- 30
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             thirty_bees_CC[thirty_bees_CC$padj <= 0.05, ])
+
+```
+```{r 30 bees MF, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, MF, module size 30
+thirty_bees_MF <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_30/bees/topgo_result_MF")
+thirty_bees_MF$species <- "all bees"
+# change class
+thirty_bees_MF$GO.ID <- as.character(thirty_bees_MF$GO.ID)
+thirty_bees_MF$Term <- as.character(thirty_bees_MF$Term)
+
+# adjust for multiple comparison
+thirty_bees_MF$padj <- p.adjust(p = thirty_bees_MF$pvalue, method = "BH")
+summary(thirty_bees_MF$padj)
+thirty_bees_MF[thirty_bees_MF$padj <= 0.05, ]
+
+# add a column for module size
+thirty_bees_MF$module_size <- 30
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             thirty_bees_MF[thirty_bees_MF$padj <= 0.05, ])
+
+```
+
+In the consensus of all bees species, there are many significant GO terms that are enriched: 49 BP terms (e.g. regulation, tissue and gland devlopment), 7 CC terms and 11 MF terms (mainly cellular component).
+
+
+## Aim 6: Consensus with all bees species (module size = 10 genes)
+
+```{r 10 bees BP, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, BP, module size 30
+ten_bees_BP <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/bees/topgo_result_BP")
+ten_bees_BP$species <- "all bees"
+# change class
+ten_bees_BP$GO.ID <- as.character(ten_bees_BP$GO.ID)
+ten_bees_BP$Term <- as.character(ten_bees_BP$Term)
+
+# adjust for multiple comparison
+ten_bees_BP$padj <- p.adjust(p = ten_bees_BP$pvalue, method = "BH")
+summary(ten_bees_BP$padj)
+ten_bees_BP[ten_bees_BP$padj <= 0.05, ]
+
+# add a column for module size
+ten_bees_BP$module_size <- 10
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             ten_bees_BP[ten_bees_BP$padj <= 0.05, ])
+
+```
+
+```{r 10 bees CC, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, CC, module size 30
+ten_bees_CC <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/bees/topgo_result_CC")
+ten_bees_CC$species <- "all bees"
+# change class
+ten_bees_CC$GO.ID <- as.character(ten_bees_CC$GO.ID)
+ten_bees_CC$Term <- as.character(ten_bees_CC$Term)
+
+# adjust for multiple comparison
+ten_bees_CC$padj <- p.adjust(p = ten_bees_CC$pvalue, method = "BH")
+summary(ten_bees_CC$padj)
+ten_bees_CC[ten_bees_CC$padj <= 0.05, ]
+
+# add a column for module size
+ten_bees_CC$module_size <- 10
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             ten_bees_CC[ten_bees_CC$padj <= 0.05, ])
+
+
+```
+
+```{r 10 bees MF, eval = TRUE, echo = FALSE, include = TRUE}
+# six species, MF, module size 30
+ten_bees_MF <- read.delim("~/working-dir-GOTIT/WGCNA/result/module_size_10/bees/topgo_result_MF")
+ten_bees_MF$species <- "all bees"
+# change class
+ten_bees_MF$GO.ID <- as.character(ten_bees_MF$GO.ID)
+ten_bees_MF$Term <- as.character(ten_bees_MF$Term)
+
+# adjust for multiple comparison
+ten_bees_MF$padj <- p.adjust(p = ten_bees_MF$pvalue, method = "BH")
+summary(ten_bees_MF$padj)
+ten_bees_MF[ten_bees_MF$padj <= 0.05, ]
+
+# add a column for module size
+ten_bees_MF$module_size <- 10
+
+# save significant results to a summary table
+significant_results <- rbind(significant_results,
+                             ten_bees_MF[ten_bees_MF$padj <= 0.05, ])
+
+# save result for supplementary info
+write.table(x = significant_results,
+            file = "../result/topgo_sig_go_terms",
+            quote = FALSE,
+            row.names = FALSE,
+            sep = "\t")
+# SVM GO term
+svm_go_terms <- c("GO:0006090", "GO:0044331", "GO:0008362", "GO:0009112", "GO:0008052", "GO:0016339", "GO:0046661", "GO:0046034", "GO:0030239", "GO:0008045", "GO:0016999", "GO:0009144", "GO:0006270", "GO:0009126", "GO:0046496", "GO:0006790", "GO:0009141", "GO:0009123", "GO:0006732", "GO:0072522", "GO:0019693", "GO:0006091", "GO:0072521", "GO:0017144", "GO:0098662", "GO:0055086", "GO:0007268", "GO:0055114", "GO:0006412", "GO:0006811", "GO:0055085", "GO:0044281", "GO:0003008", "GO:0001895", "GO:0006026", "GO:0006099", "GO:0006101", "GO:0006826", "GO:0007310", "GO:0009416", "GO:0009581", "GO:0015918", "GO:0015985", "GO:0030488", "GO:0031497", "GO:0046154", "GO:0060180", "GO:0072350")
+
+# find overlap between the two lists: "GO:0009126" "GO:0003008"
+svm_go_terms[svm_go_terms %in% unique(significant_results$GO.ID)]
+# purine nucleoside monophosphate metabolic process "GO:0009126"
+# system process  "GO:0003008"
+
+```
+
+In the consensus of all bees species with a module size of 10 genes, there are many significant GO terms that are enriched: 44 BP terms (e.g. regulation, body growth, sensory), 12 CC terms and 12 MF terms (mainly cellular component).
+
+
+
+## Conclusion
+
+Our consensus analysis presents very few significant GO Terms for orthogroups that are in significant WGCNA modules and associated with being a reproductive or a non-reproductive. Specifically, none BP GO term in all species' analysis using module size of 30 (the most typically reported analysis in other publications). The wasp-focused analyses present not a single significant GO term, as expected by species-level WGCNA analyses. The bee-focused analyses list up to 49 BP GO terms (module size 30). 
+
+Out of the 21 GO terms enriched in all species for either reproductives or non-reproductives, three notable terms associated with chromatin are present: regulation of chromatin assembly or disassembly, RSC-type complex, brahma complex. As a reminder, chromatin assembly is one important term found in the REVIGO analysis (Fig 3b) based on SVM and DEG genes. Katie and I think this is an notable, kind-of-interesting finding worth mentioning.
+
+
+
+
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```

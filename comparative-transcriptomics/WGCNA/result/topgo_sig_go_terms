@@ -1,0 +1,163 @@
+GO.ID	Term	Annotated	Significant	Expected	pvalue	species	goCategory	padj	module_size
+GO:0005575	cellular_component	2662	116	95.69	7.8e-05	common to all	CC	0.03353	30
+GO:0005623	cell	2249	103	80.84	0.00021	common to all	CC	0.03353	30
+GO:0044464	cell part	2249	103	80.84	0.00021	common to all	CC	0.03353	30
+GO:0003674	molecular_function	2686	119	98.23	5.4e-05	common to all	MF	0.029862	30
+GO:0008150	biological_process	2663	312	258.03	1.5e-09	common to all	BP	3.9945e-06	10
+GO:0044087	regulation of cellular component biogenesis	113	28	10.95	6.2e-06	common to all	BP	0.0082553	10
+GO:0008152	metabolic process	1741	216	168.69	2.2e-05	common to all	BP	0.0195286666666667	10
+GO:0001672	regulation of chromatin assembly or disassembly	6	5	0.58	6.4e-05	common to all	BP	0.0355066666666667	10
+GO:0051129	negative regulation of cellular component organization	55	16	5.33	8.5e-05	common to all	BP	0.0355066666666667	10
+GO:0030036	actin cytoskeleton organization	97	23	9.4	9.1e-05	common to all	BP	0.0355066666666667	10
+GO:0009987	cellular process	2242	262	217.24	9.4e-05	common to all	BP	0.0355066666666667	10
+GO:0030029	actin filament-based process	98	23	9.5	0.00011	common to all	BP	0.0355066666666667	10
+GO:0022607	cellular component assembly	399	64	38.66	0.00012	common to all	BP	0.0355066666666667	10
+GO:0005575	cellular_component	2662	311	256.55	7.1e-09	common to all	CC	3.4009e-06	10
+GO:0005623	cell	2249	269	216.75	2.7e-06	common to all	CC	0.0004311	10
+GO:0044464	cell part	2249	269	216.75	2.7e-06	common to all	CC	0.0004311	10
+GO:0016586	RSC-type complex	5	4	0.48	0.00052	common to all	CC	0.05748	10
+GO:0005622	intracellular	1974	232	190.24	0.00072	common to all	CC	0.05748	10
+GO:0044424	intracellular part	1974	232	190.24	0.00072	common to all	CC	0.05748	10
+GO:0005795	Golgi stack	25	8	2.41	0.00275	common to all	CC	0.127334166666667	10
+GO:1904949	ATPase complex	25	8	2.41	0.00275	common to all	CC	0.127334166666667	10
+GO:0035060	brahma complex	7	4	0.67	0.0031	common to all	CC	0.127334166666667	10
+GO:0003674	molecular_function	2686	318	262.49	2.1e-08	common to all	MF	1.1613e-05	10
+GO:0005488	binding	1967	240	192.23	9.5e-05	common to all	MF	0.0258066666666667	10
+GO:0005515	protein binding	1097	147	107.21	0.00014	common to all	MF	0.0258066666666667	10
+GO:0008150	biological_process	2663	410	339.08	9e-09	all bees	BP	2.3967e-05	30
+GO:0048732	gland development	62	21	7.89	4.7e-05	all bees	BP	0.047934	30
+GO:0048729	tissue morphogenesis	185	45	23.56	6.5e-05	all bees	BP	0.047934	30
+GO:0051258	protein polymerization	38	15	4.84	8e-05	all bees	BP	0.047934	30
+GO:0044087	regulation of cellular component biogenesis	113	31	14.39	9e-05	all bees	BP	0.047934	30
+GO:0110053	regulation of actin filament organization	28	12	3.57	0.00017	all bees	BP	0.0490552631578947	30
+GO:0097435	supramolecular fiber organization	92	26	11.71	2e-04	all bees	BP	0.0490552631578947	30
+GO:0008064	regulation of actin polymerization or depolymerization	25	11	3.18	0.00024	all bees	BP	0.0490552631578947	30
+GO:0030832	regulation of actin filament length	25	11	3.18	0.00024	all bees	BP	0.0490552631578947	30
+GO:0010562	positive regulation of phosphorus metabolic process	55	18	7	0.00027	all bees	BP	0.0490552631578947	30
+GO:0045937	positive regulation of phosphate metabolic process	55	18	7	0.00027	all bees	BP	0.0490552631578947	30
+GO:0002009	morphogenesis of an epithelium	179	42	22.79	0.00027	all bees	BP	0.0490552631578947	30
+GO:1902903	regulation of supramolecular fiber organization	38	14	4.84	0.00033	all bees	BP	0.0490552631578947	30
+GO:0007498	mesoderm development	22	10	2.8	0.00033	all bees	BP	0.0490552631578947	30
+GO:0046847	filopodium assembly	15	8	1.91	0.00035	all bees	BP	0.0490552631578947	30
+GO:0019220	regulation of phosphate metabolic process	95	26	12.1	0.00035	all bees	BP	0.0490552631578947	30
+GO:0051174	regulation of phosphorus metabolic process	95	26	12.1	0.00035	all bees	BP	0.0490552631578947	30
+GO:0007431	salivary gland development	34	13	4.33	0.00035	all bees	BP	0.0490552631578947	30
+GO:0035272	exocrine system development	34	13	4.33	0.00035	all bees	BP	0.0490552631578947	30
+GO:0003008	system process	160	38	20.37	0.00041	all bees	BP	0.0494557142857143	30
+GO:0009887	animal organ morphogenesis	229	50	29.16	0.00046	all bees	BP	0.0494557142857143	30
+GO:0042330	taxis	113	29	14.39	0.00053	all bees	BP	0.0494557142857143	30
+GO:0008154	actin polymerization or depolymerization	27	11	3.44	0.00053	all bees	BP	0.0494557142857143	30
+GO:0048588	developmental cell growth	27	11	3.44	0.00053	all bees	BP	0.0494557142857143	30
+GO:0048513	animal organ development	382	75	48.64	6e-04	all bees	BP	0.0494557142857143	30
+GO:0060560	developmental growth involved in morphogenesis	40	14	5.09	6e-04	all bees	BP	0.0494557142857143	30
+GO:0007424	open tracheal system development	83	23	10.57	0.00063	all bees	BP	0.0494557142857143	30
+GO:0050793	regulation of developmental process	232	50	29.54	0.00064	all bees	BP	0.0494557142857143	30
+GO:0009987	cellular process	2242	341	285.47	0.00065	all bees	BP	0.0494557142857143	30
+GO:0050877	nervous system process	136	33	17.32	0.00066	all bees	BP	0.0494557142857143	30
+GO:2000026	regulation of multicellular organismal development	192	43	24.45	0.00067	all bees	BP	0.0494557142857143	30
+GO:0032501	multicellular organismal process	960	163	122.24	0.00074	all bees	BP	0.0494557142857143	30
+GO:0030334	regulation of cell migration	28	11	3.57	0.00077	all bees	BP	0.0494557142857143	30
+GO:0008543	fibroblast growth factor receptor signaling pathway	13	7	1.66	0.00077	all bees	BP	0.0494557142857143	30
+GO:0035168	larval lymph gland hemocyte differentiation	13	7	1.66	0.00077	all bees	BP	0.0494557142857143	30
+GO:0044344	cellular response to fibroblast growth factor stimulus	13	7	1.66	0.00077	all bees	BP	0.0494557142857143	30
+GO:0060491	regulation of cell projection assembly	13	7	1.66	0.00077	all bees	BP	0.0494557142857143	30
+GO:0071774	response to fibroblast growth factor	13	7	1.66	0.00077	all bees	BP	0.0494557142857143	30
+GO:0120032	regulation of plasma membrane bounded cell projection assembly	13	7	1.66	0.00077	all bees	BP	0.0494557142857143	30
+GO:0030041	actin filament polymerization	24	10	3.06	0.00077	all bees	BP	0.0494557142857143	30
+GO:0030833	regulation of actin filament polymerization	24	10	3.06	0.00077	all bees	BP	0.0494557142857143	30
+GO:0051239	regulation of multicellular organismal process	228	49	29.03	0.00078	all bees	BP	0.0494557142857143	30
+GO:0009653	anatomical structure morphogenesis	467	88	59.46	8e-04	all bees	BP	0.0494557142857143	30
+GO:0032956	regulation of actin cytoskeleton organization	37	13	4.71	0.00091	all bees	BP	0.0494557142857143	30
+GO:0032970	regulation of actin filament-based process	37	13	4.71	0.00091	all bees	BP	0.0494557142857143	30
+GO:0042325	regulation of phosphorylation	85	23	10.82	0.00091	all bees	BP	0.0494557142857143	30
+GO:0060541	respiratory system development	85	23	10.82	0.00091	all bees	BP	0.0494557142857143	30
+GO:0009126	purine nucleoside monophosphate metabolic process	46	15	5.86	0.00091	all bees	BP	0.0494557142857143	30
+GO:0009167	purine ribonucleoside monophosphate metabolic process	46	15	5.86	0.00091	all bees	BP	0.0494557142857143	30
+GO:0005575	cellular_component	2662	421	347.29	2.8e-08	all bees	CC	1.3412e-05	30
+GO:0044421	extracellular region part	121	35	15.79	1.8e-05	all bees	CC	0.004311	30
+GO:0005886	plasma membrane	398	83	51.92	1e-04	all bees	CC	0.0155675	30
+GO:0016020	membrane	979	175	127.72	0.00013	all bees	CC	0.0155675	30
+GO:0071944	cell periphery	431	86	56.23	0.00037	all bees	CC	0.035446	30
+GO:0030054	cell junction	65	20	8.48	0.00048	all bees	CC	0.0362671428571429	30
+GO:0005576	extracellular region	168	40	21.92	0.00053	all bees	CC	0.0362671428571429	30
+GO:0005615	extracellular space	91	25	11.87	0.00068	all bees	CC	0.040715	30
+GO:0044459	plasma membrane part	233	51	30.4	0.00081	all bees	CC	0.04311	30
+GO:0003674	molecular_function	2686	421	347.51	3.3e-08	all bees	MF	1.8249e-05	30
+GO:0005488	binding	1967	321	254.49	1.2e-05	all bees	MF	0.003318	30
+GO:0005102	signaling receptor binding	85	27	11	2.3e-05	all bees	MF	0.00423966666666667	30
+GO:0048018	receptor ligand activity	24	12	3.11	3.2e-05	all bees	MF	0.0043134	30
+GO:0005509	calcium ion binding	78	25	10.09	3.9e-05	all bees	MF	0.0043134	30
+GO:0008083	growth factor activity	7	6	0.91	5e-05	all bees	MF	0.00460833333333333	30
+GO:0030545	receptor regulator activity	26	12	3.36	8.7e-05	all bees	MF	0.006873	30
+GO:0098772	molecular function regulator	149	37	19.28	3e-04	all bees	MF	0.0207375	30
+GO:0019199	transmembrane receptor protein kinase activity	20	9	2.59	0.00086	all bees	MF	0.0462509090909091	30
+GO:0046872	metal ion binding	495	94	64.04	0.00088	all bees	MF	0.0462509090909091	30
+GO:0043169	cation binding	502	95	64.95	0.00092	all bees	MF	0.0462509090909091	30
+GO:0008150	biological_process	2663	438	362.23	3.3e-09	all bees	BP	8.7879e-06	10
+GO:0048732	gland development	62	22	8.43	4e-05	all bees	BP	0.0351516	10
+GO:0048729	tissue morphogenesis	185	47	25.16	7.8e-05	all bees	BP	0.0351516	10
+GO:0051239	regulation of multicellular organismal process	228	55	31.01	8.9e-05	all bees	BP	0.0351516	10
+GO:0007424	open tracheal system development	83	26	11.29	9.4e-05	all bees	BP	0.0351516	10
+GO:0060541	respiratory system development	85	26	11.56	0.00015	all bees	BP	0.0351516	10
+GO:0019220	regulation of phosphate metabolic process	95	28	12.92	0.00017	all bees	BP	0.0351516	10
+GO:0051174	regulation of phosphorus metabolic process	95	28	12.92	0.00017	all bees	BP	0.0351516	10
+GO:0007431	salivary gland development	34	14	4.62	0.00017	all bees	BP	0.0351516	10
+GO:0035272	exocrine system development	34	14	4.62	0.00017	all bees	BP	0.0351516	10
+GO:0051258	protein polymerization	38	15	5.17	0.00018	all bees	BP	0.0351516	10
+GO:0003008	system process	160	41	21.76	0.00019	all bees	BP	0.0351516	10
+GO:0010562	positive regulation of phosphorus metabolic process	55	19	7.48	2e-04	all bees	BP	0.0351516	10
+GO:0045937	positive regulation of phosphate metabolic process	55	19	7.48	2e-04	all bees	BP	0.0351516	10
+GO:0050896	response to stimulus	845	158	114.94	0.00022	all bees	BP	0.0351516	10
+GO:0097435	supramolecular fiber organization	92	27	12.51	0.00024	all bees	BP	0.0351516	10
+GO:0032501	multicellular organismal process	960	176	130.58	0.00024	all bees	BP	0.0351516	10
+GO:0050793	regulation of developmental process	232	54	31.56	0.00028	all bees	BP	0.0351516	10
+GO:0002009	morphogenesis of an epithelium	179	44	24.35	3e-04	all bees	BP	0.0351516	10
+GO:0042330	taxis	113	31	15.37	0.00032	all bees	BP	0.0351516	10
+GO:0044087	regulation of cellular component biogenesis	113	31	15.37	0.00032	all bees	BP	0.0351516	10
+GO:0030334	regulation of cell migration	28	12	3.81	0.00032	all bees	BP	0.0351516	10
+GO:0110053	regulation of actin filament organization	28	12	3.81	0.00032	all bees	BP	0.0351516	10
+GO:0050790	regulation of catalytic activity	169	42	22.99	0.00032	all bees	BP	0.0351516	10
+GO:0009653	anatomical structure morphogenesis	467	95	63.52	0.00033	all bees	BP	0.0351516	10
+GO:0009887	animal organ morphogenesis	229	53	31.15	0.00037	all bees	BP	0.0378965384615385	10
+GO:2000026	regulation of multicellular organismal development	192	46	26.12	0.00041	all bees	BP	0.0394858620689655	10
+GO:0008064	regulation of actin polymerization or depolymerization	25	11	3.4	0.00043	all bees	BP	0.0394858620689655	10
+GO:0030832	regulation of actin filament length	25	11	3.4	0.00043	all bees	BP	0.0394858620689655	10
+GO:0009888	tissue development	320	69	43.53	0.00045	all bees	BP	0.039945	10
+GO:0050794	regulation of cellular process	1146	203	155.88	0.00051	all bees	BP	0.0438106451612903	10
+GO:0046847	filopodium assembly	15	8	2.04	0.00056	all bees	BP	0.0441668292682927	10
+GO:0007498	mesoderm development	22	10	2.99	0.00058	all bees	BP	0.0441668292682927	10
+GO:0009126	purine nucleoside monophosphate metabolic process	46	16	6.26	0.00059	all bees	BP	0.0441668292682927	10
+GO:0009167	purine ribonucleoside monophosphate metabolic process	46	16	6.26	0.00059	all bees	BP	0.0441668292682927	10
+GO:0018108	peptidyl-tyrosine phosphorylation	26	11	3.54	0.00065	all bees	BP	0.0441668292682927	10
+GO:0018212	peptidyl-tyrosine modification	26	11	3.54	0.00065	all bees	BP	0.0441668292682927	10
+GO:1902903	regulation of supramolecular fiber organization	38	14	5.17	0.00066	all bees	BP	0.0441668292682927	10
+GO:1901135	carbohydrate derivative metabolic process	164	40	22.31	0.00067	all bees	BP	0.0441668292682927	10
+GO:0048513	animal organ development	382	79	51.96	0.00068	all bees	BP	0.0441668292682927	10
+GO:2000145	regulation of cell motility	30	12	4.08	0.00068	all bees	BP	0.0441668292682927	10
+GO:0007399	nervous system development	365	76	49.65	7e-04	all bees	BP	0.0443833333333333	10
+GO:0090066	regulation of anatomical structure size	79	23	10.75	0.00077	all bees	BP	0.0476862790697674	10
+GO:0050789	regulation of biological process	1232	215	167.58	0.00079	all bees	BP	0.0478129545454545	10
+GO:0005575	cellular_component	2662	449	370.39	2e-08	all bees	CC	9.58e-06	10
+GO:0044421	extracellular region part	121	38	16.84	4.5e-06	all bees	CC	0.00107775	10
+GO:0005886	plasma membrane	398	92	55.38	7.8e-06	all bees	CC	0.0012454	10
+GO:0071944	cell periphery	431	96	59.97	2.5e-05	all bees	CC	0.00299375	10
+GO:0016020	membrane	979	188	136.22	4.7e-05	all bees	CC	0.0045026	10
+GO:0005576	extracellular region	168	45	23.38	6e-05	all bees	CC	0.00479	10
+GO:0044459	plasma membrane part	233	57	32.42	0.00011	all bees	CC	0.00752714285714286	10
+GO:0098590	plasma membrane region	94	28	13.08	0.00023	all bees	CC	0.01377125	10
+GO:0005615	extracellular space	91	27	12.66	0.00033	all bees	CC	0.0175633333333333	10
+GO:0016323	basolateral plasma membrane	15	8	2.09	0.00069	all bees	CC	0.033051	10
+GO:0009986	cell surface	19	9	2.64	0.00096	all bees	CC	0.0418036363636364	10
+GO:0044425	membrane part	816	153	113.54	0.00125	all bees	CC	0.0498958333333333	10
+GO:0003674	molecular_function	2686	450	371.45	1e-08	all bees	MF	5.53e-06	10
+GO:0005102	signaling receptor binding	85	31	11.75	8.5e-07	all bees	MF	0.000235025	10
+GO:0005509	calcium ion binding	78	28	10.79	4.2e-06	all bees	MF	0.0007742	10
+GO:0048018	receptor ligand activity	24	13	3.32	1e-05	all bees	MF	0.0013825	10
+GO:0030545	receptor regulator activity	26	13	3.6	3.1e-05	all bees	MF	0.00341016666666667	10
+GO:0005488	binding	1967	339	272.02	3.7e-05	all bees	MF	0.00341016666666667	10
+GO:0098772	molecular function regulator	149	41	20.61	5.5e-05	all bees	MF	0.004345	10
+GO:0008083	growth factor activity	7	6	0.97	7.4e-05	all bees	MF	0.00511525	10
+GO:0019199	transmembrane receptor protein kinase activity	20	10	2.77	0.00027	all bees	MF	0.01659	10
+GO:0004714	transmembrane receptor protein tyrosine kinase activity	17	9	2.35	0.00031	all bees	MF	0.017143	10
+GO:0046872	metal ion binding	495	100	68.45	7e-04	all bees	MF	0.0350233333333333	10
+GO:0043169	cation binding	502	101	69.42	0.00076	all bees	MF	0.0350233333333333	10
