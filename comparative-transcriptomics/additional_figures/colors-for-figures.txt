@@ -1,0 +1,19 @@
+# colours used in the upset plot
+# from svm/R-scripts/2021-06-18-125-overlap.R
+blues_vec <- c("#9ecae1",
+               "#6baed6",
+               "#3182bd",
+               "#08519c",
+               "#deebf7")
+
+oranges_vec <- c("#fdae6b",
+                 "#fd8d3c",
+                 "#f16913",
+                 "#d94801",
+		"#fff5eb")
+
+# from scripts/svm/2021-06-14-explore-features-dropping-regression.R
+https://www.datanovia.com/en/blog/the-a-z-of-rcolorbrewer-palette/
+# #library(RColorBrewer)
+# pinks
+coul <- rev(colorRampPalette(brewer.pal(8, "RdPu"))(25))
