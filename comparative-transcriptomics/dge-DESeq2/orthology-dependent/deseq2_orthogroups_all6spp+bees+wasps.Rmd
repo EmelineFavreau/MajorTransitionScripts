@@ -1,0 +1,677 @@
+---
+title: "DESeq2 Analyses: Orthogroups-only"
+author: "KS Geist, Iowa State University"
+date: "26 Sept 2021"
+output: html_document
+---
+
+**Unlike with the resampling approach, this program do a comprehensive DEG analysis using species and clade as additional variables.**
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = F, warning = F, include = F}
+#install.packages("htmltools")
+# BiocManager::install("vsn")
+## Install BiocManager if you don't already have it first.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+## Load libraries
+library(DESeq2)
+library(vsn)
+library(ggplot2)
+library(tidyverse)
+library(apeglm)
+```
+
+## Getting Started
+
+##### Read in the metadata:
+```{r}
+meta <- read.csv(file ="~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/Comparative_Transcriptomics_Metadata.csv", strip.white = T, header = T)
+```
+
+##### Set the species:
+```{r}
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata") 
+wasps <- species[4:6]
+bees <- species[1:3]
+```
+
+We need to add a column to the metadata called 'Clade' for our analysis as well:
+```{r}
+meta$Clade <- ifelse(meta$Species %in% wasps, "Wasp", "Bee")
+# View(meta)
+```
+
+
+##### Importing & cleaning up the raw count data. Make the associated phenotype metadata.
+
+First, we set a function to do the cleanup to the data & make the associated metadata that we need for DESeq2. For the pheno metadata, make sure that the row names of the metadata dataframe are present and in the same order as the column names of the counts dataframe. Function returns a check to verify that this is true.
+
+```{r}
+# df <- counts5787
+# clade <- "Bee"
+
+setupDESeq2 <- function(df, clade) {
+  ## Save the gene IDs as a vector for the row names:
+  geneID <- df[,1]
+  ## Rename the headers to the sample names only, stripping extra text:
+  names(df) <- gsub("_1Aligned.sortedByCoord.out.bam", "", names(df))
+  ## Need to remove the geneID column:
+  df <- df[,-c(1)]
+  ## Next, move the gene IDs to the row names instead of as a column:
+  rownames(df) <- geneID
+  
+  # This part is now redundant because the data from EF were already filtered:
+  ## Grab just the columns you want given the metadata:
+  # cols2grab <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR")),"Sample.Name.on.SRA"]
+  ## Select each of the columns from the cols2grab vector:
+  # df <- df[,as.character(cols2grab)]
+
+  ## Ensure the dimensions look good:
+  print(head(df))
+  
+  ## Now, we also need to make the phenotype metadata. Notice that the resulting pheno DF is analogous to the expression DF
+  id <- colnames(df)
+  phenotype <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR")),c("R.NR_Phenotype", "Species", "Clade")]
+  pheno <- as.data.frame(phenotype)
+
+  ## If we are doing bees / wasps separately:
+  if(clade == "Bee" | clade == "Wasp") {
+     pheno <- pheno[which(pheno$Clade == clade),]
+  }
+  
+  ## Add the rownames to the pheno data:
+  row.names(pheno) <- id
+
+  # Check that the column names of the counts df are the same and in the same order as the phenotypes df:
+  print(all(colnames(df) %in% rownames(pheno)))
+  print(all(colnames(df) == rownames(pheno)))
+  
+  return(list(df, pheno)) 
+}
+```
+
+Then, import the raw count data for the 3718 orthologs (from EF) and apply the cleanupCounts function:
+**Note: ** EF had changed the counts in the bees and the wasps only read count files such that read counts of 0 became 1 for SVM. We need to change this back as well.
+```{r}
+counts3718 <- read.csv("~/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/svm/input/readcounts_3718orthogroups_6species.txt", sep = "", stringsAsFactors = FALSE)
+# counts3718[counts3718[,2:ncol(counts3718)] == 0, ]
+# length(counts3718[counts3718 == 0])
+
+counts5787 <- read.csv("~/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/svm/input/readcounts_5787orthogroups_beeonly.txt", sep = "", stringsAsFactors = FALSE)
+## Proof EF had changes 1s to 0s:
+# length(counts5787[counts5787 == 0])
+## So let's change them back:
+counts5787[counts5787 == 1] <- 0
+## Proof it worked as it should:
+# counts5787[which(counts5787$orthogroup == "OG0000799"),]
+
+counts6983 <- read.csv("~/Dropbox/GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/svm/input/readcounts_6983orthogroups_wasponly.txt", sep = "", stringsAsFactors = FALSE)
+counts6983[counts6983 == 1] <- 0
+
+all6spp <- setupDESeq2(counts3718, "None")
+head(all6spp[[1]])
+head(all6spp[[2]])
+
+bees <- setupDESeq2(counts5787, "Bee")
+head(bees[[1]])
+head(bees[[2]])
+
+wasps <- setupDESeq2(counts6983, "Wasp")
+head(wasps[[1]])
+head(wasps[[2]])
+
+## Save the phenotype matrix for future use
+pheno <- all6spp[[2]]
+beePheno <- bees[[2]]
+waspPheno <- wasps[[2]]
+```
+
+##### Quick Summary Statistics on the Raw Feature Counts:
+```{r}
+## Make a directory to save everything to:
+dir.create(path=paste(getwd(), "/orthogroups3718_all6spp_together", sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+dir.create(path=paste(getwd(), "/orthogroups5787_BEES", sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+dir.create(path=paste(getwd(), "/orthogroups6983_WASPS", sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+
+# df <- bees[[1]]
+# spp <- species[1]
+countsSummStats <- function(df, spp) {
+  header <- c("Total Genes", 
+              "Num Genes with >1 read count", 
+              "Prop. Genes without Zero Expression", 
+              "Num Genes with Zero Expression", 
+              "Prop. Genes with Zero Expression", 
+              "Prop. Genes with Low Expression", 
+              "Num Reads: R Phenotype", 
+              "Num Reads: NR Phenotype", 
+              "Total Reads Mapped", 
+              "N Samples", 
+              "Mean CPM per Sample")
+  
+  ## How many total genes:
+  totalGenes <- nrow(df)
+
+  id <- rownames(pheno[which(pheno$Species == spp), ])
+  ## Need to subset for whatever species we want data for:
+  df <- df[, colnames(df) %in% id]
+  
+  ## One quick quality check: how many of my gene counts are zero for all samples?
+  totalCounts <- rowSums(df)
+  ## Number of genes with at least 1 counts:  
+  numWithoutZeroExp <- length(totalCounts[totalCounts > 0])
+  propWithoutZeroExp <- numWithoutZeroExp / totalGenes
+  ## Proportion of all genes not expressed AT ALL:
+  numZeroExp <- length(totalCounts[totalCounts == 0]) 
+  propZeroExp <- numZeroExp / totalGenes
+
+  ## How about how many genes where there are fewer than 10 reads in 90% of samples?
+  ## If you have 9 samples, and 10 reads per sample, then there should be less than 90 total reads for that gene.
+  lowExp <- length(totalCounts[totalCounts < 10*ncol(df)*0.9]) 
+  # hist(totalCounts[totalCounts < 10*ncol(df)*0.9])
+  # lowExp ## the genes with fewer than 10 counts in 90% of the samples
+  ## Now, let's get a proportion of any gene in any sample that was 0:
+  propLowExp <- sum(lowExp) / totalGenes
+
+  ## Read count by phenotype
+  Rcount <- sum(df[,as.character(meta[which((meta$R.NR_Phenotype == "R") & meta$Species == spp),"Sample.Name.on.SRA"])])
+  #Rcount <- sum(df %>% select(one_of(meta[which((meta$R.NR_Phenotype == "R") & meta$Species == spp),"Sample.Name.on.SRA"])))
+  NRcount <- sum(df[,as.character(meta[which((meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"])])
+  #NRcount <- sum(df %>% select(one_of(meta[which((meta$R.NR_Phenotype == "NR") & meta$Species == spp),"Sample.Name.on.SRA"])))
+
+  # Total read count:
+  totalReads <- sum(df)
+
+  # Number of samples
+  samples <- ncol(df)
+  
+  summStats <- as.data.frame(rbind(sprintf("%1.0f", totalGenes), 
+                                   sprintf("%1.0f", numWithoutZeroExp), 
+                                   sprintf("%1.4f", propWithoutZeroExp), 
+                                   sprintf("%1.0f", numZeroExp), 
+                                   sprintf("%1.4f", propZeroExp), 
+                                   sprintf("%1.4f", propLowExp), 
+                                   sprintf("%1.0f", Rcount), 
+                                   sprintf("%1.0f", NRcount), 
+                                   sprintf("%1.0f", totalReads), 
+                                   sprintf("%1.0f", samples), 
+                                   sprintf("%1.2f",totalReads/samples/10^6)))
+  rownames(summStats) <- header
+  colnames(summStats) <- spp
+
+  return(summStats)
+}
+
+## All 6 Species:
+summaryStatsDF <- cbind(countsSummStats(all6spp[[1]], species[1]), countsSummStats(all6spp[[1]], species[2]), 
+                        countsSummStats(all6spp[[1]], species[3]), countsSummStats(all6spp[[1]], species[4]), 
+                        countsSummStats(all6spp[[1]], species[5]), countsSummStats(all6spp[[1]], species[6]))
+
+summaryStatsDF
+write.table(summaryStatsDF, file = "orthogroups3718_all6spp_together/Raw_Read_Counts_Summary_Statistics.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+
+## Just the bees:
+summaryStatsDF <- cbind(countsSummStats(bees[[1]], species[1]), countsSummStats(bees[[1]], species[2]), 
+                        countsSummStats(bees[[1]], species[3]))
+
+summaryStatsDF
+write.table(summaryStatsDF, file = "orthogroups5787_BEES/Raw_Read_Counts_Summary_Statistics.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+
+## Just the wasps:
+summaryStatsDF <- cbind(countsSummStats(wasps[[1]], species[4]), 
+                        countsSummStats(wasps[[1]], species[5]), countsSummStats(wasps[[1]], species[6]))
+
+summaryStatsDF
+write.table(summaryStatsDF, file = "orthogroups6983_WASPS/Raw_Read_Counts_Summary_Statistics.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+```
+
+## Run DESeq2 on the Full dataset for Comparison
+
+#### Run DESeq Function
+* **Performs normalization (median of ratios):**
+  1.Corrects for variance in read sequencing depth
+  2.Corrects for inter-library dispersion in counts (for each gene)
+
+* **Calculates the significance of coefficients with a negative binomial GLM**
+Note that DESeq2 does not actually use the normalized counts but rather uses the raw counts and models the normalization in the negative binomial model.
+
+```{r, message = F, warning = F}
+runDESeq2 <- function(df, pheno, clade) {
+  ## If we are doing bees / wasps separately:
+  if(clade == "Bee" | clade == "Wasp") {
+    ## Construct DESEQDataSet Object (stored as dds):
+    dds <- DESeqDataSetFromMatrix(countData=df, 
+                              colData=pheno, 
+                              design= ~ Species + Species:R.NR_Phenotype + R.NR_Phenotype)
+    
+    ## Now run the DESeq model:
+    dds <- DESeq(dds)
+    ## Yes, we are overwriting / performing the functions on the dataset object
+  
+    ddsResults <- results(dds)
+
+    ## Do log-fold change shrinkage as well for volcano plots:
+    lfc_shrunk <- lfcShrink(dds, res = ddsResults, coef=6, type = "apeglm")
+    
+    if(clade == "Bee") {
+      path = "orthogroups5787_BEES"
+    }
+    if(clade == "Wasp") {
+      path = "orthogroups6983_WASPS"
+    }
+  }
+  
+  else {
+    path = "orthogroups3718_all6spp_together"
+
+    ## Construct DESEQDataSet Object (stored as dds):
+    dds <- DESeqDataSetFromMatrix(countData=df, 
+                              colData=pheno, 
+                              #design= ~ Clade + Clade:R.NR_Phenotype + R.NR_Phenotype)
+                              design= ~ Species + Species:R.NR_Phenotype + R.NR_Phenotype)
+    
+    ## Now run the DESeq model:
+    dds <- DESeq(dds)
+    ## Yes, we are overwriting / performing the functions on the dataset object
+  
+    ddsResults <- results(dds)
+
+    ## Do log-fold change shrinkage as well for volcano plots:
+#    lfc_shrunk <- lfcShrink(dds, res = ddsResults, coef=4, type = "apeglm")
+    lfc_shrunk <- lfcShrink(dds, res = ddsResults, coef=6, type = "apeglm")
+    
+  }
+  
+  ## Now save the dds input:
+  save(dds, file=paste(path, "/DESeq2_input_matrix.Rdata", sep=""))
+  ## Save the dds output:
+  save(dds, file=paste(path, "/DESeq2_function_output.Rdata", sep=""))
+  
+  ## Save the log-fold shrinkage results:
+  save(lfc_shrunk, file=paste(path, "/DESeq2_results_lfcShrinkage.Rdata", sep=""))
+  
+  ## Let's extract the normalized counts (from either the DESeq() function or the estimateSizeFactors() function, whichever was used above):
+  normalized_counts <- counts(dds, normalized=TRUE)
+  write.table(normalized_counts, 
+              file=paste(path, "/DESeq2_normalized_counts.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=NA)
+
+  ## I would also like to write the results file for future use / reference:
+  write.table(ddsResults, 
+              file=paste(path, "/DESeq2_results.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=NA)
+  save(ddsResults, 
+       file=paste(path, "/DESeq2_results.Rdata", sep=""))
+
+
+
+  ## Phenotype sample sizes
+  R.N <- nrow(pheno[which(pheno$R.NR_Phenotype == "R"), ])
+  NR.N <- nrow(pheno[which(pheno$R.NR_Phenotype == "NR"), ])
+  
+  ## Next, I want to filter for the number of genes with FDR < 0.05
+  sig <- subset(ddsResults, padj < 0.05)
+  DEG.counts.df <- c(sprintf("%1.0f", nrow(sig)), 
+                     sprintf("%1.0f", nrow(subset(sig, log2FoldChange > 0))), 
+                     sprintf("%1.0f", nrow(subset(sig, log2FoldChange < 0))), 
+                     sprintf("%1.3f", mean(abs(sig$log2FoldChange))), 
+                     sprintf("%1.3f", sd(abs(sig$log2FoldChange))), 
+                     R.N, 
+                     NR.N) 
+  DEG.counts.df <- as.data.frame(DEG.counts.df)
+  rownames(DEG.counts.df) <- c("Total DEGs", "Up-Reg in R", "Up-Reg in NR", "meanAbsLFC", "stdevAbsLFC", "Reproductives N", "Non-Repros N")
+  colnames(DEG.counts.df) <- ""
+
+  ## Lastly, we want the identities of the DEGs:
+  allDEGs <- rownames(sig)
+  write.table(allDEGs, 
+              file = paste(path, "/all_DEGs.txt", sep=""), 
+              sep="\t", quote=F, col.names=F, row.names = F)
+  upR <- rownames(subset(sig, log2FoldChange > 0))
+  write.table(upR, 
+              file = paste(path, "/upR_DEGs.txt", sep=""), 
+              sep="\t", quote=F, col.names=F, row.names = F)
+  upNR <- rownames(subset(sig, log2FoldChange < 0))
+  write.table(upNR, 
+              file = paste(path, "/upNR_DEGs.txt", sep=""), 
+              sep="\t", quote=F, col.names=F, row.names = F)
+
+  return(list(dds, normalized_counts, ddsResults, DEG.counts.df, allDEGs, upR, upNR))
+}
+
+## Note that size factors for normalization could be extracted as follows:
+#dds <- estimateSizeFactors(dds)
+#sizeFactors(dds)
+# df = all6spp[[1]]
+# pheno = all6spp[[2]]
+all6spp_DEG <- runDESeq2(all6spp[[1]], all6spp[[2]], "None")
+
+combinedDEGcounts <- all6spp_DEG[[4]]
+combinedDEGcounts
+
+write.table(combinedDEGcounts, file = "orthogroups3718_all6spp_together/DEGs_Summary_All_Species.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+
+## Now just the bees:
+# df = bees[[1]]
+# pheno = bees[[2]]
+# clade = "Bee"
+bees_DEG <- runDESeq2(bees[[1]], bees[[2]], "Bee")
+combinedDEGcounts <- bees_DEG[[4]]
+combinedDEGcounts
+
+write.table(combinedDEGcounts, file = "orthogroups5787_BEES/DEGs_Summary_All_Species.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+
+
+## Finally, just the wasps:
+wasps_DEG <- runDESeq2(wasps[[1]], wasps[[2]], "Wasp")
+combinedDEGcounts <- wasps_DEG[[4]]
+combinedDEGcounts
+
+write.table(combinedDEGcounts, file = "orthogroups6983_WASPS/DEGs_Summary_All_Species.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+
+```
+
+#### Run Variance-Stabilizing Transformation: All Six Species in One
+We will also need to run the VST for downstream visualization and applications like WGCNA, which will include filtering out low expression values too (prints files with and without filtering). We are using a parametric fit with the VST. **Note that all transformations have set blind = FALSE. We do not want the transformations to be blind to the experimental design (phenotypes) at this point; we expect large differential expression in some genes, and so we need to control for outliers by setting blind to FALSE.**
+
+A note on the filtering: Langfelder has said: "I require that a gene has a relatively high expression (e.g., 0.5 to 1 count per million reads, this translates to a counts in low tens for a typical data set with 30-50M reads per sample) in at least 1/4 of the samples (or whatever fraction is the smallest experimental group of the design). The rationale is that typical correlation analysis in WGCNA assumes (approximately) continuous data; using correlation on counts below say 5-10 which tend to be mostly zero can really lead to spurious results."
+
+So, to apply the same logic here, we have 7-15 CPM per sample, which is less than half of the read depth that Langfelder typically has. So, we will filter for at least 5 in 1/2 of the samples. 
+
+```{r}
+runVST <- function(dds, samples, clade) {
+    if(clade == "Bee") {
+      path = "orthogroups5787_BEES"
+    }
+    if(clade == "Wasp") {
+      path = "orthogroups6983_WASPS"
+    }
+    if(clade == "None") {
+      path = "orthogroups3718_all6spp_together"
+    }
+    print(path)
+
+    ## Run the VST without filtering (for SVM):
+    vsdata1 <- varianceStabilizingTransformation(dds, blind = FALSE, fitType = "parametric")
+    (meanSdPlot(assay(vsdata1)))
+    write.table(assay(vsdata1), file=paste(path, "/VST.txt", sep=""), sep="\t", quote=F, row.names=T)
+    save(vsdata1, file=paste(path, "/VST.Rdata", sep=""))
+
+    ## Run the VST with filtering (for WGCNA):
+    keep <- rowSums(counts(dds) >= 5) >= samples/2    ## This filters for 5 in the smallest group size
+    paste("I filtered ", nrow(dds) - nrow(dds[keep,]), " genes from the dataset.\n", sep="")
+    dds.filt <- dds[keep,]
+    vsdata2 <- varianceStabilizingTransformation(dds.filt, blind = FALSE, fitType = "parametric")
+    (meanSdPlot(assay(vsdata2)))
+    write.table(assay(vsdata2), file=paste(path, "/VST_lowExprfiltered.txt", sep=""), sep="\t", quote=F, row.names=T)
+    # name <- paste(path, ".vsdata", sep="")
+    save(vsdata2, file=paste(path, "/VST_lowExprfiltered.Rdata", sep=""))
+}
+
+all6spp.vst <- runVST(all6spp_DEG[[1]], ncol(all6spp[[1]]), "None")
+bee.vst <- runVST(bees_DEG[[1]], ncol(bees[[1]]), "Bee")
+wasp.vst <- runVST(wasps_DEG[[1]], ncol(wasps[[1]]), "Wasp")
+```
+
+#### Run Variance-Stabilizing Transformation: Each species individually for Consensus WGCNA
+
+**EXTRA NOTE:** Once I dug into the WGCNA consensus network, I realized that I would want a single VST **for each species** still for the MultiExpr dataset, rather than one VST for everybody. So, below I will generate the indvidual VSTs (different than done previously **because it includes orthologs for which there are *no data* **). Note that I keep the above VST because I may want the all-6-species-in-one VST for plotting purposes even if I don't want it for WGCNA. 
+
+Modifying the setupDESeq2 function to grab each species individually:
+```{r}
+# df <- counts3718
+# spp = species[1]
+setupDESeq2 <- function(df, spp) {
+  ## Save the gene IDs as a vector for the row names:
+  geneID <- df[,1]
+  ## Rename the headers to the sample names only, stripping extra text:
+  names(df) <- gsub("_1Aligned.sortedByCoord.out.bam", "", names(df))
+  ## Need to remove the geneID column:
+  df <- df[,-c(1)]
+  ## Next, move the gene IDs to the row names instead of as a column:
+  rownames(df) <- geneID
+  
+  ## Grab just the columns you want given the metadata:
+  cols2grab <- meta[which(meta$Species == spp & (meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR")),"Sample.Name.on.SRA"]
+  ## Select each of the columns from the cols2grab vector:
+  df <- df[,as.character(cols2grab)]
+
+  ## Ensure the dimensions look good:
+  print(head(df))
+  
+  ## Now, we also need to make the phenotype metadata. Notice that the resulting pheno DF is analogous to the expression DF
+  id <- colnames(df)
+  phenotype <- meta[which(meta$Species == spp & (meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR")),c("R.NR_Phenotype", "Species", "Clade")]
+  
+  pheno <- as.data.frame(phenotype)
+  row.names(pheno) <- id
+
+  # Check that the column names of the counts df are the same and in the same order as the phenotypes df:
+  print(all(colnames(df) %in% rownames(pheno)))
+  print(all(colnames(df) == rownames(pheno)))
+  
+  return(list(df, pheno)) 
+}
+```
+
+Now, make set up the datasets for individual DESeq2:
+```{r}
+Caus.all6spp <- setupDESeq2(counts3718, species[1])
+Ccal.all6spp <- setupDESeq2(counts3718, species[2])
+Mgen.all6spp <- setupDESeq2(counts3718, species[3])
+Pcan.all6spp <- setupDESeq2(counts3718, species[4])
+Pdom.all6spp <- setupDESeq2(counts3718, species[5])
+Lfla.all6spp <- setupDESeq2(counts3718, species[6])
+
+Caus.beesOnly <- setupDESeq2(counts5787, species[1])
+Ccal.beesOnly <- setupDESeq2(counts5787, species[2])
+Mgen.beesOnly <- setupDESeq2(counts5787, species[3])
+
+Pcan.waspsOnly <- setupDESeq2(counts6983, species[4])
+Pdom.waspsOnly <- setupDESeq2(counts6983, species[5])
+Lfla.waspsOnly <- setupDESeq2(counts6983, species[6])
+```
+
+
+Modifying the RunDESeq2 function as well (not doing all the above work for brevity):
+```{r, message = F, warning = F}
+
+
+runDESeq2 <- function(df, pheno, spp, filepath, flag) {
+  
+  ## Make a directory to save everything to:
+  dir.create(path=paste(getwd(), "/", filepath, "/", spp, sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  
+  ## Construct DESEQDataSet Object (stored as dds):
+  dds <- DESeqDataSetFromMatrix(countData=df, 
+                              colData=pheno, 
+                              design= ~ R.NR_Phenotype)
+  ## Design specifies how the counts from each gene depend on our variables in the metadata; we currently only have one factor of interest, phenotype
+  ## tidy=TRUE argument tells DESeq2 to output the results table with rownames as a first column called 'row; alternatively, I could have used that argument here to move the first col into the rownames of each dataset.
+
+  save(dds, 
+       file = paste(filepath, "/", spp, "/", spp, "_orthogroups_", flag, "_DESeq2_input_matrix.Rdata", sep=""))
+
+  ## Now run the DESeq model:
+  dds <- DESeq(dds)
+  ## Yes, we are overwriting / performing the functions on the dataset object
+  save(dds, 
+       file = paste(filepath, "/", spp, "/", spp, "_orthogroups_", flag, "_DESeq2_function_output.Rdata", sep=""))
+
+  ## I would also like to write the results file for future use / reference:
+  ddsResults <- results(dds)
+
+  write.table(ddsResults, 
+              file=paste(filepath, "/", spp, "/", spp, "_all6spp_DESeq2_results.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=NA)
+  save(ddsResults, 
+       file = paste(filepath, "/", spp, "/", spp, "_all6spp_DESeq2_results.Rdata", sep=""))
+
+  ## Let's extract the normalized counts (from either the DESeq() function or the estimateSizeFactors() function, whichever was used above):
+  normalized_counts <- counts(dds, normalized=TRUE)
+  write.table(normalized_counts, 
+              file=paste(filepath, "/", spp, "/", spp, "_orthogroups_", flag, "_DESeq2_normalized_counts.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=NA)
+  
+  ## Do log-fold change shrinkage as well for volcano plots:
+  # lfc_shrunk <- lfcShrink(dds, res = ddsResults, coef=4, type = "apeglm")   ## This is specific to multivariate
+  lfc_shrunk <- lfcShrink(dds, contrast = c("R.NR_Phenotype", "R", "NR"), res = ddsResults, type = "normal")
+  save(lfc_shrunk, 
+       file = paste(filepath, "/", spp, "/", spp, "_all6spp_DESeq2_results_lfcShrinkage.Rdata", sep=""))
+
+  ## Phenotype sample sizes
+  R.N <- ncol(df[,as.character(meta[which(meta$Species == spp & (meta$R.NR_Phenotype == "R")),"Sample.Name.on.SRA"])])
+  NR.N <- ncol(df[,as.character(meta[which(meta$Species == spp & (meta$R.NR_Phenotype == "NR")),"Sample.Name.on.SRA"])])
+  
+  ## Next, I want to filter for the number of genes with FDR < 0.05
+  sig <- subset(ddsResults, padj < 0.05)
+  DEG.counts.df <- c(sprintf("%1.0f", nrow(sig)), 
+                     sprintf("%1.0f", nrow(subset(sig, log2FoldChange > 0))), 
+                     sprintf("%1.0f", nrow(subset(sig, log2FoldChange < 0))), 
+                     sprintf("%1.3f", mean(abs(sig$log2FoldChange))), 
+                     sprintf("%1.3f", sd(abs(sig$log2FoldChange))), 
+                     R.N, 
+                     NR.N) 
+  DEG.counts.df <- as.data.frame(DEG.counts.df)
+  rownames(DEG.counts.df) <- c("Total DEGs", "Up-Reg in R", "Up-Reg in NR", "meanAbsLFC", "stdevAbsLFC", "Reproductives N", "Non-Repros N")
+  colnames(DEG.counts.df) <- paste(spp, sep = "")
+
+  ## Lastly, we want the identities of the DEGs:
+  allDEGs <- rownames(sig)
+  write.table(allDEGs, 
+              file = paste(filepath, "/", spp, "/", spp, "_all6spp_all_DEGs.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=F, 
+              row.names = F)
+  
+  upR <- rownames(subset(sig, log2FoldChange > 0))
+  write.table(upR, 
+              file = paste(filepath, "/", spp, "/", spp, "_all6spp_upR_DEGs.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=F, 
+              row.names = F)
+  
+  upNR <- rownames(subset(sig, log2FoldChange < 0))
+  write.table(upNR, 
+              file = paste(filepath, "/", spp, "/", spp, "_all6spp_upNR_DEGs.txt", sep=""), 
+              sep="\t", 
+              quote=F, 
+              col.names=F, 
+              row.names = F)
+
+  return(list(dds, normalized_counts, ddsResults, DEG.counts.df, allDEGs, upR, upNR))
+}
+
+## Run all 6 species for the 3718 orthogroups:
+Caus.all6spp_DEG <- runDESeq2(Caus.all6spp[[1]], Caus.all6spp[[2]], species[1], "orthogroups3718_all6spp_together", "all6spp")
+Ccal.all6spp_DEG <- runDESeq2(Ccal.all6spp[[1]], Ccal.all6spp[[2]], species[2], "orthogroups3718_all6spp_together", "all6spp")
+Mgen.all6spp_DEG <- runDESeq2(Mgen.all6spp[[1]], Mgen.all6spp[[2]], species[3], "orthogroups3718_all6spp_together", "all6spp")
+Pcan.all6spp_DEG <- runDESeq2(Pcan.all6spp[[1]], Pcan.all6spp[[2]], species[4], "orthogroups3718_all6spp_together", "all6spp")
+Pdom.all6spp_DEG <- runDESeq2(Pdom.all6spp[[1]], Pdom.all6spp[[2]], species[5], "orthogroups3718_all6spp_together", "all6spp")
+Lfla.all6spp_DEG <- runDESeq2(Lfla.all6spp[[1]], Lfla.all6spp[[2]], species[6], "orthogroups3718_all6spp_together", "all6spp")
+
+combinedDEGcounts <- cbind(Caus.all6spp_DEG[[4]], Ccal.all6spp_DEG[[4]], Mgen.all6spp_DEG[[4]], Pcan.all6spp_DEG[[4]], 
+                           Pdom.all6spp_DEG[[4]], Lfla.all6spp_DEG[[4]])
+
+write.table(combinedDEGcounts, file = "orthogroups3718_all6spp_together/DEGs_Summary_All6Species_INDIVIDUAL_RUNS.txt", 
+            row.names = T, 
+            col.names = T, 
+            append = F, 
+            quote = F, 
+            sep = "\t")
+
+## Run all the bees for the 5787 orthogroups:
+Caus.beesOnly_DEG <- runDESeq2(Caus.beesOnly[[1]], Caus.beesOnly[[2]], species[1], "orthogroups5787_BEES", "beesOnly")
+Ccal.beesOnly_DEG <- runDESeq2(Ccal.beesOnly[[1]], Ccal.beesOnly[[2]], species[2], "orthogroups5787_BEES", "beesOnly")
+Mgen.beesOnly_DEG <- runDESeq2(Mgen.beesOnly[[1]], Mgen.beesOnly[[2]], species[3], "orthogroups5787_BEES", "beesOnly")
+
+combinedDEGcounts <- cbind(Caus.beesOnly_DEG[[4]], Ccal.beesOnly_DEG[[4]], Mgen.beesOnly_DEG[[4]])
+
+write.table(combinedDEGcounts, file = "orthogroups5787_BEES/DEGs_Summary_beesOnly_INDIVIDUAL_RUNS.txt", 
+            row.names = T, 
+            col.names = T, 
+            append = F, 
+            quote = F, 
+            sep = "\t")
+
+## Run all the wasps for the 6983 orthogroups:
+Pcan.waspsOnly_DEG <- runDESeq2(Pcan.waspsOnly[[1]], Pcan.waspsOnly[[2]], species[4], "orthogroups6983_WASPS", "waspsOnly")
+Pdom.waspsOnly_DEG <- runDESeq2(Pdom.waspsOnly[[1]], Pdom.waspsOnly[[2]], species[5], "orthogroups6983_WASPS", "waspsOnly")
+Lfla.waspsOnly_DEG <- runDESeq2(Lfla.waspsOnly[[1]], Lfla.waspsOnly[[2]], species[6], "orthogroups6983_WASPS", "waspsOnly")
+
+combinedDEGcounts <- cbind(Pcan.waspsOnly_DEG[[4]], Pdom.waspsOnly_DEG[[4]], Lfla.waspsOnly_DEG[[4]])
+
+write.table(combinedDEGcounts, file = "orthogroups6983_WASPS/DEGs_Summary_waspsOnly_INDIVIDUAL_RUNS.txt", 
+            row.names = T, 
+            col.names = T, 
+            append = F, 
+            quote = F, 
+            sep = "\t")
+
+## Let's also make a vector of the dds objects so we can loop through them downstream:
+dds.list <- c(Caus.all6spp_DEG[1], Ccal.all6spp_DEG[1], Mgen.all6spp_DEG[1], Pcan.all6spp_DEG[1], Pdom.all6spp_DEG[1], Lfla.all6spp_DEG[1])
+
+bees.dds.list <- c(Caus.beesOnly_DEG[1], Ccal.beesOnly_DEG[1], Mgen.beesOnly_DEG[1])
+wasps.dds.list <- c(Pcan.waspsOnly_DEG[1], Pdom.waspsOnly_DEG[1], Lfla.waspsOnly_DEG[1])
+
+```
+
+Lastly, use the runVST function from individual runs (previous code):
+**NOTE:** No low expression filtering was run this time because we need the same number of genes for input into WGCNA. We filter with WGCNA instead.
+
+```{r}
+runVST <- function(dds, samples, spp, filepath, flag) {
+    
+    ## Run the VST without filtering (for SVM):
+    vsdata1 <- varianceStabilizingTransformation(dds, blind = FALSE, fitType = "parametric")
+    jpeg(filename = paste(filepath, "/", spp, "/", spp, "_orthogroups_", flag, "_VST_All_Genes.jpg", sep=""), 
+         width = 8, height = 8, units = "in", res = 400)
+    meanSdPlot(assay(vsdata1))
+    dev.off()
+    write.table(assay(vsdata1), 
+                file = paste(filepath, "/", spp, "/", spp, "_orthogroups_", flag, "_VST.txt", sep=""), 
+                sep = "\t", 
+                quote = F, 
+                row.names = T)
+    save(vsdata1, 
+         file = paste(filepath, "/", spp, "/", spp, "_orthogroups_", flag, "_VST.Rdata", sep=""))
+
+  }
+# dds <- dds.list[[1]]
+# samples <- ncol(Caus[[1]])
+# spp <- species[2]
+runVST(dds.list[[1]], ncol(Caus.all6spp[[1]]), species[1], "orthogroups3718_all6spp_together", "all6spp")
+runVST(dds.list[[2]], ncol(Ccal.all6spp[[1]]), species[2], "orthogroups3718_all6spp_together", "all6spp")
+runVST(dds.list[[3]], ncol(Mgen.all6spp[[1]]), species[3], "orthogroups3718_all6spp_together", "all6spp")
+runVST(dds.list[[4]], ncol(Pcan.all6spp[[1]]), species[4], "orthogroups3718_all6spp_together", "all6spp")
+runVST(dds.list[[5]], ncol(Pdom.all6spp[[1]]), species[5], "orthogroups3718_all6spp_together", "all6spp")
+runVST(dds.list[[6]], ncol(Lfla.all6spp[[1]]), species[6], "orthogroups3718_all6spp_together", "all6spp")
+
+runVST(bees.dds.list[[1]], ncol(Caus.beesOnly[[1]]), species[1], "orthogroups5787_BEES", "beesOnly")
+runVST(bees.dds.list[[2]], ncol(Ccal.beesOnly[[1]]), species[2], "orthogroups5787_BEES", "beesOnly")
+runVST(bees.dds.list[[3]], ncol(Mgen.beesOnly[[1]]), species[3], "orthogroups5787_BEES", "beesOnly")
+
+runVST(wasps.dds.list[[1]], ncol(Pcan.waspsOnly[[1]]), species[4], "orthogroups6983_WASPS", "waspsOnly")
+runVST(wasps.dds.list[[2]], ncol(Pdom.waspsOnly[[1]]), species[5], "orthogroups6983_WASPS", "waspsOnly")
+runVST(wasps.dds.list[[3]], ncol(Lfla.waspsOnly[[1]]), species[6], "orthogroups6983_WASPS", "waspsOnly")
+
+```
+

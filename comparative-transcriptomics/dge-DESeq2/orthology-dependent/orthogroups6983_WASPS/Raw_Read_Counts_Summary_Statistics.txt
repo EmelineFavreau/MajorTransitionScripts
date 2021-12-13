@@ -1,0 +1,12 @@
+Polistes_canadensis	Polistes_dominula	Liostenogaster_flavolineata
+Total Genes	6983	6983	6983
+Num Genes with >1 read count	5783	5617	6582
+Prop. Genes without Zero Expression	0.8282	0.8044	0.9426
+Num Genes with Zero Expression	1200	1366	401
+Prop. Genes with Zero Expression	0.1718	0.1956	0.0574
+Prop. Genes with Low Expression	0.2350	0.2410	0.0945
+Num Reads: R Phenotype	26984109	44760040	83839442
+Num Reads: NR Phenotype	32370789	52819244	92943652
+Total Reads Mapped	59354898	97579284	176783094
+N Samples	10	24	19
+Mean CPM per Sample	5.94	4.07	9.30

@@ -1,0 +1,8 @@
+
+Total DEGs	113
+Up-Reg in R	65
+Up-Reg in NR	48
+meanAbsLFC	1.954
+stdevAbsLFC	1.681
+Reproductives N	13
+Non-Repros N	15

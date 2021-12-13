@@ -1,0 +1,8 @@
+Ceratina_australensis	Ceratina_calcarata	Megalopta_genalis
+Total DEGs	586	287	263
+Up-Reg in R	244	173	115
+Up-Reg in NR	342	114	148
+meanAbsLFC	1.047	1.390	0.606
+stdevAbsLFC	0.983	0.833	0.500
+Reproductives N	3	3	7
+Non-Repros N	3	3	9
