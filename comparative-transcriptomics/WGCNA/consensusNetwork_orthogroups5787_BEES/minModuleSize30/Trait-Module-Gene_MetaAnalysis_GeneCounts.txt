@@ -1,9 +1,0 @@
-ME	Num.Genes.Sig.Module	Num.Genes.Sig.Module.Trait	R.Genes.Sig.Module.Trait	NR.Genes.Sig.Module.Trait
-MEbrown	794	243	243	NA
-MEdarkgrey	748	354	354	NA
-MEdarkred	498	262	262	NA
-MElightgreen	706	221	221	NA
-MEpurple	775	254	254	NA
-MEtan	572	269	NA	269
-MEturquoise	931	255	NA	255
-Total	5024	1858	1334	524

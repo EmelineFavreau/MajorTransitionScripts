@@ -1,8 +1,0 @@
-ME	Num.Genes.Sig.Module	Num.Genes.Sig.Module.Trait	R.Genes.Sig.Module.Trait	NR.Genes.Sig.Module.Trait
-MEblue	1496	325	325	NA
-MElightcyan	725	293	NA	293
-MElightgreen	847	191	191	NA
-MElightyellow	1458	327	327	NA
-MEpurple	1255	312	NA	312
-MEtan	1378	285	285	NA
-Total	7159	1733	1128	605

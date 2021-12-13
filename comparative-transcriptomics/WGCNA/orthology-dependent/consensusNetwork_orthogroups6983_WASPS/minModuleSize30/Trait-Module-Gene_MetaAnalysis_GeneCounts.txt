@@ -1,0 +1,11 @@
+ME	Num.Genes.Sig.Module	Num.Genes.Sig.Module.Trait	R.Genes.Sig.Module.Trait	NR.Genes.Sig.Module.Trait
+MEblue	2039	486	486	NA
+MElightyellow	1909	458	458	NA
+MEmagenta	1699	280	NA	280
+MEmidnightblue	1849	384	384	NA
+MEpaleturquoise	1726	434	NA	434
+MEroyalblue	1074	409	NA	409
+MEsaddlebrown	1430	255	255	NA
+MEtan	1263	293	293	NA
+MEturquoise	1461	399	NA	399
+Total	14450	3398	1876	1522
