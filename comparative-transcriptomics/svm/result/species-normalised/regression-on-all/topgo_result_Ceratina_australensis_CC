@@ -1,0 +1,483 @@
+GO.ID	Term	Annotated	Significant	Expected	pvalue	species	goCategory
+GO:0031985	Golgi cisterna	13	8	2.01	0.018	Ceratina_australensis	CC
+GO:0000138	Golgi trans cisterna	5	4	0.77	0.031	Ceratina_australensis	CC
+GO:0005967	mitochondrial pyruvate dehydrogenase complex	5	4	0.77	0.031	Ceratina_australensis	CC
+GO:0045254	pyruvate dehydrogenase complex	5	4	0.77	0.031	Ceratina_australensis	CC
+GO:0005795	Golgi stack	25	11	3.87	0.098	Ceratina_australensis	CC
+GO:1990204	oxidoreductase complex	23	10	3.56	0.120	Ceratina_australensis	CC
+GO:0035060	brahma complex	7	4	1.08	0.126	Ceratina_australensis	CC
+GO:0005753	mitochondrial proton-transporting ATP synthase complex	5	3	0.77	0.164	Ceratina_australensis	CC
+GO:0016586	RSC-type complex	5	3	0.77	0.164	Ceratina_australensis	CC
+GO:0030175	filopodium	5	3	0.77	0.164	Ceratina_australensis	CC
+GO:0035032	phosphatidylinositol 3-kinase complex, class III	5	3	0.77	0.164	Ceratina_australensis	CC
+GO:0045259	proton-transporting ATP synthase complex	5	3	0.77	0.164	Ceratina_australensis	CC
+GO:0032589	neuron projection membrane	11	5	1.7	0.211	Ceratina_australensis	CC
+GO:0005604	basement membrane	6	3	0.93	0.256	Ceratina_australensis	CC
+GO:0016514	SWI/SNF complex	6	3	0.93	0.256	Ceratina_australensis	CC
+GO:0032039	integrator complex	9	4	1.39	0.271	Ceratina_australensis	CC
+GO:0031256	leading edge membrane	12	5	1.86	0.277	Ceratina_australensis	CC
+GO:0060293	germ plasm	13	5	2.01	0.347	Ceratina_australensis	CC
+GO:0042734	presynaptic membrane	7	3	1.08	0.354	Ceratina_australensis	CC
+GO:0005942	phosphatidylinositol 3-kinase complex	8	3	1.24	0.450	Ceratina_australensis	CC
+GO:0030426	growth cone	8	3	1.24	0.450	Ceratina_australensis	CC
+GO:0030427	site of polarized growth	8	3	1.24	0.450	Ceratina_australensis	CC
+GO:0045169	fusome	8	3	1.24	0.450	Ceratina_australensis	CC
+GO:0045171	intercellular bridge	8	3	1.24	0.450	Ceratina_australensis	CC
+GO:0045172	germline ring canal	8	3	1.24	0.450	Ceratina_australensis	CC
+GO:0000145	exocyst	5	2	0.77	0.473	Ceratina_australensis	CC
+GO:0000940	condensed chromosome outer kinetochore	5	2	0.77	0.473	Ceratina_australensis	CC
+GO:0035102	PRC1 complex	5	2	0.77	0.473	Ceratina_australensis	CC
+GO:0016324	apical plasma membrane	38	12	5.88	0.479	Ceratina_australensis	CC
+GO:0045495	pole plasm	15	5	2.32	0.486	Ceratina_australensis	CC
+GO:0070469	respiratory chain	15	5	2.32	0.486	Ceratina_australensis	CC
+GO:0031012	extracellular matrix	35	11	5.41	0.493	Ceratina_australensis	CC
+GO:0016459	myosin complex	12	4	1.86	0.509	Ceratina_australensis	CC
+GO:0043186	P granule	12	4	1.86	0.509	Ceratina_australensis	CC
+GO:0062023	collagen-containing extracellular matrix	12	4	1.86	0.509	Ceratina_australensis	CC
+GO:0030017	sarcomere	19	6	2.94	0.528	Ceratina_australensis	CC
+GO:0031261	DNA replication preinitiation complex	9	3	1.39	0.539	Ceratina_australensis	CC
+GO:0071162	CMG complex	9	3	1.39	0.539	Ceratina_australensis	CC
+GO:0015030	Cajal body	6	2	0.93	0.581	Ceratina_australensis	CC
+GO:0033178	proton-transporting two-sector ATPase complex, catalytic domain	6	2	0.93	0.581	Ceratina_australensis	CC
+GO:0070069	cytochrome complex	6	2	0.93	0.581	Ceratina_australensis	CC
+GO:0101031	chaperone complex	6	2	0.93	0.581	Ceratina_australensis	CC
+GO:0098858	actin-based cell projection	13	4	2.01	0.581	Ceratina_australensis	CC
+GO:0030016	myofibril	20	6	3.09	0.586	Ceratina_australensis	CC
+GO:0016469	proton-transporting two-sector ATPase complex	10	3	1.55	0.619	Ceratina_australensis	CC
+GO:0043292	contractile fiber	21	6	3.25	0.640	Ceratina_australensis	CC
+GO:0044449	contractile fiber part	21	6	3.25	0.640	Ceratina_australensis	CC
+GO:0000792	heterochromatin	14	4	2.17	0.647	Ceratina_australensis	CC
+GO:0005746	mitochondrial respiratory chain	14	4	2.17	0.647	Ceratina_australensis	CC
+GO:0098803	respiratory chain complex	14	4	2.17	0.647	Ceratina_australensis	CC
+GO:0098798	mitochondrial protein complex	53	15	8.2	0.661	Ceratina_australensis	CC
+GO:0031252	cell leading edge	25	7	3.87	0.662	Ceratina_australensis	CC
+GO:0042555	MCM complex	7	2	1.08	0.672	Ceratina_australensis	CC
+GO:1990391	DNA repair complex	7	2	1.08	0.672	Ceratina_australensis	CC
+GO:0000932	P-body	11	3	1.7	0.689	Ceratina_australensis	CC
+GO:0031519	PcG protein complex	11	3	1.7	0.689	Ceratina_australensis	CC
+GO:0043596	nuclear replication fork	11	3	1.7	0.689	Ceratina_australensis	CC
+GO:0070603	SWI/SNF superfamily-type complex	22	6	3.4	0.689	Ceratina_australensis	CC
+GO:0005657	replication fork	15	4	2.32	0.705	Ceratina_australensis	CC
+GO:0098800	inner mitochondrial membrane protein complex	26	7	4.02	0.706	Ceratina_australensis	CC
+GO:1904949	ATPase complex	26	7	4.02	0.706	Ceratina_australensis	CC
+GO:0031253	cell projection membrane	19	5	2.94	0.720	Ceratina_australensis	CC
+GO:0044421	extracellular region part	122	34	18.87	0.735	Ceratina_australensis	CC
+GO:0000152	nuclear ubiquitin ligase complex	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0005732	small nucleolar ribonucleoprotein complex	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0005747	mitochondrial respiratory chain complex I	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0005788	endoplasmic reticulum lumen	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0005925	focal adhesion	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0030964	NADH dehydrogenase complex	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0045271	respiratory chain complex I	8	2	1.24	0.746	Ceratina_australensis	CC
+GO:0150034	distal axon	28	7	4.33	0.783	Ceratina_australensis	CC
+GO:0005881	cytoplasmic microtubule	13	3	2.01	0.799	Ceratina_australensis	CC
+GO:0005924	cell-substrate adherens junction	13	3	2.01	0.799	Ceratina_australensis	CC
+GO:0030018	Z disc	13	3	2.01	0.799	Ceratina_australensis	CC
+GO:0031674	I band	13	3	2.01	0.799	Ceratina_australensis	CC
+GO:0005874	microtubule	58	15	8.97	0.800	Ceratina_australensis	CC
+GO:1902562	H4 histone acetyltransferase complex	17	4	2.63	0.800	Ceratina_australensis	CC
+GO:0000407	phagophore assembly site	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:0000777	condensed chromosome kinetochore	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:0008287	protein serine/threonine phosphatase complex	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:0017053	transcriptional repressor complex	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:0035327	transcriptionally active chromatin	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:0035869	ciliary transition zone	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:1903293	phosphatase complex	9	2	1.39	0.805	Ceratina_australensis	CC
+GO:0000124	SAGA complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0000796	condensin complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0000923	equatorial microtubule organizing center	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0005671	Ada2/Gcn5/Ada3 transcription activator complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0005685	U1 snRNP	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0005832	chaperonin-containing T-complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0017119	Golgi transport complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0030312	external encapsulating structure	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0030677	ribonuclease P complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0030688	preribosome, small subunit precursor	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0030897	HOPS complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0030991	intraciliary transport particle A	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0031312	extrinsic component of organelle membrane	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0034045	phagophore assembly site membrane	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0035324	female germline ring canal	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0035371	microtubule plus-end	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0070461	SAGA-type complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0070775	H3 histone acetyltransferase complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0070847	core mediator complex	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:1990752	microtubule end	5	1	0.77	0.833	Ceratina_australensis	CC
+GO:0098590	plasma membrane region	96	25	14.85	0.837	Ceratina_australensis	CC
+GO:0005802	trans-Golgi network	18	4	2.78	0.837	Ceratina_australensis	CC
+GO:0070382	exocytic vesicle	22	5	3.4	0.838	Ceratina_australensis	CC
+GO:0005876	spindle microtubule	14	3	2.17	0.841	Ceratina_australensis	CC
+GO:0030055	cell-substrate junction	14	3	2.17	0.841	Ceratina_australensis	CC
+GO:0034703	cation channel complex	14	3	2.17	0.841	Ceratina_australensis	CC
+GO:1902911	protein kinase complex	14	3	2.17	0.841	Ceratina_australensis	CC
+GO:0099503	secretory vesicle	30	7	4.64	0.843	Ceratina_australensis	CC
+GO:0030424	axon	64	16	9.9	0.848	Ceratina_australensis	CC
+GO:0045177	apical part of cell	64	16	9.9	0.848	Ceratina_australensis	CC
+GO:0005778	peroxisomal membrane	10	2	1.55	0.852	Ceratina_australensis	CC
+GO:0016607	nuclear speck	10	2	1.55	0.852	Ceratina_australensis	CC
+GO:0030139	endocytic vesicle	10	2	1.55	0.852	Ceratina_australensis	CC
+GO:0030141	secretory granule	10	2	1.55	0.852	Ceratina_australensis	CC
+GO:0031903	microbody membrane	10	2	1.55	0.852	Ceratina_australensis	CC
+GO:0051233	spindle midzone	10	2	1.55	0.852	Ceratina_australensis	CC
+GO:0005700	polytene chromosome	61	15	9.44	0.861	Ceratina_australensis	CC
+GO:0099080	supramolecular complex	87	22	13.46	0.865	Ceratina_australensis	CC
+GO:0099081	supramolecular polymer	87	22	13.46	0.865	Ceratina_australensis	CC
+GO:0099023	tethering complex	23	5	3.56	0.866	Ceratina_australensis	CC
+GO:0043025	neuronal cell body	31	7	4.8	0.868	Ceratina_australensis	CC
+GO:0009986	cell surface	19	4	2.94	0.869	Ceratina_australensis	CC
+GO:0019005	SCF ubiquitin ligase complex	19	4	2.94	0.869	Ceratina_australensis	CC
+GO:0032993	protein-DNA complex	19	4	2.94	0.869	Ceratina_australensis	CC
+GO:0033267	axon part	35	8	5.41	0.870	Ceratina_australensis	CC
+GO:0005576	extracellular region	170	45	26.3	0.872	Ceratina_australensis	CC
+GO:0009898	cytoplasmic side of plasma membrane	15	3	2.32	0.875	Ceratina_australensis	CC
+GO:0000930	gamma-tubulin complex	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0005682	U5 snRNP	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0005704	polytene chromosome band	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0005927	muscle tendon junction	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0016328	lateral plasma membrane	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0030672	synaptic vesicle membrane	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0031080	nuclear pore outer ring	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0044815	DNA packaging complex	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0071004	U2-type prespliceosome	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0071010	prespliceosome	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0097346	INO80-type complex	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0097729	9+2 motile cilium	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0098589	membrane region	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0098595	perivitelline space	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0099501	exocytic vesicle membrane	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:1990124	messenger ribonucleoprotein complex	6	1	0.93	0.883	Ceratina_australensis	CC
+GO:0032154	cleavage furrow	11	2	1.7	0.888	Ceratina_australensis	CC
+GO:0035267	NuA4 histone acetyltransferase complex	11	2	1.7	0.888	Ceratina_australensis	CC
+GO:0043189	H4/H2A histone acetyltransferase complex	11	2	1.7	0.888	Ceratina_australensis	CC
+GO:0044438	microbody part	11	2	1.7	0.888	Ceratina_australensis	CC
+GO:0044439	peroxisomal part	11	2	1.7	0.888	Ceratina_australensis	CC
+GO:0097730	non-motile cilium	11	2	1.7	0.888	Ceratina_australensis	CC
+GO:0000123	histone acetyltransferase complex	28	6	4.33	0.889	Ceratina_australensis	CC
+GO:0031594	neuromuscular junction	28	6	4.33	0.889	Ceratina_australensis	CC
+GO:0098793	presynapse	63	15	9.75	0.893	Ceratina_australensis	CC
+GO:0036064	ciliary basal body	20	4	3.09	0.894	Ceratina_australensis	CC
+GO:0099512	supramolecular fiber	86	21	13.3	0.901	Ceratina_australensis	CC
+GO:0005705	polytene chromosome interband	16	3	2.48	0.902	Ceratina_australensis	CC
+GO:0016323	basolateral plasma membrane	16	3	2.48	0.902	Ceratina_australensis	CC
+GO:0032040	small-subunit processome	16	3	2.48	0.902	Ceratina_australensis	CC
+GO:0032153	cell division site	16	3	2.48	0.902	Ceratina_australensis	CC
+GO:0032155	cell division site part	16	3	2.48	0.902	Ceratina_australensis	CC
+GO:0044297	cell body	33	7	5.1	0.908	Ceratina_australensis	CC
+GO:0044455	mitochondrial membrane part	41	9	6.34	0.908	Ceratina_australensis	CC
+GO:0000790	nuclear chromatin	49	11	7.58	0.911	Ceratina_australensis	CC
+GO:0005759	mitochondrial matrix	49	11	7.58	0.911	Ceratina_australensis	CC
+GO:0036464	cytoplasmic ribonucleoprotein granule	25	5	3.87	0.911	Ceratina_australensis	CC
+GO:0120114	Sm-like protein family complex	25	5	3.87	0.911	Ceratina_australensis	CC
+GO:0005615	extracellular space	91	22	14.08	0.915	Ceratina_australensis	CC
+GO:0008021	synaptic vesicle	21	4	3.25	0.916	Ceratina_australensis	CC
+GO:0043679	axon terminus	21	4	3.25	0.916	Ceratina_australensis	CC
+GO:0044306	neuron projection terminus	21	4	3.25	0.916	Ceratina_australensis	CC
+GO:0000779	condensed chromosome, centromeric region	12	2	1.86	0.916	Ceratina_australensis	CC
+GO:1902554	serine/threonine protein kinase complex	12	2	1.86	0.916	Ceratina_australensis	CC
+GO:0005669	transcription factor TFIID complex	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0005758	mitochondrial intermembrane space	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0005828	kinetochore microtubule	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0005902	microvillus	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0016327	apicolateral plasma membrane	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0031234	extrinsic component of cytoplasmic side of plasma membrane	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0031672	A band	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0048786	presynaptic active zone	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0097223	sperm part	7	1	1.08	0.918	Ceratina_australensis	CC
+GO:0019898	extrinsic component of membrane	34	7	5.26	0.923	Ceratina_australensis	CC
+GO:0035097	histone methyltransferase complex	17	3	2.63	0.924	Ceratina_australensis	CC
+GO:0043195	terminal bouton	17	3	2.63	0.924	Ceratina_australensis	CC
+GO:0044452	nucleolar part	17	3	2.63	0.924	Ceratina_australensis	CC
+GO:0098562	cytoplasmic side of membrane	17	3	2.63	0.924	Ceratina_australensis	CC
+GO:0098791	Golgi subcompartment	77	18	11.91	0.925	Ceratina_australensis	CC
+GO:0005912	adherens junction	26	5	4.02	0.928	Ceratina_australensis	CC
+GO:0035770	ribonucleoprotein granule	26	5	4.02	0.928	Ceratina_australensis	CC
+GO:0070161	anchoring junction	26	5	4.02	0.928	Ceratina_australensis	CC
+GO:0097060	synaptic membrane	22	4	3.4	0.933	Ceratina_australensis	CC
+GO:0005743	mitochondrial inner membrane	59	13	9.13	0.937	Ceratina_australensis	CC
+GO:0031461	cullin-RING ubiquitin ligase complex	35	7	5.41	0.937	Ceratina_australensis	CC
+GO:0000776	kinetochore	13	2	2.01	0.937	Ceratina_australensis	CC
+GO:0015935	small ribosomal subunit	13	2	2.01	0.937	Ceratina_australensis	CC
+GO:0044447	axoneme part	13	2	2.01	0.937	Ceratina_australensis	CC
+GO:0099513	polymeric cytoskeletal fiber	67	15	10.36	0.939	Ceratina_australensis	CC
+GO:0031248	protein acetyltransferase complex	31	6	4.8	0.939	Ceratina_australensis	CC
+GO:1902493	acetyltransferase complex	31	6	4.8	0.939	Ceratina_australensis	CC
+GO:0034702	ion channel complex	18	3	2.78	0.941	Ceratina_australensis	CC
+GO:1902495	transmembrane transporter complex	18	3	2.78	0.941	Ceratina_australensis	CC
+GO:0030990	intraciliary transport particle	8	1	1.24	0.943	Ceratina_australensis	CC
+GO:0031970	organelle envelope lumen	8	1	1.24	0.943	Ceratina_australensis	CC
+GO:0044431	Golgi apparatus part	83	19	12.84	0.944	Ceratina_australensis	CC
+GO:0005667	transcription factor complex	56	12	8.66	0.945	Ceratina_australensis	CC
+GO:0030133	transport vesicle	32	6	4.95	0.950	Ceratina_australensis	CC
+GO:0030658	transport vesicle membrane	14	2	2.17	0.953	Ceratina_australensis	CC
+GO:0031514	motile cilium	14	2	2.17	0.953	Ceratina_australensis	CC
+GO:0072686	mitotic spindle	14	2	2.17	0.953	Ceratina_australensis	CC
+GO:0000139	Golgi membrane	53	11	8.2	0.954	Ceratina_australensis	CC
+GO:0005769	early endosome	28	5	4.33	0.954	Ceratina_australensis	CC
+GO:0016604	nuclear body	24	4	3.71	0.959	Ceratina_australensis	CC
+GO:0030532	small nuclear ribonucleoprotein complex	24	4	3.71	0.959	Ceratina_australensis	CC
+GO:0005811	lipid droplet	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:0005871	kinesin complex	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:0016592	mediator complex	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:0022627	cytosolic small ribosomal subunit	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:0030686	90S preribosome	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:0031305	integral component of mitochondrial inner membrane	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:1902555	endoribonuclease complex	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:1905348	endonuclease complex	9	1	1.39	0.960	Ceratina_australensis	CC
+GO:0005643	nuclear pore	20	3	3.09	0.965	Ceratina_australensis	CC
+GO:0031227	intrinsic component of endoplasmic reticulum membrane	20	3	3.09	0.965	Ceratina_australensis	CC
+GO:1990351	transporter complex	20	3	3.09	0.965	Ceratina_australensis	CC
+GO:0000313	organellar ribosome	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0005761	mitochondrial ribosome	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0018995	host	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0033643	host cell part	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0033646	host intracellular part	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0033647	host intracellular organelle	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0033648	host intracellular membrane-bounded organelle	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0042025	host cell nucleus	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0043296	apical junction complex	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0043656	intracellular region of host	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0043657	host cell	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0044215	other organism	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0044216	other organism cell	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0044217	other organism part	15	2	2.32	0.965	Ceratina_australensis	CC
+GO:0005777	peroxisome	34	6	5.26	0.968	Ceratina_australensis	CC
+GO:0042579	microbody	34	6	5.26	0.968	Ceratina_australensis	CC
+GO:0015629	actin cytoskeleton	39	7	6.03	0.972	Ceratina_australensis	CC
+GO:0005858	axonemal dynein complex	10	1	1.55	0.972	Ceratina_australensis	CC
+GO:0031304	intrinsic component of mitochondrial inner membrane	10	1	1.55	0.972	Ceratina_australensis	CC
+GO:0045178	basal part of cell	10	1	1.55	0.972	Ceratina_australensis	CC
+GO:0000785	chromatin	92	20	14.23	0.973	Ceratina_australensis	CC
+GO:0005930	axoneme	21	3	3.25	0.974	Ceratina_australensis	CC
+GO:0034708	methyltransferase complex	21	3	3.25	0.974	Ceratina_australensis	CC
+GO:0019897	extrinsic component of plasma membrane	16	2	2.48	0.974	Ceratina_australensis	CC
+GO:0055037	recycling endosome	16	2	2.48	0.974	Ceratina_australensis	CC
+GO:0030684	preribosome	26	4	4.02	0.975	Ceratina_australensis	CC
+GO:0097014	ciliary plasm	22	3	3.4	0.980	Ceratina_australensis	CC
+GO:0019866	organelle inner membrane	66	13	10.21	0.980	Ceratina_australensis	CC
+GO:0048471	perinuclear region of cytoplasm	27	4	4.18	0.980	Ceratina_australensis	CC
+GO:0000315	organellar large ribosomal subunit	11	1	1.7	0.981	Ceratina_australensis	CC
+GO:0005762	mitochondrial large ribosomal subunit	11	1	1.7	0.981	Ceratina_australensis	CC
+GO:0032592	integral component of mitochondrial membrane	11	1	1.7	0.981	Ceratina_australensis	CC
+GO:0005813	centrosome	41	7	6.34	0.982	Ceratina_australensis	CC
+GO:0031966	mitochondrial membrane	80	16	12.38	0.985	Ceratina_australensis	CC
+GO:0005770	late endosome	33	5	5.1	0.986	Ceratina_australensis	CC
+GO:0090575	RNA polymerase II transcription factor complex	33	5	5.1	0.986	Ceratina_australensis	CC
+GO:0036477	somatodendritic compartment	51	9	7.89	0.986	Ceratina_australensis	CC
+GO:0005703	polytene chromosome puff	18	2	2.78	0.986	Ceratina_australensis	CC
+GO:0005741	mitochondrial outer membrane	18	2	2.78	0.986	Ceratina_australensis	CC
+GO:0016591	RNA polymerase II, holoenzyme	18	2	2.78	0.986	Ceratina_australensis	CC
+GO:0019867	outer membrane	18	2	2.78	0.986	Ceratina_australensis	CC
+GO:0031968	organelle outer membrane	18	2	2.78	0.986	Ceratina_australensis	CC
+GO:0030136	clathrin-coated vesicle	12	1	1.86	0.986	Ceratina_australensis	CC
+GO:0098573	intrinsic component of mitochondrial membrane	12	1	1.86	0.986	Ceratina_australensis	CC
+GO:0000922	spindle pole	19	2	2.94	0.990	Ceratina_australensis	CC
+GO:0005776	autophagosome	19	2	2.94	0.990	Ceratina_australensis	CC
+GO:0030176	integral component of endoplasmic reticulum membrane	19	2	2.94	0.990	Ceratina_australensis	CC
+GO:0097525	spliceosomal snRNP complex	19	2	2.94	0.990	Ceratina_australensis	CC
+GO:0005684	U2-type spliceosomal complex	13	1	2.01	0.990	Ceratina_australensis	CC
+GO:0008023	transcription elongation factor complex	13	1	2.01	0.990	Ceratina_australensis	CC
+GO:0022625	cytosolic large ribosomal subunit	13	1	2.01	0.990	Ceratina_australensis	CC
+GO:0031902	late endosome membrane	13	1	2.01	0.990	Ceratina_australensis	CC
+GO:0030054	cell junction	66	12	10.21	0.991	Ceratina_australensis	CC
+GO:0044456	synapse part	83	16	12.84	0.991	Ceratina_australensis	CC
+GO:0098552	side of membrane	25	3	3.87	0.991	Ceratina_australensis	CC
+GO:0044798	nuclear transcription factor complex	40	6	6.19	0.992	Ceratina_australensis	CC
+GO:0005814	centriole	20	2	3.09	0.993	Ceratina_australensis	CC
+GO:0030425	dendrite	31	4	4.8	0.993	Ceratina_australensis	CC
+GO:0097447	dendritic tree	31	4	4.8	0.993	Ceratina_australensis	CC
+GO:0034399	nuclear periphery	14	1	2.17	0.993	Ceratina_australensis	CC
+GO:0005740	mitochondrial envelope	85	16	13.15	0.994	Ceratina_australensis	CC
+GO:0000151	ubiquitin ligase complex	55	9	8.51	0.994	Ceratina_australensis	CC
+GO:0044429	mitochondrial part	127	26	19.65	0.995	Ceratina_australensis	CC
+GO:0000775	chromosome, centromeric region	27	3	4.18	0.995	Ceratina_australensis	CC
+GO:0000793	condensed chromosome	27	3	4.18	0.995	Ceratina_australensis	CC
+GO:0005911	cell-cell junction	27	3	4.18	0.995	Ceratina_australensis	CC
+GO:0030659	cytoplasmic vesicle membrane	27	3	4.18	0.995	Ceratina_australensis	CC
+GO:0031965	nuclear membrane	27	3	4.18	0.995	Ceratina_australensis	CC
+GO:0043235	receptor complex	27	3	4.18	0.995	Ceratina_australensis	CC
+GO:0044441	ciliary part	47	7	7.27	0.995	Ceratina_australensis	CC
+GO:0061695	transferase complex, transferring phosphorus-containing groups	47	7	7.27	0.995	Ceratina_australensis	CC
+GO:0044454	nuclear chromosome part	83	15	12.84	0.996	Ceratina_australensis	CC
+GO:0005730	nucleolus	79	14	12.22	0.996	Ceratina_australensis	CC
+GO:0044450	microtubule organizing center part	28	3	4.33	0.996	Ceratina_australensis	CC
+GO:0097458	neuron part	165	35	25.52	0.997	Ceratina_australensis	CC
+GO:0016028	rhabdomere	16	1	2.48	0.997	Ceratina_australensis	CC
+GO:0030286	dynein complex	16	1	2.48	0.997	Ceratina_australensis	CC
+GO:0045179	apical cortex	16	1	2.48	0.997	Ceratina_australensis	CC
+GO:0022626	cytosolic ribosome	23	2	3.56	0.997	Ceratina_australensis	CC
+GO:0010008	endosome membrane	29	3	4.49	0.997	Ceratina_australensis	CC
+GO:0098687	chromosomal region	59	9	9.13	0.997	Ceratina_australensis	CC
+GO:0005819	spindle	45	6	6.96	0.998	Ceratina_australensis	CC
+GO:0005635	nuclear envelope	50	7	7.73	0.998	Ceratina_australensis	CC
+GO:0015934	large ribosomal subunit	24	2	3.71	0.998	Ceratina_australensis	CC
+GO:0000228	nuclear chromosome	87	15	13.46	0.998	Ceratina_australensis	CC
+GO:0005887	integral component of plasma membrane	130	25	20.11	0.998	Ceratina_australensis	CC
+GO:0000428	DNA-directed RNA polymerase complex	25	2	3.87	0.998	Ceratina_australensis	CC
+GO:0030880	RNA polymerase complex	25	2	3.87	0.998	Ceratina_australensis	CC
+GO:0055029	nuclear DNA-directed RNA polymerase complex	25	2	3.87	0.998	Ceratina_australensis	CC
+GO:0012506	vesicle membrane	31	3	4.8	0.999	Ceratina_australensis	CC
+GO:0044391	ribosomal subunit	37	4	5.72	0.999	Ceratina_australensis	CC
+GO:0043005	neuron projection	115	21	17.79	0.999	Ceratina_australensis	CC
+GO:0044448	cell cortex part	32	3	4.95	0.999	Ceratina_australensis	CC
+GO:0099738	cell cortex region	19	1	2.94	0.999	Ceratina_australensis	CC
+GO:0005774	vacuolar membrane	26	2	4.02	0.999	Ceratina_australensis	CC
+GO:0031301	integral component of organelle membrane	26	2	4.02	0.999	Ceratina_australensis	CC
+GO:0005815	microtubule organizing center	72	11	11.14	0.999	Ceratina_australensis	CC
+GO:0044427	chromosomal part	158	31	24.44	0.999	Ceratina_australensis	CC
+GO:0032838	plasma membrane bounded cell projection cytoplasm	33	3	5.1	0.999	Ceratina_australensis	CC
+GO:0044440	endosomal part	33	3	5.1	0.999	Ceratina_australensis	CC
+GO:0031300	intrinsic component of organelle membrane	27	2	4.18	0.999	Ceratina_australensis	CC
+GO:0044437	vacuolar part	27	2	4.18	0.999	Ceratina_australensis	CC
+GO:0005768	endosome	87	14	13.46	0.999	Ceratina_australensis	CC
+GO:0045202	synapse	122	22	18.87	0.999	Ceratina_australensis	CC
+GO:0031226	intrinsic component of plasma membrane	135	25	20.88	0.999	Ceratina_australensis	CC
+GO:0005840	ribosome	40	4	6.19	0.999	Ceratina_australensis	CC
+GO:0005794	Golgi apparatus	115	20	17.79	0.999	Ceratina_australensis	CC
+GO:0005739	mitochondrion	225	47	34.81	0.999	Ceratina_australensis	CC
+GO:0005694	chromosome	198	40	30.63	1.000	Ceratina_australensis	CC
+GO:0044459	plasma membrane part	238	50	36.82	1.000	Ceratina_australensis	CC
+GO:0005856	cytoskeleton	200	40	30.94	1.000	Ceratina_australensis	CC
+GO:0044463	cell projection part	126	22	19.49	1.000	Ceratina_australensis	CC
+GO:0120038	plasma membrane bounded cell projection part	126	22	19.49	1.000	Ceratina_australensis	CC
+GO:0000323	lytic vacuole	37	3	5.72	1.000	Ceratina_australensis	CC
+GO:0005764	lysosome	37	3	5.72	1.000	Ceratina_australensis	CC
+GO:0015630	microtubule cytoskeleton	133	23	20.57	1.000	Ceratina_australensis	CC
+GO:0098794	postsynapse	24	1	3.71	1.000	Ceratina_australensis	CC
+GO:0044445	cytosolic part	44	4	6.81	1.000	Ceratina_australensis	CC
+GO:0098797	plasma membrane protein complex	44	4	6.81	1.000	Ceratina_australensis	CC
+GO:0005875	microtubule associated complex	32	2	4.95	1.000	Ceratina_australensis	CC
+GO:0044430	cytoskeletal part	160	29	24.75	1.000	Ceratina_australensis	CC
+GO:0044433	cytoplasmic vesicle part	61	7	9.44	1.000	Ceratina_australensis	CC
+GO:0031967	organelle envelope	135	23	20.88	1.000	Ceratina_australensis	CC
+GO:0031975	envelope	135	23	20.88	1.000	Ceratina_australensis	CC
+GO:0044451	nucleoplasm part	122	20	18.87	1.000	Ceratina_australensis	CC
+GO:0005773	vacuole	56	6	8.66	1.000	Ceratina_australensis	CC
+GO:0030135	coated vesicle	25	1	3.87	1.000	Ceratina_australensis	CC
+GO:0005938	cell cortex	53	5	8.2	1.000	Ceratina_australensis	CC
+GO:0071013	catalytic step 2 spliceosome	53	5	8.2	1.000	Ceratina_australensis	CC
+GO:1905368	peptidase complex	27	1	4.18	1.000	Ceratina_australensis	CC
+GO:0005929	cilium	75	9	11.6	1.000	Ceratina_australensis	CC
+GO:0031410	cytoplasmic vesicle	150	24	23.2	1.000	Ceratina_australensis	CC
+GO:0097708	intracellular vesicle	150	24	23.2	1.000	Ceratina_australensis	CC
+GO:0071011	precatalytic spliceosome	58	5	8.97	1.000	Ceratina_australensis	CC
+GO:0098805	whole membrane	103	13	15.93	1.000	Ceratina_australensis	CC
+GO:0031984	organelle subcompartment	141	21	21.81	1.000	Ceratina_australensis	CC
+GO:0005886	plasma membrane	405	85	62.65	1.000	Ceratina_australensis	CC
+GO:0031982	vesicle	167	26	25.83	1.000	Ceratina_australensis	CC
+GO:0099568	cytoplasmic region	83	8	12.84	1.000	Ceratina_australensis	CC
+GO:0098588	bounding membrane of organelle	148	21	22.9	1.000	Ceratina_australensis	CC
+GO:1990234	transferase complex	168	25	25.99	1.000	Ceratina_australensis	CC
+GO:0005681	spliceosomal complex	75	6	11.6	1.000	Ceratina_australensis	CC
+GO:0005654	nucleoplasm	208	33	32.18	1.000	Ceratina_australensis	CC
+GO:0071944	cell periphery	442	90	68.38	1.000	Ceratina_australensis	CC
+GO:0042995	cell projection	214	34	33.1	1.000	Ceratina_australensis	CC
+GO:0098796	membrane protein complex	136	17	21.04	1.000	Ceratina_australensis	CC
+GO:0042175	nuclear outer membrane-endoplasmic reticulum membrane network	79	6	12.22	1.000	Ceratina_australensis	CC
+GO:0120025	plasma membrane bounded cell projection	209	32	32.33	1.000	Ceratina_australensis	CC
+GO:0031090	organelle membrane	237	38	36.66	1.000	Ceratina_australensis	CC
+GO:0005789	endoplasmic reticulum membrane	78	5	12.07	1.000	Ceratina_australensis	CC
+GO:0098827	endoplasmic reticulum subcompartment	79	5	12.22	1.000	Ceratina_australensis	CC
+GO:0044432	endoplasmic reticulum part	96	7	14.85	1.000	Ceratina_australensis	CC
+GO:0005783	endoplasmic reticulum	151	15	23.36	1.000	Ceratina_australensis	CC
+GO:0043228	non-membrane-bounded organelle	523	98	80.91	1.000	Ceratina_australensis	CC
+GO:0043232	intracellular non-membrane-bounded organelle	523	98	80.91	1.000	Ceratina_australensis	CC
+GO:1990904	ribonucleoprotein complex	200	23	30.94	1.000	Ceratina_australensis	CC
+GO:0031981	nuclear lumen	329	50	50.9	1.000	Ceratina_australensis	CC
+GO:0005829	cytosol	330	50	51.05	1.000	Ceratina_australensis	CC
+GO:0016021	integral component of membrane	675	134	104.42	1.000	Ceratina_australensis	CC
+GO:0031224	intrinsic component of membrane	681	134	105.35	1.000	Ceratina_australensis	CC
+GO:0031974	membrane-enclosed lumen	394	63	60.95	1.000	Ceratina_australensis	CC
+GO:0043233	organelle lumen	394	63	60.95	1.000	Ceratina_australensis	CC
+GO:0070013	intracellular organelle lumen	394	63	60.95	1.000	Ceratina_australensis	CC
+GO:1902494	catalytic complex	336	49	51.98	1.000	Ceratina_australensis	CC
+GO:0012505	endomembrane system	384	57	59.4	1.000	Ceratina_australensis	CC
+GO:0044425	membrane part	820	162	126.85	1.000	Ceratina_australensis	CC
+GO:0005575	cellular_component	2691	504	416.29	1.000	Ceratina_australensis	CC
+GO:0005622	intracellular	2010	351	310.94	1.000	Ceratina_australensis	CC
+GO:0005623	cell	2292	412	354.56	1.000	Ceratina_australensis	CC
+GO:0005634	nucleus	948	170	146.65	1.000	Ceratina_australensis	CC
+GO:0005737	cytoplasm	1332	221	206.06	1.000	Ceratina_australensis	CC
+GO:0016020	membrane	987	191	152.69	1.000	Ceratina_australensis	CC
+GO:0032991	protein-containing complex	897	135	138.76	1.000	Ceratina_australensis	CC
+GO:0043226	organelle	1724	301	266.7	1.000	Ceratina_australensis	CC
+GO:0043227	membrane-bounded organelle	1527	267	236.22	1.000	Ceratina_australensis	CC
+GO:0043229	intracellular organelle	1694	300	262.06	1.000	Ceratina_australensis	CC
+GO:0043231	intracellular membrane-bounded organelle	1435	251	221.99	1.000	Ceratina_australensis	CC
+GO:0044422	organelle part	1015	159	157.02	1.000	Ceratina_australensis	CC
+GO:0044424	intracellular part	2010	351	310.94	1.000	Ceratina_australensis	CC
+GO:0044428	nuclear part	468	69	72.4	1.000	Ceratina_australensis	CC
+GO:0044444	cytoplasmic part	1002	159	155.01	1.000	Ceratina_australensis	CC
+GO:0044446	intracellular organelle part	992	156	153.46	1.000	Ceratina_australensis	CC
+GO:0044464	cell part	2292	412	354.56	1.000	Ceratina_australensis	CC
+GO:0000118	histone deacetylase complex	8	0	1.24	1.000	Ceratina_australensis	CC
+GO:0000502	proteasome complex	19	0	2.94	1.000	Ceratina_australensis	CC
+GO:0000791	euchromatin	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0000794	condensed nuclear chromosome	11	0	1.7	1.000	Ceratina_australensis	CC
+GO:0005637	nuclear inner membrane	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0005652	nuclear lamina	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0005686	U2 snRNP	8	0	1.24	1.000	Ceratina_australensis	CC
+GO:0005720	nuclear heterochromatin	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0005721	pericentric heterochromatin	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0005765	lysosomal membrane	16	0	2.48	1.000	Ceratina_australensis	CC
+GO:0005767	secondary lysosome	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0005791	rough endoplasmic reticulum	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0005793	endoplasmic reticulum-Golgi intermediate compartment	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0005798	Golgi-associated vesicle	17	0	2.63	1.000	Ceratina_australensis	CC
+GO:0005838	proteasome regulatory particle	13	0	2.01	1.000	Ceratina_australensis	CC
+GO:0005849	mRNA cleavage factor complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0005884	actin filament	9	0	1.39	1.000	Ceratina_australensis	CC
+GO:0005905	clathrin-coated pit	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0005918	septate junction	9	0	1.39	1.000	Ceratina_australensis	CC
+GO:0008278	cohesin complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0008540	proteasome regulatory particle, base subcomplex	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0008541	proteasome regulatory particle, lid subcomplex	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0009897	external side of plasma membrane	8	0	1.24	1.000	Ceratina_australensis	CC
+GO:0010494	cytoplasmic stress granule	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0012507	ER to Golgi transport vesicle membrane	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0014069	postsynaptic density	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0017101	aminoacyl-tRNA synthetase multienzyme complex	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0022624	proteasome accessory complex	14	0	2.17	1.000	Ceratina_australensis	CC
+GO:0030014	CCR4-NOT complex	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0030027	lamellipodium	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0030117	membrane coat	15	0	2.32	1.000	Ceratina_australensis	CC
+GO:0030118	clathrin coat	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0030120	vesicle coat	11	0	1.7	1.000	Ceratina_australensis	CC
+GO:0030132	clathrin coat of coated pit	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0030134	COPII-coated ER to Golgi transport vesicle	10	0	1.55	1.000	Ceratina_australensis	CC
+GO:0030173	integral component of Golgi membrane	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0030496	midbody	9	0	1.39	1.000	Ceratina_australensis	CC
+GO:0030660	Golgi-associated vesicle membrane	9	0	1.39	1.000	Ceratina_australensis	CC
+GO:0030662	coated vesicle membrane	13	0	2.01	1.000	Ceratina_australensis	CC
+GO:0030665	clathrin-coated vesicle membrane	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0030687	preribosome, large subunit precursor	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0030863	cortical cytoskeleton	10	0	1.55	1.000	Ceratina_australensis	CC
+GO:0030864	cortical actin cytoskeleton	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0030867	rough endoplasmic reticulum membrane	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0031010	ISWI-type complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0031201	SNARE complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0031228	intrinsic component of Golgi membrane	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0031430	M band	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0032279	asymmetric synapse	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0033176	proton-transporting V-type ATPase complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0035363	histone locus body	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0036126	sperm flagellum	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0044665	MLL1/2 complex	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0044754	autolysosome	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0045211	postsynaptic membrane	15	0	2.32	1.000	Ceratina_australensis	CC
+GO:0046540	U4/U6 x U5 tri-snRNP complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0048475	coated membrane	15	0	2.32	1.000	Ceratina_australensis	CC
+GO:0061174	type I terminal bouton	6	0	0.93	1.000	Ceratina_australensis	CC
+GO:0070160	tight junction	12	0	1.86	1.000	Ceratina_australensis	CC
+GO:0070971	endoplasmic reticulum exit site	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:0071014	post-mRNA release spliceosomal complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0071683	sensory dendrite	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0080008	Cul4-RING E3 ubiquitin ligase complex	8	0	1.24	1.000	Ceratina_australensis	CC
+GO:0090576	RNA polymerase III transcription factor complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0097526	spliceosomal tri-snRNP complex	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0098802	plasma membrane receptor complex	12	0	1.86	1.000	Ceratina_australensis	CC
+GO:0098852	lytic vacuole membrane	16	0	2.48	1.000	Ceratina_australensis	CC
+GO:0098984	neuron to neuron synapse	5	0	0.77	1.000	Ceratina_australensis	CC
+GO:0099572	postsynaptic specialization	8	0	1.24	1.000	Ceratina_australensis	CC
+GO:0120111	neuron projection cytoplasm	10	0	1.55	1.000	Ceratina_australensis	CC
+GO:1904115	axon cytoplasm	7	0	1.08	1.000	Ceratina_australensis	CC
+GO:1905369	endopeptidase complex	19	0	2.94	1.000	Ceratina_australensis	CC

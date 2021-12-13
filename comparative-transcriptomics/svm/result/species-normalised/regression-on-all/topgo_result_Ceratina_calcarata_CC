@@ -1,0 +1,476 @@
+GO.ID	Term	Annotated	Significant	Expected	pvalue	species	goCategory
+GO:0035060	brahma complex	5	4	0.59	0.048	Ceratina_calcarata	CC
+GO:1990204	oxidoreductase complex	22	10	2.59	0.176	Ceratina_calcarata	CC
+GO:0016514	SWI/SNF complex	5	3	0.59	0.218	Ceratina_calcarata	CC
+GO:0034704	calcium channel complex	5	3	0.59	0.218	Ceratina_calcarata	CC
+GO:0101031	chaperone complex	5	3	0.59	0.218	Ceratina_calcarata	CC
+GO:0034703	cation channel complex	11	5	1.3	0.302	Ceratina_calcarata	CC
+GO:0005604	basement membrane	9	4	1.06	0.363	Ceratina_calcarata	CC
+GO:1902495	transmembrane transporter complex	15	6	1.77	0.399	Ceratina_calcarata	CC
+GO:0031261	DNA replication preinitiation complex	7	3	0.83	0.442	Ceratina_calcarata	CC
+GO:0071162	CMG complex	7	3	0.83	0.442	Ceratina_calcarata	CC
+GO:0031985	Golgi cisterna	17	6	2	0.542	Ceratina_calcarata	CC
+GO:0070469	respiratory chain	17	6	2	0.542	Ceratina_calcarata	CC
+GO:1990351	transporter complex	17	6	2	0.542	Ceratina_calcarata	CC
+GO:0034702	ion channel complex	14	5	1.65	0.542	Ceratina_calcarata	CC
+GO:0045495	pole plasm	14	5	1.65	0.542	Ceratina_calcarata	CC
+GO:0005704	polytene chromosome band	8	3	0.94	0.545	Ceratina_calcarata	CC
+GO:0035267	NuA4 histone acetyltransferase complex	8	3	0.94	0.545	Ceratina_calcarata	CC
+GO:0043189	H4/H2A histone acetyltransferase complex	8	3	0.94	0.545	Ceratina_calcarata	CC
+GO:0043596	nuclear replication fork	8	3	0.94	0.545	Ceratina_calcarata	CC
+GO:0000138	Golgi trans cisterna	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0030175	filopodium	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0031463	Cul3-RING ubiquitin ligase complex	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0032580	Golgi cisterna membrane	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0035032	phosphatidylinositol 3-kinase complex, class III	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0042555	MCM complex	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0098595	perivitelline space	5	2	0.59	0.550	Ceratina_calcarata	CC
+GO:0062023	collagen-containing extracellular matrix	15	5	1.77	0.614	Ceratina_calcarata	CC
+GO:0005747	mitochondrial respiratory chain complex I	9	3	1.06	0.636	Ceratina_calcarata	CC
+GO:0030964	NADH dehydrogenase complex	9	3	1.06	0.636	Ceratina_calcarata	CC
+GO:0032589	neuron projection membrane	9	3	1.06	0.636	Ceratina_calcarata	CC
+GO:0042734	presynaptic membrane	9	3	1.06	0.636	Ceratina_calcarata	CC
+GO:0045271	respiratory chain complex I	9	3	1.06	0.636	Ceratina_calcarata	CC
+GO:0000137	Golgi cis cisterna	6	2	0.71	0.660	Ceratina_calcarata	CC
+GO:0000152	nuclear ubiquitin ligase complex	6	2	0.71	0.660	Ceratina_calcarata	CC
+GO:0000940	condensed chromosome outer kinetochore	6	2	0.71	0.660	Ceratina_calcarata	CC
+GO:0005788	endoplasmic reticulum lumen	6	2	0.71	0.660	Ceratina_calcarata	CC
+GO:0070069	cytochrome complex	6	2	0.71	0.660	Ceratina_calcarata	CC
+GO:0070603	SWI/SNF superfamily-type complex	19	6	2.24	0.667	Ceratina_calcarata	CC
+GO:0005746	mitochondrial respiratory chain	16	5	1.89	0.678	Ceratina_calcarata	CC
+GO:0098803	respiratory chain complex	16	5	1.89	0.678	Ceratina_calcarata	CC
+GO:0060293	germ plasm	13	4	1.53	0.693	Ceratina_calcarata	CC
+GO:0098800	inner mitochondrial membrane protein complex	23	7	2.71	0.710	Ceratina_calcarata	CC
+GO:0031256	leading edge membrane	10	3	1.18	0.714	Ceratina_calcarata	CC
+GO:0048786	presynaptic active zone	10	3	1.18	0.714	Ceratina_calcarata	CC
+GO:0000407	phagophore assembly site	7	2	0.83	0.747	Ceratina_calcarata	CC
+GO:0031305	integral component of mitochondrial inner membrane	7	2	0.83	0.747	Ceratina_calcarata	CC
+GO:0097730	non-motile cilium	7	2	0.83	0.747	Ceratina_calcarata	CC
+GO:0099738	cell cortex region	21	6	2.48	0.768	Ceratina_calcarata	CC
+GO:0005795	Golgi stack	31	9	3.65	0.774	Ceratina_calcarata	CC
+GO:0005657	replication fork	11	3	1.3	0.778	Ceratina_calcarata	CC
+GO:1904949	ATPase complex	25	7	2.95	0.796	Ceratina_calcarata	CC
+GO:0045179	apical cortex	15	4	1.77	0.804	Ceratina_calcarata	CC
+GO:0000777	condensed chromosome kinetochore	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0005758	mitochondrial intermembrane space	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0005778	peroxisomal membrane	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0005942	phosphatidylinositol 3-kinase complex	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0031304	intrinsic component of mitochondrial inner membrane	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0031903	microbody membrane	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0045171	intercellular bridge	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0045172	germline ring canal	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0051233	spindle midzone	8	2	0.94	0.814	Ceratina_calcarata	CC
+GO:0005615	extracellular space	87	26	10.25	0.819	Ceratina_calcarata	CC
+GO:0005876	spindle microtubule	12	3	1.41	0.830	Ceratina_calcarata	CC
+GO:0043186	P granule	12	3	1.41	0.830	Ceratina_calcarata	CC
+GO:0005705	polytene chromosome interband	16	4	1.89	0.846	Ceratina_calcarata	CC
+GO:0005930	axoneme	16	4	1.89	0.846	Ceratina_calcarata	CC
+GO:0097014	ciliary plasm	16	4	1.89	0.846	Ceratina_calcarata	CC
+GO:1902562	H4 histone acetyltransferase complex	16	4	1.89	0.846	Ceratina_calcarata	CC
+GO:0009986	cell surface	20	5	2.36	0.861	Ceratina_calcarata	CC
+GO:0030141	secretory granule	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0031970	organelle envelope lumen	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0032592	integral component of mitochondrial membrane	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0035327	transcriptionally active chromatin	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0044438	microbody part	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0044439	peroxisomal part	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0044447	axoneme part	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0045169	fusome	9	2	1.06	0.865	Ceratina_calcarata	CC
+GO:0032040	small-subunit processome	13	3	1.53	0.871	Ceratina_calcarata	CC
+GO:0072686	mitotic spindle	13	3	1.53	0.871	Ceratina_calcarata	CC
+GO:0000242	pericentriolar material	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0000923	equatorial microtubule organizing center	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0005682	U5 snRNP	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0016363	nuclear matrix	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0017119	Golgi transport complex	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0030014	CCR4-NOT complex	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0031080	nuclear pore outer ring	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0031225	anchored component of membrane	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0031312	extrinsic component of organelle membrane	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0031462	Cul2-RING ubiquitin ligase complex	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0043230	extracellular organelle	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0070062	extracellular exosome	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0098589	membrane region	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:1903561	extracellular vesicle	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:1990391	DNA repair complex	5	1	0.59	0.874	Ceratina_calcarata	CC
+GO:0009898	cytoplasmic side of plasma membrane	17	4	2	0.880	Ceratina_calcarata	CC
+GO:0000123	histone acetyltransferase complex	28	7	3.3	0.887	Ceratina_calcarata	CC
+GO:0044421	extracellular region part	118	34	13.91	0.901	Ceratina_calcarata	CC
+GO:0031519	PcG protein complex	10	2	1.18	0.903	Ceratina_calcarata	CC
+GO:0032039	integrator complex	10	2	1.18	0.903	Ceratina_calcarata	CC
+GO:0098573	intrinsic component of mitochondrial membrane	10	2	1.18	0.903	Ceratina_calcarata	CC
+GO:0044452	nucleolar part	14	3	1.65	0.903	Ceratina_calcarata	CC
+GO:0000930	gamma-tubulin complex	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0005637	nuclear inner membrane	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0005732	small nucleolar ribonucleoprotein complex	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0005793	endoplasmic reticulum-Golgi intermediate compartment	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0005828	kinetochore microtubule	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0005905	clathrin-coated pit	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0010369	chromocenter	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0016469	proton-transporting two-sector ATPase complex	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0030688	preribosome, small subunit precursor	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0031672	A band	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0035230	cytoneme	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0070775	H3 histone acetyltransferase complex	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0070847	core mediator complex	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0097346	INO80-type complex	6	1	0.71	0.917	Ceratina_calcarata	CC
+GO:0031012	extracellular matrix	37	9	4.36	0.924	Ceratina_calcarata	CC
+GO:0000792	heterochromatin	15	3	1.77	0.927	Ceratina_calcarata	CC
+GO:0005703	polytene chromosome puff	15	3	1.77	0.927	Ceratina_calcarata	CC
+GO:0030017	sarcomere	15	3	1.77	0.927	Ceratina_calcarata	CC
+GO:0032993	protein-DNA complex	15	3	1.77	0.927	Ceratina_calcarata	CC
+GO:0005643	nuclear pore	19	4	2.24	0.929	Ceratina_calcarata	CC
+GO:0000313	organellar ribosome	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0000776	kinetochore	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0000779	condensed chromosome, centromeric region	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0000932	P-body	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0005761	mitochondrial ribosome	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0015935	small ribosomal subunit	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0016459	myosin complex	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0022625	cytosolic large ribosomal subunit	11	2	1.3	0.930	Ceratina_calcarata	CC
+GO:0016324	apical plasma membrane	38	9	4.48	0.938	Ceratina_calcarata	CC
+GO:0031248	protein acetyltransferase complex	31	7	3.65	0.941	Ceratina_calcarata	CC
+GO:1902493	acetyltransferase complex	31	7	3.65	0.941	Ceratina_calcarata	CC
+GO:0000315	organellar large ribosomal subunit	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0005762	mitochondrial large ribosomal subunit	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0005858	axonemal dynein complex	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0008287	protein serine/threonine phosphatase complex	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0009925	basal plasma membrane	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0016327	apicolateral plasma membrane	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0022627	cytosolic small ribosomal subunit	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0030990	intraciliary transport particle	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0098862	cluster of actin-based cell projections	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:1903293	phosphatase complex	7	1	0.83	0.945	Ceratina_calcarata	CC
+GO:0044455	mitochondrial membrane part	35	8	4.13	0.945	Ceratina_calcarata	CC
+GO:0070382	exocytic vesicle	20	4	2.36	0.946	Ceratina_calcarata	CC
+GO:0098562	cytoplasmic side of membrane	20	4	2.36	0.946	Ceratina_calcarata	CC
+GO:0008023	transcription elongation factor complex	16	3	1.89	0.946	Ceratina_calcarata	CC
+GO:0030016	myofibril	16	3	1.89	0.946	Ceratina_calcarata	CC
+GO:0031253	cell projection membrane	16	3	1.89	0.946	Ceratina_calcarata	CC
+GO:0043292	contractile fiber	16	3	1.89	0.946	Ceratina_calcarata	CC
+GO:0044449	contractile fiber part	16	3	1.89	0.946	Ceratina_calcarata	CC
+GO:0098798	mitochondrial protein complex	46	11	5.42	0.948	Ceratina_calcarata	CC
+GO:0099503	secretory vesicle	28	6	3.3	0.950	Ceratina_calcarata	CC
+GO:0030286	dynein complex	12	2	1.41	0.950	Ceratina_calcarata	CC
+GO:0030863	cortical cytoskeleton	12	2	1.41	0.950	Ceratina_calcarata	CC
+GO:0098858	actin-based cell projection	17	3	2	0.960	Ceratina_calcarata	CC
+GO:0005669	transcription factor TFIID complex	8	1	0.94	0.964	Ceratina_calcarata	CC
+GO:0009897	external side of plasma membrane	8	1	0.94	0.964	Ceratina_calcarata	CC
+GO:0016607	nuclear speck	8	1	0.94	0.964	Ceratina_calcarata	CC
+GO:0030686	90S preribosome	8	1	0.94	0.964	Ceratina_calcarata	CC
+GO:0080008	Cul4-RING E3 ubiquitin ligase complex	8	1	0.94	0.964	Ceratina_calcarata	CC
+GO:0036064	ciliary basal body	13	2	1.53	0.965	Ceratina_calcarata	CC
+GO:0000922	spindle pole	22	4	2.59	0.969	Ceratina_calcarata	CC
+GO:0044448	cell cortex part	34	7	4.01	0.971	Ceratina_calcarata	CC
+GO:0008021	synaptic vesicle	18	3	2.12	0.971	Ceratina_calcarata	CC
+GO:0015934	large ribosomal subunit	18	3	2.12	0.971	Ceratina_calcarata	CC
+GO:0005776	autophagosome	14	2	1.65	0.975	Ceratina_calcarata	CC
+GO:0005811	lipid droplet	9	1	1.06	0.976	Ceratina_calcarata	CC
+GO:0005902	microvillus	9	1	1.06	0.976	Ceratina_calcarata	CC
+GO:0031234	extrinsic component of cytoplasmic side of plasma membrane	9	1	1.06	0.976	Ceratina_calcarata	CC
+GO:1902555	endoribonuclease complex	9	1	1.06	0.976	Ceratina_calcarata	CC
+GO:1905348	endonuclease complex	9	1	1.06	0.976	Ceratina_calcarata	CC
+GO:0031301	integral component of organelle membrane	23	4	2.71	0.977	Ceratina_calcarata	CC
+GO:0005743	mitochondrial inner membrane	50	11	5.89	0.977	Ceratina_calcarata	CC
+GO:0005802	trans-Golgi network	19	3	2.24	0.979	Ceratina_calcarata	CC
+GO:0022626	cytosolic ribosome	19	3	2.24	0.979	Ceratina_calcarata	CC
+GO:0000790	nuclear chromatin	43	9	5.07	0.979	Ceratina_calcarata	CC
+GO:0031965	nuclear membrane	28	5	3.3	0.982	Ceratina_calcarata	CC
+GO:0098552	side of membrane	28	5	3.3	0.982	Ceratina_calcarata	CC
+GO:0031227	intrinsic component of endoplasmic reticulum membrane	15	2	1.77	0.983	Ceratina_calcarata	CC
+GO:0035097	histone methyltransferase complex	15	2	1.77	0.983	Ceratina_calcarata	CC
+GO:0045178	basal part of cell	15	2	1.77	0.983	Ceratina_calcarata	CC
+GO:0055037	recycling endosome	15	2	1.77	0.983	Ceratina_calcarata	CC
+GO:0031300	intrinsic component of organelle membrane	24	4	2.83	0.983	Ceratina_calcarata	CC
+GO:0099023	tethering complex	24	4	2.83	0.983	Ceratina_calcarata	CC
+GO:0005576	extracellular region	155	41	18.27	0.983	Ceratina_calcarata	CC
+GO:0005684	U2-type spliceosomal complex	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0005881	cytoplasmic microtubule	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0030018	Z disc	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0030426	growth cone	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0030427	site of polarized growth	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0031514	motile cilium	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0031674	I band	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0032154	cleavage furrow	10	1	1.18	0.984	Ceratina_calcarata	CC
+GO:0030532	small nuclear ribonucleoprotein complex	20	3	2.36	0.985	Ceratina_calcarata	CC
+GO:0019866	organelle inner membrane	56	12	6.6	0.986	Ceratina_calcarata	CC
+GO:0005777	peroxisome	37	7	4.36	0.986	Ceratina_calcarata	CC
+GO:0042579	microbody	37	7	4.36	0.986	Ceratina_calcarata	CC
+GO:0044391	ribosomal subunit	29	5	3.42	0.986	Ceratina_calcarata	CC
+GO:0030684	preribosome	25	4	2.95	0.987	Ceratina_calcarata	CC
+GO:0032838	plasma membrane bounded cell projection cytoplasm	25	4	2.95	0.987	Ceratina_calcarata	CC
+GO:0032153	cell division site	16	2	1.89	0.988	Ceratina_calcarata	CC
+GO:0032155	cell division site part	16	2	1.89	0.988	Ceratina_calcarata	CC
+GO:0043296	apical junction complex	16	2	1.89	0.988	Ceratina_calcarata	CC
+GO:0120114	Sm-like protein family complex	21	3	2.48	0.989	Ceratina_calcarata	CC
+GO:0005700	polytene chromosome	61	13	7.19	0.989	Ceratina_calcarata	CC
+GO:0000794	condensed nuclear chromosome	11	1	1.3	0.990	Ceratina_calcarata	CC
+GO:0005871	kinesin complex	11	1	1.3	0.990	Ceratina_calcarata	CC
+GO:0005925	focal adhesion	11	1	1.3	0.990	Ceratina_calcarata	CC
+GO:0016592	mediator complex	11	1	1.3	0.990	Ceratina_calcarata	CC
+GO:0005819	spindle	46	9	5.42	0.990	Ceratina_calcarata	CC
+GO:0031252	cell leading edge	26	4	3.06	0.991	Ceratina_calcarata	CC
+GO:0043679	axon terminus	17	2	2	0.992	Ceratina_calcarata	CC
+GO:0044306	neuron projection terminus	17	2	2	0.992	Ceratina_calcarata	CC
+GO:0030133	transport vesicle	31	5	3.65	0.992	Ceratina_calcarata	CC
+GO:0005874	microtubule	55	11	6.48	0.992	Ceratina_calcarata	CC
+GO:0000793	condensed chromosome	27	4	3.18	0.993	Ceratina_calcarata	CC
+GO:0031594	neuromuscular junction	27	4	3.18	0.993	Ceratina_calcarata	CC
+GO:0097060	synaptic membrane	23	3	2.71	0.994	Ceratina_calcarata	CC
+GO:0005840	ribosome	32	5	3.77	0.994	Ceratina_calcarata	CC
+GO:0005924	cell-substrate adherens junction	13	1	1.53	0.995	Ceratina_calcarata	CC
+GO:0016028	rhabdomere	13	1	1.53	0.995	Ceratina_calcarata	CC
+GO:0030136	clathrin-coated vesicle	13	1	1.53	0.995	Ceratina_calcarata	CC
+GO:0031902	late endosome membrane	13	1	1.53	0.995	Ceratina_calcarata	CC
+GO:0045177	apical part of cell	65	13	7.66	0.996	Ceratina_calcarata	CC
+GO:0036464	cytoplasmic ribonucleoprotein granule	24	3	2.83	0.996	Ceratina_calcarata	CC
+GO:0005774	vacuolar membrane	19	2	2.24	0.996	Ceratina_calcarata	CC
+GO:0034708	methyltransferase complex	19	2	2.24	0.996	Ceratina_calcarata	CC
+GO:0044437	vacuolar part	19	2	2.24	0.996	Ceratina_calcarata	CC
+GO:0005635	nuclear envelope	46	8	5.42	0.996	Ceratina_calcarata	CC
+GO:0005911	cell-cell junction	29	4	3.42	0.996	Ceratina_calcarata	CC
+GO:0044454	nuclear chromosome part	70	14	8.25	0.997	Ceratina_calcarata	CC
+GO:0019897	extrinsic component of plasma membrane	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:0030055	cell-substrate junction	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:0030139	endocytic vesicle	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:0030176	integral component of endoplasmic reticulum membrane	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:0034399	nuclear periphery	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:0043195	terminal bouton	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:1902911	protein kinase complex	14	1	1.65	0.997	Ceratina_calcarata	CC
+GO:0035770	ribonucleoprotein granule	25	3	2.95	0.997	Ceratina_calcarata	CC
+GO:0031461	cullin-RING ubiquitin ligase complex	39	6	4.6	0.997	Ceratina_calcarata	CC
+GO:0044441	ciliary part	35	5	4.13	0.998	Ceratina_calcarata	CC
+GO:0150034	distal axon	26	3	3.06	0.998	Ceratina_calcarata	CC
+GO:0005769	early endosome	31	4	3.65	0.998	Ceratina_calcarata	CC
+GO:0033267	axon part	31	4	3.65	0.998	Ceratina_calcarata	CC
+GO:0099080	supramolecular complex	81	16	9.55	0.998	Ceratina_calcarata	CC
+GO:0005875	microtubule associated complex	27	3	3.18	0.999	Ceratina_calcarata	CC
+GO:0019898	extrinsic component of membrane	32	4	3.77	0.999	Ceratina_calcarata	CC
+GO:0098687	chromosomal region	58	10	6.84	0.999	Ceratina_calcarata	CC
+GO:0019005	SCF ubiquitin ligase complex	22	2	2.59	0.999	Ceratina_calcarata	CC
+GO:0018995	host	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0033643	host cell part	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0033646	host intracellular part	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0033647	host intracellular organelle	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0033648	host intracellular membrane-bounded organelle	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0042025	host cell nucleus	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0043656	intracellular region of host	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0043657	host cell	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0044215	other organism	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0044216	other organism cell	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0044217	other organism part	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0097525	spliceosomal snRNP complex	16	1	1.89	0.999	Ceratina_calcarata	CC
+GO:0000785	chromatin	86	17	10.14	0.999	Ceratina_calcarata	CC
+GO:0099513	polymeric cytoskeletal fiber	63	11	7.43	0.999	Ceratina_calcarata	CC
+GO:0005730	nucleolus	71	13	8.37	0.999	Ceratina_calcarata	CC
+GO:0043235	receptor complex	28	3	3.3	0.999	Ceratina_calcarata	CC
+GO:0000228	nuclear chromosome	79	15	9.31	0.999	Ceratina_calcarata	CC
+GO:0005770	late endosome	33	4	3.89	0.999	Ceratina_calcarata	CC
+GO:0048471	perinuclear region of cytoplasm	33	4	3.89	0.999	Ceratina_calcarata	CC
+GO:0000775	chromosome, centromeric region	23	2	2.71	0.999	Ceratina_calcarata	CC
+GO:0099081	supramolecular polymer	80	15	9.43	0.999	Ceratina_calcarata	CC
+GO:0015629	actin cytoskeleton	39	5	4.6	0.999	Ceratina_calcarata	CC
+GO:0031966	mitochondrial membrane	69	12	8.13	0.999	Ceratina_calcarata	CC
+GO:0000428	DNA-directed RNA polymerase complex	24	2	2.83	0.999	Ceratina_calcarata	CC
+GO:0030880	RNA polymerase complex	24	2	2.83	0.999	Ceratina_calcarata	CC
+GO:0055029	nuclear DNA-directed RNA polymerase complex	24	2	2.83	0.999	Ceratina_calcarata	CC
+GO:0098793	presynapse	57	9	6.72	0.999	Ceratina_calcarata	CC
+GO:0005773	vacuole	44	6	5.19	0.999	Ceratina_calcarata	CC
+GO:0016591	RNA polymerase II, holoenzyme	18	1	2.12	0.999	Ceratina_calcarata	CC
+GO:0030658	transport vesicle membrane	18	1	2.12	0.999	Ceratina_calcarata	CC
+GO:0010008	endosome membrane	30	3	3.54	0.999	Ceratina_calcarata	CC
+GO:0099512	supramolecular fiber	78	14	9.19	1.000	Ceratina_calcarata	CC
+GO:0005813	centrosome	49	7	5.78	1.000	Ceratina_calcarata	CC
+GO:0044445	cytosolic part	40	5	4.71	1.000	Ceratina_calcarata	CC
+GO:0098797	plasma membrane protein complex	40	5	4.71	1.000	Ceratina_calcarata	CC
+GO:0016604	nuclear body	19	1	2.24	1.000	Ceratina_calcarata	CC
+GO:0043025	neuronal cell body	36	4	4.24	1.000	Ceratina_calcarata	CC
+GO:0030424	axon	59	9	6.95	1.000	Ceratina_calcarata	CC
+GO:0000151	ubiquitin ligase complex	55	8	6.48	1.000	Ceratina_calcarata	CC
+GO:0005912	adherens junction	26	2	3.06	1.000	Ceratina_calcarata	CC
+GO:0070161	anchoring junction	26	2	3.06	1.000	Ceratina_calcarata	CC
+GO:0044440	endosomal part	37	4	4.36	1.000	Ceratina_calcarata	CC
+GO:0005759	mitochondrial matrix	47	6	5.54	1.000	Ceratina_calcarata	CC
+GO:0044450	microtubule organizing center part	27	2	3.18	1.000	Ceratina_calcarata	CC
+GO:0000323	lytic vacuole	33	3	3.89	1.000	Ceratina_calcarata	CC
+GO:0005764	lysosome	33	3	3.89	1.000	Ceratina_calcarata	CC
+GO:0016323	basolateral plasma membrane	21	1	2.48	1.000	Ceratina_calcarata	CC
+GO:0005740	mitochondrial envelope	75	12	8.84	1.000	Ceratina_calcarata	CC
+GO:0044297	cell body	39	4	4.6	1.000	Ceratina_calcarata	CC
+GO:0090575	RNA polymerase II transcription factor complex	34	3	4.01	1.000	Ceratina_calcarata	CC
+GO:0000139	Golgi membrane	59	8	6.95	1.000	Ceratina_calcarata	CC
+GO:0005667	transcription factor complex	59	8	6.95	1.000	Ceratina_calcarata	CC
+GO:0044431	Golgi apparatus part	93	16	10.96	1.000	Ceratina_calcarata	CC
+GO:0031226	intrinsic component of plasma membrane	125	24	14.73	1.000	Ceratina_calcarata	CC
+GO:0005929	cilium	60	8	7.07	1.000	Ceratina_calcarata	CC
+GO:0098791	Golgi subcompartment	86	14	10.14	1.000	Ceratina_calcarata	CC
+GO:0030425	dendrite	31	2	3.65	1.000	Ceratina_calcarata	CC
+GO:0097447	dendritic tree	31	2	3.65	1.000	Ceratina_calcarata	CC
+GO:0061695	transferase complex, transferring phosphorus-containing groups	48	5	5.66	1.000	Ceratina_calcarata	CC
+GO:0098590	plasma membrane region	93	15	10.96	1.000	Ceratina_calcarata	CC
+GO:0005887	integral component of plasma membrane	118	21	13.91	1.000	Ceratina_calcarata	CC
+GO:0005815	microtubule organizing center	69	9	8.13	1.000	Ceratina_calcarata	CC
+GO:0030659	cytoplasmic vesicle membrane	34	2	4.01	1.000	Ceratina_calcarata	CC
+GO:0044427	chromosomal part	146	27	17.21	1.000	Ceratina_calcarata	CC
+GO:0044798	nuclear transcription factor complex	42	3	4.95	1.000	Ceratina_calcarata	CC
+GO:0005938	cell cortex	68	8	8.01	1.000	Ceratina_calcarata	CC
+GO:0030054	cell junction	69	8	8.13	1.000	Ceratina_calcarata	CC
+GO:0031967	organelle envelope	121	20	14.26	1.000	Ceratina_calcarata	CC
+GO:0031975	envelope	121	20	14.26	1.000	Ceratina_calcarata	CC
+GO:0012506	vesicle membrane	37	2	4.36	1.000	Ceratina_calcarata	CC
+GO:0030135	coated vesicle	30	1	3.54	1.000	Ceratina_calcarata	CC
+GO:0036477	somatodendritic compartment	55	5	6.48	1.000	Ceratina_calcarata	CC
+GO:0044456	synapse part	76	9	8.96	1.000	Ceratina_calcarata	CC
+GO:0099568	cytoplasmic region	90	12	10.61	1.000	Ceratina_calcarata	CC
+GO:0015630	microtubule cytoskeleton	121	19	14.26	1.000	Ceratina_calcarata	CC
+GO:0005768	endosome	91	12	10.73	1.000	Ceratina_calcarata	CC
+GO:0044433	cytoplasmic vesicle part	73	8	8.6	1.000	Ceratina_calcarata	CC
+GO:0044429	mitochondrial part	115	17	13.55	1.000	Ceratina_calcarata	CC
+GO:0071011	precatalytic spliceosome	42	2	4.95	1.000	Ceratina_calcarata	CC
+GO:0044451	nucleoplasm part	118	17	13.91	1.000	Ceratina_calcarata	CC
+GO:0044430	cytoskeletal part	149	24	17.56	1.000	Ceratina_calcarata	CC
+GO:0043005	neuron projection	105	13	12.38	1.000	Ceratina_calcarata	CC
+GO:0005856	cytoskeleton	194	34	22.86	1.000	Ceratina_calcarata	CC
+GO:0005694	chromosome	188	32	22.16	1.000	Ceratina_calcarata	CC
+GO:0071013	catalytic step 2 spliceosome	42	1	4.95	1.000	Ceratina_calcarata	CC
+GO:0044463	cell projection part	109	13	12.85	1.000	Ceratina_calcarata	CC
+GO:0120038	plasma membrane bounded cell projection part	109	13	12.85	1.000	Ceratina_calcarata	CC
+GO:0097458	neuron part	153	23	18.03	1.000	Ceratina_calcarata	CC
+GO:0005794	Golgi apparatus	128	17	15.09	1.000	Ceratina_calcarata	CC
+GO:0045202	synapse	110	13	12.96	1.000	Ceratina_calcarata	CC
+GO:0005681	spliceosomal complex	59	3	6.95	1.000	Ceratina_calcarata	CC
+GO:0098796	membrane protein complex	121	15	14.26	1.000	Ceratina_calcarata	CC
+GO:0098805	whole membrane	98	10	11.55	1.000	Ceratina_calcarata	CC
+GO:0005739	mitochondrion	210	36	24.75	1.000	Ceratina_calcarata	CC
+GO:0044459	plasma membrane part	228	40	26.87	1.000	Ceratina_calcarata	CC
+GO:0042175	nuclear outer membrane-endoplasmic reticulum membrane network	64	3	7.54	1.000	Ceratina_calcarata	CC
+GO:0005654	nucleoplasm	196	30	23.1	1.000	Ceratina_calcarata	CC
+GO:1990234	transferase complex	160	21	18.86	1.000	Ceratina_calcarata	CC
+GO:0005789	endoplasmic reticulum membrane	62	2	7.31	1.000	Ceratina_calcarata	CC
+GO:0044432	endoplasmic reticulum part	77	4	9.08	1.000	Ceratina_calcarata	CC
+GO:0098827	endoplasmic reticulum subcompartment	64	2	7.54	1.000	Ceratina_calcarata	CC
+GO:0031410	cytoplasmic vesicle	161	20	18.98	1.000	Ceratina_calcarata	CC
+GO:0097708	intracellular vesicle	161	20	18.98	1.000	Ceratina_calcarata	CC
+GO:0031984	organelle subcompartment	134	14	15.79	1.000	Ceratina_calcarata	CC
+GO:0098588	bounding membrane of organelle	145	15	17.09	1.000	Ceratina_calcarata	CC
+GO:0031982	vesicle	182	22	21.45	1.000	Ceratina_calcarata	CC
+GO:0031090	organelle membrane	227	32	26.75	1.000	Ceratina_calcarata	CC
+GO:0120025	plasma membrane bounded cell projection	188	23	22.16	1.000	Ceratina_calcarata	CC
+GO:1990904	ribonucleoprotein complex	175	19	20.63	1.000	Ceratina_calcarata	CC
+GO:0031981	nuclear lumen	304	49	35.83	1.000	Ceratina_calcarata	CC
+GO:0042995	cell projection	194	23	22.86	1.000	Ceratina_calcarata	CC
+GO:0005783	endoplasmic reticulum	135	10	15.91	1.000	Ceratina_calcarata	CC
+GO:0031974	membrane-enclosed lumen	366	59	43.14	1.000	Ceratina_calcarata	CC
+GO:0043233	organelle lumen	366	59	43.14	1.000	Ceratina_calcarata	CC
+GO:0070013	intracellular organelle lumen	366	59	43.14	1.000	Ceratina_calcarata	CC
+GO:0005886	plasma membrane	392	65	46.2	1.000	Ceratina_calcarata	CC
+GO:1902494	catalytic complex	304	43	35.83	1.000	Ceratina_calcarata	CC
+GO:0005575	cellular_component	2516	390	296.54	1.000	Ceratina_calcarata	CC
+GO:0005622	intracellular	1879	273	221.46	1.000	Ceratina_calcarata	CC
+GO:0005623	cell	2139	319	252.1	1.000	Ceratina_calcarata	CC
+GO:0005634	nucleus	857	125	101.01	1.000	Ceratina_calcarata	CC
+GO:0005737	cytoplasm	1276	179	150.39	1.000	Ceratina_calcarata	CC
+GO:0005829	cytosol	307	40	36.18	1.000	Ceratina_calcarata	CC
+GO:0012505	endomembrane system	371	47	43.73	1.000	Ceratina_calcarata	CC
+GO:0016020	membrane	933	144	109.96	1.000	Ceratina_calcarata	CC
+GO:0016021	integral component of membrane	629	101	74.13	1.000	Ceratina_calcarata	CC
+GO:0031224	intrinsic component of membrane	639	104	75.31	1.000	Ceratina_calcarata	CC
+GO:0032991	protein-containing complex	810	115	95.47	1.000	Ceratina_calcarata	CC
+GO:0043226	organelle	1601	232	188.69	1.000	Ceratina_calcarata	CC
+GO:0043227	membrane-bounded organelle	1417	200	167.01	1.000	Ceratina_calcarata	CC
+GO:0043228	non-membrane-bounded organelle	487	82	57.4	1.000	Ceratina_calcarata	CC
+GO:0043229	intracellular organelle	1574	230	185.51	1.000	Ceratina_calcarata	CC
+GO:0043231	intracellular membrane-bounded organelle	1320	189	155.58	1.000	Ceratina_calcarata	CC
+GO:0043232	intracellular non-membrane-bounded organelle	487	82	57.4	1.000	Ceratina_calcarata	CC
+GO:0044422	organelle part	941	130	110.91	1.000	Ceratina_calcarata	CC
+GO:0044424	intracellular part	1879	273	221.46	1.000	Ceratina_calcarata	CC
+GO:0044425	membrane part	782	123	92.17	1.000	Ceratina_calcarata	CC
+GO:0044428	nuclear part	426	61	50.21	1.000	Ceratina_calcarata	CC
+GO:0044444	cytoplasmic part	960	129	113.15	1.000	Ceratina_calcarata	CC
+GO:0044446	intracellular organelle part	924	129	108.9	1.000	Ceratina_calcarata	CC
+GO:0044464	cell part	2139	319	252.1	1.000	Ceratina_calcarata	CC
+GO:0071944	cell periphery	441	69	51.98	1.000	Ceratina_calcarata	CC
+GO:0000118	histone deacetylase complex	8	0	0.94	1.000	Ceratina_calcarata	CC
+GO:0000124	SAGA complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0000502	proteasome complex	13	0	1.53	1.000	Ceratina_calcarata	CC
+GO:0000781	chromosome, telomeric region	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0000791	euchromatin	9	0	1.06	1.000	Ceratina_calcarata	CC
+GO:0005652	nuclear lamina	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0005671	Ada2/Gcn5/Ada3 transcription activator complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0005686	U2 snRNP	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0005720	nuclear heterochromatin	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0005721	pericentric heterochromatin	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0005741	mitochondrial outer membrane	15	0	1.77	1.000	Ceratina_calcarata	CC
+GO:0005765	lysosomal membrane	13	0	1.53	1.000	Ceratina_calcarata	CC
+GO:0005767	secondary lysosome	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0005771	multivesicular body	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0005791	rough endoplasmic reticulum	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0005798	Golgi-associated vesicle	21	0	2.48	1.000	Ceratina_calcarata	CC
+GO:0005814	centriole	16	0	1.89	1.000	Ceratina_calcarata	CC
+GO:0005838	proteasome regulatory particle	9	0	1.06	1.000	Ceratina_calcarata	CC
+GO:0005849	mRNA cleavage factor complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0005884	actin filament	8	0	0.94	1.000	Ceratina_calcarata	CC
+GO:0005903	brush border	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0005918	septate junction	10	0	1.18	1.000	Ceratina_calcarata	CC
+GO:0008305	integrin complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0008540	proteasome regulatory particle, base subcomplex	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0010494	cytoplasmic stress granule	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0012507	ER to Golgi transport vesicle membrane	8	0	0.94	1.000	Ceratina_calcarata	CC
+GO:0015030	Cajal body	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0016328	lateral plasma membrane	8	0	0.94	1.000	Ceratina_calcarata	CC
+GO:0017053	transcriptional repressor complex	10	0	1.18	1.000	Ceratina_calcarata	CC
+GO:0019012	virion	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0019028	viral capsid	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0019867	outer membrane	15	0	1.77	1.000	Ceratina_calcarata	CC
+GO:0022624	proteasome accessory complex	9	0	1.06	1.000	Ceratina_calcarata	CC
+GO:0030027	lamellipodium	9	0	1.06	1.000	Ceratina_calcarata	CC
+GO:0030117	membrane coat	16	0	1.89	1.000	Ceratina_calcarata	CC
+GO:0030118	clathrin coat	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0030119	AP-type membrane coat adaptor complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0030120	vesicle coat	14	0	1.65	1.000	Ceratina_calcarata	CC
+GO:0030125	clathrin vesicle coat	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0030127	COPII vesicle coat	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0030132	clathrin coat of coated pit	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0030134	COPII-coated ER to Golgi transport vesicle	13	0	1.53	1.000	Ceratina_calcarata	CC
+GO:0030173	integral component of Golgi membrane	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0030496	midbody	13	0	1.53	1.000	Ceratina_calcarata	CC
+GO:0030660	Golgi-associated vesicle membrane	14	0	1.65	1.000	Ceratina_calcarata	CC
+GO:0030662	coated vesicle membrane	19	0	2.24	1.000	Ceratina_calcarata	CC
+GO:0030665	clathrin-coated vesicle membrane	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0030672	synaptic vesicle membrane	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0030687	preribosome, large subunit precursor	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0030864	cortical actin cytoskeleton	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0030897	HOPS complex	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0031228	intrinsic component of Golgi membrane	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0031968	organelle outer membrane	15	0	1.77	1.000	Ceratina_calcarata	CC
+GO:0032806	carboxy-terminal domain protein kinase complex	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0033263	CORVET complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0035363	histone locus body	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0035869	ciliary transition zone	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0036452	ESCRT complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0042575	DNA polymerase complex	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0043204	perikaryon	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0044423	virion part	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0044754	autolysosome	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0044815	DNA packaging complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0045211	postsynaptic membrane	15	0	1.77	1.000	Ceratina_calcarata	CC
+GO:0045334	clathrin-coated endocytic vesicle	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0046540	U4/U6 x U5 tri-snRNP complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0048475	coated membrane	16	0	1.89	1.000	Ceratina_calcarata	CC
+GO:0070160	tight junction	13	0	1.53	1.000	Ceratina_calcarata	CC
+GO:0070461	SAGA-type complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0070822	Sin3-type complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0070971	endoplasmic reticulum exit site	8	0	0.94	1.000	Ceratina_calcarata	CC
+GO:0090568	nuclear transcriptional repressor complex	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0097526	spliceosomal tri-snRNP complex	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0098636	protein complex involved in cell adhesion	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:0098794	postsynapse	22	0	2.59	1.000	Ceratina_calcarata	CC
+GO:0098802	plasma membrane receptor complex	12	0	1.41	1.000	Ceratina_calcarata	CC
+GO:0098852	lytic vacuole membrane	13	0	1.53	1.000	Ceratina_calcarata	CC
+GO:0099501	exocytic vesicle membrane	7	0	0.83	1.000	Ceratina_calcarata	CC
+GO:0099572	postsynaptic specialization	6	0	0.71	1.000	Ceratina_calcarata	CC
+GO:0120111	neuron projection cytoplasm	8	0	0.94	1.000	Ceratina_calcarata	CC
+GO:1902554	serine/threonine protein kinase complex	11	0	1.3	1.000	Ceratina_calcarata	CC
+GO:1904115	axon cytoplasm	5	0	0.59	1.000	Ceratina_calcarata	CC
+GO:1905368	peptidase complex	20	0	2.36	1.000	Ceratina_calcarata	CC
+GO:1905369	endopeptidase complex	13	0	1.53	1.000	Ceratina_calcarata	CC

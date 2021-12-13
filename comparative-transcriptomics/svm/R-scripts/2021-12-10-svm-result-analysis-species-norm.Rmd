@@ -1,0 +1,1164 @@
+---
+title: "SVM result analysis"
+author: "Emeline Favreau"
+date: "2021-05-14"
+output: html_document
+---
+
+Copyright 2021 Emeline Favreau, University College London.
+
+Read count from reproductives and non-reproductives were input to SVM to classify samples based on the gene expression pattern. Six SVM models were run, with species normalisation, each with a different species as test data.
+
+Here we compare predictor genes between species: is there an overlap between species? among/between lineages?
+
+---
+# Objective of analysis
+
+## Analysis steps:
+- Obtaining data
+- Aim 1: describe overlap between SVM predictor genes
+- Aim 2: GO Terms associated with those predictor genes
+- Aim 3: GO Terms associated for each species
+- Aim 4: description
+
+
+
+```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
+# get libraries
+basic_libraries <- c("ggplot2",
+                     "tidyverse",
+                     "dplyr")
+
+for (lib in basic_libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                install.packages(lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+
+```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
+# list of predicted genes in C.aus
+# obtained by SVM 
+Ceratina_australensis_svm_gene <- read.table("../result/species-normalised/Ceratina_australensis_svm_predicted_gene_list_tidy",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+# list of predicted genes in C.cal
+Ceratina_calcarata_svm_gene <- read.table("../result/species-normalised/Ceratina_calcarata_svm_predicted_gene_list_tidy",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+# list of predicted genes in M.gen
+# obtained by SVM 
+Megalopta_genalis_svm_gene <- read.table("../result/species-normalised/Megalopta_genalis_svm_predicted_gene_list_tidy",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+# list of predicted genes in Pdom
+Polistes_dominula_svm_gene <- read.table("../result/species-normalised/Polistes_dominula_svm_predicted_gene_list_tidy",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+# list of predicted genes in LF
+# obtained by SVM 
+Liostenogaster_flavolineata_svm_gene <- read.table("../result/species-normalised/Liostenogaster_flavolineata_svm_predicted_gene_list_tidy",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+# list of predicted genes in Pcan
+Polistes_canadensis_svm_gene <- read.table("../result/species-normalised/Polistes_canadensis_svm_predicted_gene_list_tidy",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+################################################################################
+# list of predicted genes in DESEQ2 when the environment is 3718 genes
+# one column, gene-LOC106786498
+Polistes_canadensis_deg_gene <- read.table("../input/Polistes_canadensis_all_DEGs.txt",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+Polistes_dominula_deg_gene <- read.table("../input/Polistes_dominula_all_DEGs.txt",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+Ceratina_australensis_deg_gene <- read.table("../input/Ceratina_australensis_all_DEGs.txt",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+Ceratina_calcarata_deg_gene <- read.table("../input/Ceratina_calcarata_all_DEGs.txt",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+Liostenogaster_flavolineata_deg_gene <- read.table("../input/Liostenogaster_flavolineata_all_DEGs.txt",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+Megalopta_genalis_deg_gene <- read.table("../input/Megalopta_genalis_all_DEGs.txt",
+           quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+
+```
+
+## Aim 1: describe overlap between SVM predictor genes
+
+```{r aim 1, eval = TRUE, echo = FALSE, include = TRUE}
+# the groups that we are testing
+all_species <- c("Polistes_canadensis",
+          "Polistes_dominula",
+          "Liostenogaster_flavolineata",
+          "Ceratina_australensis",
+          "Ceratina_calcarata" ,
+          "Megalopta_genalis")
+
+wasp <- c("Polistes_canadensis",
+          "Polistes_dominula",
+          "Liostenogaster_flavolineata")
+
+bee <- c("Ceratina_australensis",
+          "Ceratina_calcarata" ,
+          "Megalopta_genalis")
+
+# add column names
+colnames(Ceratina_australensis_svm_gene) <- "predictor_gene"
+colnames(Polistes_dominula_svm_gene) <- "predictor_gene"
+colnames(Megalopta_genalis_svm_gene) <- "predictor_gene"
+colnames(Polistes_canadensis_svm_gene) <- "predictor_gene"
+colnames(Ceratina_calcarata_svm_gene) <- "predictor_gene"
+colnames(Liostenogaster_flavolineata_svm_gene) <- "predictor_gene"
+
+# add species column 
+Ceratina_australensis_svm_gene$species <- "Ceratina_australensis"
+Polistes_dominula_svm_gene$species <- "Polistes_dominula"
+Megalopta_genalis_svm_gene$species <- "Megalopta_genalis"
+Polistes_canadensis_svm_gene$species <- "Polistes_canadensis"
+Ceratina_calcarata_svm_gene$species <- "Ceratina_calcarata"
+Liostenogaster_flavolineata_svm_gene$species <- "Liostenogaster_flavolineata"
+
+# obtain vector of all genes
+all_predictor_genes_vec <- unique(c(Ceratina_australensis_svm_gene$predictor_gene,
+                     Polistes_dominula_svm_gene$predictor_gene,
+                     Megalopta_genalis_svm_gene$predictor_gene,
+                     Polistes_canadensis_svm_gene$predictor_gene,
+                     Ceratina_calcarata_svm_gene$predictor_gene,
+                     Liostenogaster_flavolineata_svm_gene$predictor_gene))
+
+
+# make a new table
+# predictor genes | Species 1 | Species 2 | Species 3 | 
+wide_df <- as.data.frame(matrix(NA, nrow = length(all_predictor_genes_vec ),
+                                ncol = 7))
+# name the columns
+colnames(wide_df) <- c("predictor_gene",
+                       all_species)
+
+# assign predictor genes
+wide_df$predictor_gene <- all_predictor_genes_vec
+
+# set all species column count to 0
+wide_df$Polistes_canadensis         <- 0
+wide_df$Polistes_dominula           <- 0
+wide_df$Liostenogaster_flavolineata <- 0
+wide_df$Ceratina_australensis       <- 0
+wide_df$Ceratina_calcarata          <- 0
+wide_df$Megalopta_genalis           <- 0
+
+
+# make a new table
+# columns: gene, species
+stacked_result <- rbind(Ceratina_australensis_svm_gene,
+                     Polistes_dominula_svm_gene,
+                     Megalopta_genalis_svm_gene,
+                     Polistes_canadensis_svm_gene,
+                     Ceratina_calcarata_svm_gene,
+                     Liostenogaster_flavolineata_svm_gene)
+
+
+
+for(i in all_predictor_genes_vec){
+  
+  # subset data for a given gene
+  this_subset <- stacked_result %>% filter(predictor_gene == i)
+  
+  # assign 1 if present in this species
+  if("Ceratina_australensis" %in% this_subset$species){
+    wide_df$Ceratina_australensis[wide_df$predictor_gene == i] <- 1
+  }
+  
+  if("Polistes_canadensis" %in% this_subset$species){
+    wide_df$Polistes_canadensis[wide_df$predictor_gene == i] <- 1
+  }
+  
+  if("Polistes_dominula" %in% this_subset$species){
+    wide_df$Polistes_dominula[wide_df$predictor_gene == i] <- 1
+  }
+  
+  if("Liostenogaster_flavolineata" %in% this_subset$species){
+    wide_df$Liostenogaster_flavolineata[wide_df$predictor_gene == i] <- 1
+  }
+  
+  if("Ceratina_calcarata" %in% this_subset$species){
+    wide_df$Ceratina_calcarata[wide_df$predictor_gene == i] <- 1
+  }
+  
+  if("Megalopta_genalis" %in% this_subset$species){
+    wide_df$Megalopta_genalis[wide_df$predictor_gene == i] <- 1
+  }
+}
+
+# add a column with count of species that have that gene
+wide_df$species_count <- wide_df %>%
+  dplyr::select(all_of(all_species)) %>%
+  rowSums()
+
+# list genes that are common to all: 127 genes
+#wide_df %>% filter(species_count == 6) %>%  nrow()
+common_predictor_genes <- wide_df %>% filter(species_count == 6) %>%
+  dplyr::select(predictor_gene)
+
+# save those genes to explore GO Terms and literature review
+write.table(x = common_predictor_genes,
+            file = "../result/species-normalised/127_common_predictor_genes",
+            quote = FALSE,
+            row.names = FALSE)
+  
+# import previous findings
+common_predictor_genes_125 <-
+  read.csv("../result/20-iterations/125_common_predictor_genes", sep="", stringsAsFactors = FALSE)
+
+# how different are they from the previous findings (not species-normalised)?
+sum(common_predictor_genes_125$predictor_gene %in% common_predictor_genes$predictor_gene)
+
+# 82 predictor genes are present in both analyses, whether the data are species-normalised or not
+# 45 are new to us!
+
+# list genes that are common to 5 species: 172 genes
+#wide_df %>% filter(species_count == 5) %>%  nrow()
+
+# list genes that are common to 4 species: 132 genes
+#wide_df %>% filter(species_count == 4) %>%  nrow()
+
+# list genes that are common to 3 species: 117 genes
+#wide_df %>% filter(species_count == 3) %>%  nrow()
+```
+
+There are 127 predictor genes that are common to all species.
+
+
+## Aim 2: GO Terms associated with those predictor genes
+
+```{r aim 2, eval = FALSE, echo = FALSE, include = FALSE}
+# obtain GO Terms associated with the predictor genes
+# all_predictor_genes_vec
+library("biomaRt")
+library("topGO")
+                     
+
+# vector of all categories available
+goCategory_vec <- c("BP", "MF", "CC")
+
+# loop over the categories
+for(gocat in goCategory_vec){
+
+      # set experiment details (species, GO Category)
+      this_goCategory  <- gocat
+      
+      # set data input
+      raw_results_file         <- "../input/Ceratina_australensis_3718_gene_orthogroups_list" 
+      raw_selectionGenes_file  <- "../result/species-normalised/127_common_predictor_genes"
+      raw_blast_results_file   <- "../../ortho-enrichment/resultOnScratch/Ceratina_australensis_filtered"
+      hash_table <- "../../ortho-enrichment/tmp/Ceratina_australensis_protein_gene_hash_table"
+      
+      
+      # import all orthogroups
+      # columns: orthogroup, gene name
+      raw_results <- read.delim(raw_results_file,
+                                stringsAsFactors = FALSE, header = FALSE)
+      
+      # import predictor genes
+      # one column with names of orthogroups
+      raw_selectionGenes <- read.delim(raw_selectionGenes_file,
+                                stringsAsFactors = FALSE, header = TRUE)
+      
+      
+      # blast results: each Drosophila Orthogroup has a match in similarity with a species' protein
+      raw_blast_results <- read.table(raw_blast_results_file,
+                                      stringsAsFactors = FALSE)
+      
+      # hash table: protein in column 1, gene in column 2
+      hash_df <- read.table(hash_table,
+                            stringsAsFactors = FALSE)
+      
+      # add column names 
+      colnames(raw_results) <- c("orthogroup", "gene")
+      colnames(raw_selectionGenes) <- "orthogroup"
+      colnames(raw_blast_results) <- c("qseqid", "sseqid", "pident", "length",
+                                       "mismatch", "gapopen", "qstart",
+                                       "qend", "sstart", "send", "evalue",
+                                       "bitscore")
+      
+      colnames(hash_df) <- c("qseqid", "gene")
+      
+      # add a colum for gene
+      raw_selectionGenes$gene <- raw_results$gene[match(raw_selectionGenes$orthogroup,
+                                                        raw_results$orthogroup)]
+      
+      # update blast query sequence id (to gene-LOCXXX, matching DESeq2 result table)
+      raw_blast_results$qseqid <- hash_df$gene[match(raw_blast_results$qseqid,
+                                                     hash_df$qseqid)]
+    
+      
+      # connect to the genes services
+      ensembl <- useEnsembl(biomart = "ensembl",
+                            dataset = "dmelanogaster_gene_ensembl")
+      
+      
+      
+      # list of droso genes transcript id
+      droso_gene_list <- raw_blast_results$sseqid
+      
+      # obtain GO terms for these genes (they match to our species)
+      gene2Go_raw <- getBM(attributes = c("flybase_translation_id", "go_id"), 
+                           filters     = "flybase_translation_id", 
+                           values      = droso_gene_list, 
+                           mart        = ensembl,
+                           useCache    = FALSE)
+      
+      # Remove the genes without GO terms
+      gene2Go_df <- subset(x = gene2Go_raw,
+                           subset = !go_id == "")
+      
+      # update the object to fit topgo
+      gene_to_go <- aggregate(go_id ~ flybase_translation_id,
+                              data = gene2Go_df,
+                              c)
+      # vector of GO identifiers
+      go_id <- gene_to_go$go_id
+      
+      # add names to the vector
+      gene2go <- setNames(go_id,
+                          gene_to_go$flybase_translation_id)
+      
+      ##### GO term enrichment 
+      
+      # aim to change species's protein names for drosophila names
+      # because the TopGO database does not contain non-model data
+      # there are NA because blasting droso against the species might have produced no hit
+      raw_results$droso_gene <- raw_blast_results$sseqid[match(raw_results$gene,
+                                                               raw_blast_results$qseqid)]
+      
+      raw_selectionGenes$droso_gene <- raw_blast_results$sseqid[match(raw_selectionGenes$gene,
+                                                                      raw_blast_results$qseqid)]
+      
+      
+      # remove NA. 
+      raw_results <- raw_results[!is.na(raw_results$droso_gene), ]
+      raw_selectionGenes <- raw_selectionGenes[!is.na(raw_selectionGenes$droso_gene), ]
+      
+      
+      ## make a vector with 0 or 1 values depending if a gene is predictor or not
+      # results: lists of predictor genes 
+      geneList <- rep(0, times = length(rownames(raw_results)))
+      
+      # name each value with the droso genes names
+      names(geneList) <- raw_results$droso_gene
+      
+      # selectionGenes: list of predictor genes  for selection
+      PredictorGenes <- raw_selectionGenes$droso_gene
+      
+      # for each gene that is the focus of the analysis, change the value 0 for 1
+      geneList[PredictorGenes] <- 1
+      
+      # change the class to factor
+      geneList <-  as.factor(geneList)
+      
+      ## Build the topGO object for biological process ontology
+      this_topGOdata <- new("topGOdata",
+                            ontology = this_goCategory,
+                            allGenes = geneList,
+                            geneSel  = PredictorGenes,
+                            nodeSize = 5,
+                            annot    = annFUN.gene2GO,
+                            gene2GO  = gene2go)
+      
+      # test for enrichment
+      # because we coded the genes 1 or 0 for Predictor gene presence or absence,
+      # Fisher test (gene count) is probably the best algorithm
+      # classic: each GO category is tested independently
+      this_topGOresult <- runTest(this_topGOdata,
+                                  algorithm = "classic",
+                                  statistic = "fisher")
+      
+      
+      
+      # create a result table
+      # GO Terms identified by fisher test
+      myTable <- GenTable(this_topGOdata,
+                          pvalue = this_topGOresult,
+                          topNodes = length(this_topGOdata@graph@nodes),
+                          numChar = 100)
+      
+      
+      # add columns to specify test details
+      myTable$species    <- "common to all"
+      myTable$goCategory <- this_goCategory
+      
+      # make a file name
+      this_file_name <- paste("../result/species-normalised/topgo_result",
+                              "common-to-all",
+                              this_goCategory,
+                              sep = "_")
+      # save table
+      write.table(x          = myTable,
+                  file       = this_file_name,
+                  quote      = FALSE,
+                  row.names  = FALSE,
+                  sep        = "\t")
+      
+    }   
+    
+    
+  
+
+
+```
+
+GO terms with smallest p-value are: 
+- BP: glial cell differentiation, pyruvate metabolic process, neuroblast fate determination, head segmentation, regulation of cell projection assembly, regulation of plasma membrane bounded cell projection assembly, gastrulation with mouth forming first, gastrulation involving germ band extension, stem cell fate determination, positive regulation of plasma membrane bounded cell projection assembly
+- MF: carboxypeptidase activity, integrin binding, transaminase activity, translation elongation factor activity, transferase activity transferring nitrogenous groups, chitin binding, electron transfer activity, oxidoreductase activity acting on the aldehyde or oxo group of donors, structural constituent of nuclear pore, phosphatidylserine binding
+- CC: mitochondrial pyruvate dehydrogenase complex, pyruvate dehydrogenase complex, DNA repair complex, cell-substrate adherens junction, endoplasmic reticulum lumen, focal adhesion, cell-substrate junction, oxidoreductase complex, cleavage furrow, exocyst
+
+```{r saving object for revigo figure, eval = TRUE, echo = FALSE, include = FALSE}
+# for the manuscript figure
+# creating two obejcts to be saved in RData
+# and used in revigo figure
+this_goCategory  <- "BP"
+      
+# set data input
+raw_results_file         <- "../input/Ceratina_australensis_3718_gene_orthogroups_list" 
+raw_selectionGenes_file  <- "../result/species-normalised/127_common_predictor_genes"
+raw_blast_results_file   <- "../../ortho-enrichment/resultOnScratch/Ceratina_australensis_filtered"
+hash_table <- "../../ortho-enrichment/tmp/Ceratina_australensis_protein_gene_hash_table"
+
+
+# import all orthogroups
+# columns: orthogroup, gene name
+raw_results <- read.delim(raw_results_file,
+                        stringsAsFactors = FALSE, header = FALSE)
+
+# import predictor genes
+# one column with names of orthogroups
+raw_selectionGenes <- read.delim(raw_selectionGenes_file,
+                        stringsAsFactors = FALSE, header = TRUE)
+
+
+# blast results: each Drosophila Orthogroup has a match in similarity with a species' protein
+raw_blast_results <- read.table(raw_blast_results_file,
+                              stringsAsFactors = FALSE)
+
+# hash table: protein in column 1, gene in column 2
+hash_df <- read.table(hash_table,
+                    stringsAsFactors = FALSE)
+
+# add column names 
+colnames(raw_results) <- c("orthogroup", "gene")
+colnames(raw_selectionGenes) <- "orthogroup"
+colnames(raw_blast_results) <- c("qseqid", "sseqid", "pident", "length",
+                               "mismatch", "gapopen", "qstart",
+                               "qend", "sstart", "send", "evalue",
+                               "bitscore")
+
+colnames(hash_df) <- c("qseqid", "gene")
+
+# add a colum for gene
+raw_selectionGenes$gene <- raw_results$gene[match(raw_selectionGenes$orthogroup,
+                                                raw_results$orthogroup)]
+
+# update blast query sequence id (to gene-LOCXXX, matching DESeq2 result table)
+raw_blast_results$qseqid <- hash_df$gene[match(raw_blast_results$qseqid,
+                                             hash_df$qseqid)]
+
+
+# connect to the genes services
+ensembl <- useEnsembl(biomart = "ensembl",
+                    dataset = "dmelanogaster_gene_ensembl")
+
+
+
+# list of droso genes transcript id
+droso_gene_list <- raw_blast_results$sseqid
+
+# obtain GO terms for these genes (they match to our species)
+gene2Go_raw <- getBM(attributes = c("flybase_translation_id", "go_id"), 
+                   filters     = "flybase_translation_id", 
+                   values      = droso_gene_list, 
+                   mart        = ensembl,
+                   useCache    = FALSE)
+
+# Remove the genes without GO terms
+gene2Go_df <- subset(x = gene2Go_raw,
+                   subset = !go_id == "")
+
+# update the object to fit topgo
+gene_to_go <- aggregate(go_id ~ flybase_translation_id,
+                      data = gene2Go_df,
+                      c)
+# vector of GO identifiers
+go_id <- gene_to_go$go_id
+
+# add names to the vector
+gene2go <- setNames(go_id,
+                  gene_to_go$flybase_translation_id)
+
+##### GO term enrichment 
+
+# aim to change species's protein names for drosophila names
+# because the TopGO database does not contain non-model data
+# there are NA because blasting droso against the species might have produced no hit
+raw_results$droso_gene <- raw_blast_results$sseqid[match(raw_results$gene,
+                                                       raw_blast_results$qseqid)]
+
+raw_selectionGenes$droso_gene <- raw_blast_results$sseqid[match(raw_selectionGenes$gene,
+                                                              raw_blast_results$qseqid)]
+
+
+# remove NA. 
+raw_results <- raw_results[!is.na(raw_results$droso_gene), ]
+raw_selectionGenes <- raw_selectionGenes[!is.na(raw_selectionGenes$droso_gene), ]
+
+ ## make a vector with 0 or 1 values depending if a gene is predictor or not
+# results: lists of predictor genes 
+geneList <- rep(0, times = length(rownames(raw_results)))
+
+# name each value with the droso genes names
+names(geneList) <- raw_results$droso_gene
+
+# selectionGenes: list of predictor genes  for selection
+PredictorGenes <- raw_selectionGenes$droso_gene
+
+# for each gene that is the focus of the analysis, change the value 0 for 1
+geneList[PredictorGenes] <- 1
+
+# change the class to factor
+geneList <-  as.factor(geneList)
+
+## Build the topGO object for biological process ontology
+this_topGOdata <- new("topGOdata",
+                      ontology = this_goCategory,
+                      allGenes = geneList,
+                      geneSel  = PredictorGenes,
+                      nodeSize = 5,
+                      annot    = annFUN.gene2GO,
+                      gene2GO  = gene2go)
+
+# test for enrichment
+# because we coded the genes 1 or 0 for Predictor gene presence or absence,
+# Fisher test (gene count) is probably the best algorithm
+# classic: each GO category is tested independently
+this_topGOresult <- runTest(this_topGOdata,
+                            algorithm = "classic",
+                            statistic = "fisher")
+
+
+
+# create a result table
+# GO Terms identified by fisher test
+myTable <- GenTable(this_topGOdata,
+                    pvalue = this_topGOresult,
+                    topNodes = length(this_topGOdata@graph@nodes),
+                    numChar = 100)
+
+
+# add columns to specify test details
+myTable$species    <- "common to all"
+myTable$goCategory <- this_goCategory
+
+#save objects for other script
+gene2go_for_revigo_fig <- gene2go
+raw_selectionGenes_for_revigo_fig <- raw_selectionGenes
+myTable_for_revigo_fig <- myTable
+PredictorGenes_for_revigo_fig <- PredictorGenes
+
+# save the object for the figure script
+saveRDS(gene2go_for_revigo_fig, "../input/species-normalised/gene2go_for_revigo_fig.rds")
+saveRDS(raw_selectionGenes_for_revigo_fig,
+        "../input/species-normalised/raw_selectionGenes_for_revigo_fig.rds")
+saveRDS(myTable_for_revigo_fig,
+        "../input/species-normalised/myTable_for_revigo_fig.rds")
+saveRDS(PredictorGenes_for_revigo_fig,
+        "../input/species-normalised/PredictorGenes_for_revigo_fig.rds")
+```
+
+## Aim 3: GO Terms associated for each species
+
+```{r aim 3, eval = TRUE, echo = FALSE, include = TRUE}
+# obtain GO Terms associated with the predictor genes
+# all_predictor_genes_vec
+library("biomaRt")
+library("topGO")
+                     
+
+# vector of all categories available
+goCategory_vec <- c("BP", "MF", "CC")
+
+# loop over the species
+for(myspecies in all_species){
+    # loop over the categories
+    for(gocat in goCategory_vec){
+      
+      # set the arguments
+      args <- c(myspecies, 
+                gocat)
+      
+      # set experiment details (species, GO Category)
+      this_species     <- args[1]
+      this_goCategory  <- args[2]
+
+      # set species data input
+      # set data input
+      raw_results_file         <- paste("../input/", this_species,
+                                        "_3718_gene_orthogroups_list", 
+                                        sep = "")
+      raw_selectionGenes_file  <- paste("../result/species-normalised/", this_species,
+                                        "_svm_predicted_gene_list_tidy", 
+                                        sep = "")
+      raw_blast_results_file   <- paste("../../ortho-enrichment/resultOnScratch/",
+                                        this_species,
+                                        "_filtered", sep = "")
+      hash_table <- paste("../../ortho-enrichment/tmp/", this_species,
+                          "_protein_gene_hash_table", sep = "")
+      
+      
+      # import all orthogroups
+      # columns: orthogroup, gene name
+      raw_results <- read.delim(raw_results_file,
+                                stringsAsFactors = FALSE, header = FALSE)
+      
+      # import predictor genes
+      # one column with names of orthogroups
+      raw_selectionGenes <- read.delim(raw_selectionGenes_file,
+                                stringsAsFactors = FALSE, header = FALSE)
+      
+      
+      # blast results: each Drosophila Orthogroup has a match in similarity with a species' protein
+      raw_blast_results <- read.table(raw_blast_results_file,
+                                      stringsAsFactors = FALSE)
+      
+      # hash table: protein in column 1, gene in column 2
+      hash_df <- read.table(hash_table,
+                            stringsAsFactors = FALSE)
+      
+      # add column names 
+      colnames(raw_results) <- c("orthogroup", "gene")
+      colnames(raw_selectionGenes) <- "orthogroup"
+      colnames(raw_blast_results) <- c("qseqid", "sseqid", "pident", "length",
+                                       "mismatch", "gapopen", "qstart",
+                                       "qend", "sstart", "send", "evalue",
+                                       "bitscore")
+      
+      colnames(hash_df) <- c("qseqid", "gene")
+      
+      # add a colum for gene
+      raw_selectionGenes$gene <- raw_results$gene[match(raw_selectionGenes$orthogroup,
+                                                        raw_results$orthogroup)]
+      
+      # update blast query sequence id (to gene-LOCXXX, matching DESeq2 result table)
+      raw_blast_results$qseqid <- hash_df$gene[match(raw_blast_results$qseqid,
+                                                     hash_df$qseqid)]
+    
+      
+      # connect to the genes services
+      ensembl <- useEnsembl(biomart = "ensembl",
+                            dataset = "dmelanogaster_gene_ensembl")
+      
+      
+      
+      # list of droso genes transcript id
+      droso_gene_list <- raw_blast_results$sseqid
+      
+      # obtain GO terms for these genes (they match to our species)
+      gene2Go_raw <- getBM(attributes = c("flybase_translation_id", "go_id"), 
+                           filters     = "flybase_translation_id", 
+                           values      = droso_gene_list, 
+                           mart        = ensembl,
+                           useCache    = FALSE)
+      
+      # Remove the genes without GO terms
+      gene2Go_df <- subset(x = gene2Go_raw,
+                           subset = !go_id == "")
+      
+      # update the object to fit topgo
+      gene_to_go <- aggregate(go_id ~ flybase_translation_id,
+                              data = gene2Go_df,
+                              c)
+      # vector of GO identifiers
+      go_id <- gene_to_go$go_id
+      
+      # add names to the vector
+      gene2go <- setNames(go_id,
+                          gene_to_go$flybase_translation_id)
+      
+      ##### GO term enrichment 
+      
+      # aim to change species's protein names for drosophila names
+      # because the TopGO database does not contain non-model data
+      # there are NA because blasting droso against the species might have produced no hit
+      raw_results$droso_gene <- raw_blast_results$sseqid[match(raw_results$gene,
+                                                               raw_blast_results$qseqid)]
+      
+      raw_selectionGenes$droso_gene <- raw_blast_results$sseqid[match(raw_selectionGenes$gene,
+                                                                      raw_blast_results$qseqid)]
+      
+      
+      # remove NA. 
+      raw_results <- raw_results[!is.na(raw_results$droso_gene), ]
+      raw_selectionGenes <- raw_selectionGenes[!is.na(raw_selectionGenes$droso_gene), ]
+      
+      
+      ## make a vector with 0 or 1 values depending if a gene is predictor or not
+      # results: lists of predictor genes 
+      geneList <- rep(0, times = length(rownames(raw_results)))
+      
+      # name each value with the droso genes names
+      names(geneList) <- raw_results$droso_gene
+      
+      # selectionGenes: list of predictor genes  for selection
+      PredictorGenes <- raw_selectionGenes$droso_gene
+      
+      # for each gene that is the focus of the analysis, change the value 0 for 1
+      geneList[PredictorGenes] <- 1
+      
+      # change the class to factor
+      geneList <-  as.factor(geneList)
+      
+      ## Build the topGO object for biological process ontology
+      this_topGOdata <- new("topGOdata",
+                            ontology = this_goCategory,
+                            allGenes = geneList,
+                            geneSel  = PredictorGenes,
+                            nodeSize = 5,
+                            annot    = annFUN.gene2GO,
+                            gene2GO  = gene2go)
+      
+      # test for enrichment
+      # because we coded the genes 1 or 0 for Predictor gene presence or absence,
+      # Fisher test (gene count) is probably the best algorithm
+      # classic: each GO category is tested independently
+      this_topGOresult <- runTest(this_topGOdata,
+                                  algorithm = "classic",
+                                  statistic = "fisher")
+      
+      
+      
+      # create a result table
+      # GO Terms identified by fisher test
+      myTable <- GenTable(this_topGOdata,
+                          pvalue = this_topGOresult,
+                          topNodes = length(this_topGOdata@graph@nodes),
+                          numChar = 100)
+      
+      
+      # add columns to specify test details
+      myTable$species    <- this_species
+      myTable$goCategory <- this_goCategory
+      
+      # make a file name
+      this_file_name <- paste("../result/species-normalised/topgo_result",
+                              this_species,
+                              this_goCategory,
+                              sep = "_")
+      # save table
+      write.table(x          = myTable,
+                  file       = this_file_name,
+                  quote      = FALSE,
+                  row.names  = FALSE,
+                  sep        = "\t")
+      
+    }   
+    
+    
+  
+}
+
+```
+
+```{r describe overlap, eval = TRUE, echo = FALSE, include = TRUE}
+# tables created by the previous chunk (svm+topgo)
+Ceratina_australensis_BP <- read.delim("../result/species-normalised/topgo_result_Ceratina_australensis_BP")
+Ceratina_australensis_MF <- read.delim("../result/species-normalised/topgo_result_Ceratina_australensis_MF")
+Ceratina_australensis_CC <- read.delim("../result/species-normalised/topgo_result_Ceratina_australensis_CC")
+
+Ceratina_calcarata_BP <- read.delim("../result/species-normalised/topgo_result_Ceratina_calcarata_BP")
+Ceratina_calcarata_MF <- read.delim("../result/species-normalised/topgo_result_Ceratina_calcarata_MF")
+Ceratina_calcarata_CC <- read.delim("../result/species-normalised/topgo_result_Ceratina_calcarata_CC")
+
+Megalopta_genalis_BP <- read.delim("../result/species-normalised/topgo_result_Megalopta_genalis_BP")
+Megalopta_genalis_MF <- read.delim("../result/species-normalised/topgo_result_Megalopta_genalis_MF")
+Megalopta_genalis_CC <- read.delim("../result/species-normalised/topgo_result_Megalopta_genalis_CC")
+
+Liostenogaster_flavolineata_BP <- read.delim("../result/species-normalised/topgo_result_Liostenogaster_flavolineata_BP")
+Liostenogaster_flavolineata_MF <- read.delim("../result/species-normalised/topgo_result_Liostenogaster_flavolineata_MF")
+Liostenogaster_flavolineata_CC <- read.delim("../result/species-normalised/topgo_result_Liostenogaster_flavolineata_CC")
+
+Polistes_canadensis_BP <- read.delim("../result/species-normalised/topgo_result_Polistes_canadensis_BP")
+Polistes_canadensis_MF <- read.delim("../result/species-normalised/topgo_result_Polistes_canadensis_MF")
+Polistes_canadensis_CC <- read.delim("../result/species-normalised/topgo_result_Polistes_canadensis_CC")
+
+Polistes_dominula_BP <- read.delim("../result/species-normalised/topgo_result_Polistes_dominula_BP")
+Polistes_dominula_MF <- read.delim("../result/species-normalised/topgo_result_Polistes_dominula_MF")
+Polistes_dominula_CC <- read.delim("../result/species-normalised/topgo_result_Polistes_dominula_CC")
+
+# make a common table
+GO_term_data <- rbind(Ceratina_australensis_BP,
+                      Ceratina_calcarata_BP,
+                      Liostenogaster_flavolineata_BP,
+                      Megalopta_genalis_BP,
+                      Polistes_canadensis_BP,
+                      Polistes_dominula_BP,
+                      Ceratina_australensis_CC,
+                      Ceratina_calcarata_CC,
+                      Liostenogaster_flavolineata_CC,
+                      Megalopta_genalis_CC,
+                      Polistes_canadensis_CC,
+                      Polistes_dominula_CC,
+                      Ceratina_australensis_MF,
+                      Ceratina_calcarata_MF,
+                      Liostenogaster_flavolineata_MF,
+                      Megalopta_genalis_MF,
+                      Polistes_canadensis_MF,
+                      Polistes_dominula_MF)
+
+# change to character class
+GO_term_data$GO.ID <- as.character(GO_term_data$GO.ID)
+GO_term_data$Term <- as.character(GO_term_data$Term)
+GO_term_data$species <- as.character(GO_term_data$species)
+GO_term_data$goCategory <- as.character(GO_term_data$goCategory)
+
+# save this table to go in the supplementary information
+write.table(x          = GO_term_data,
+                  file       = "../result/species-normalised/topgo_result_all_species_all_categories",
+                  quote      = FALSE,
+                  row.names  = FALSE,
+                  sep        = "\t")
+
+
+# make a summary table: we want to know which GO Terms are found in multiple species
+# new table: for each GO.ID in a row, add GO Term, Category, and a presence/absence for each species
+all_predictor_genes_df <- data.frame(unique(GO_term_data$GO.ID))
+
+# name the column
+colnames(all_predictor_genes_df) <- "GO.ID"
+all_predictor_genes_df$GO.ID <- as.character(all_predictor_genes_df$GO.ID)
+
+# set a new column for GO Term, goCategory
+all_predictor_genes_df$Term <- "term"
+all_predictor_genes_df$goCategory <- "category"
+all_predictor_genes_df$Ceratina_australensis <- 0
+all_predictor_genes_df$Ceratina_calcarata <- 0
+all_predictor_genes_df$Liostenogaster_flavolineata <- 0
+all_predictor_genes_df$Megalopta_genalis <- 0
+all_predictor_genes_df$Polistes_canadensis <- 0
+all_predictor_genes_df$Polistes_dominula <- 0
+
+# add the GO Terms associated with it
+for(i in 1:nrow(all_predictor_genes_df)){
+  # add the GO Terms associated with the GO ID
+  all_predictor_genes_df$Term[i] <- unique(GO_term_data$Term[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]])
+  
+  # add the goCategory associated with the GO ID
+  all_predictor_genes_df$goCategory[i] <- unique(GO_term_data$goCategory[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]])
+  
+  # add 1 if the species has this GO Term
+  if("Ceratina_australensis" %in% GO_term_data$species[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]] ){
+    all_predictor_genes_df$Ceratina_australensis[i] <- 1
+  }
+  
+  # add 1 if the species has this GO Term
+  if("Ceratina_calcarata" %in% GO_term_data$species[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]] ){
+    all_predictor_genes_df$Ceratina_calcarata[i] <- 1
+  }
+  
+  # add 1 if the species has this GO Term
+  if("Liostenogaster_flavolineata" %in% GO_term_data$species[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]] ){
+    all_predictor_genes_df$Liostenogaster_flavolineata[i] <- 1
+  }
+  
+  # add 1 if the species has this GO Term
+  if("Megalopta_genalis" %in% GO_term_data$species[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]] ){
+    all_predictor_genes_df$Megalopta_genalis[i] <- 1
+  }
+  
+  # add 1 if the species has this GO Term
+  if("Polistes_canadensis" %in% GO_term_data$species[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]] ){
+    all_predictor_genes_df$Polistes_canadensis[i] <- 1
+  }
+  
+  # add 1 if the species has this GO Term
+  if("Polistes_dominula" %in% GO_term_data$species[GO_term_data$GO.ID == all_predictor_genes_df$GO.ID[i]] ){
+    all_predictor_genes_df$Polistes_dominula[i] <- 1
+  }
+  
+  
+  
+}
+
+# check result
+head(all_predictor_genes_df)
+
+# add a column for the number of species in which this orthogroup is found
+all_predictor_genes_df$species_count <- rowSums(all_predictor_genes_df[, 4:9])
+
+
+# sort by descending species count
+all_predictor_genes_df <- all_predictor_genes_df[order(all_predictor_genes_df$species_count, decreasing = TRUE),]
+
+# save table
+write.table(x          = all_predictor_genes_df,
+            file       = "../result/species-normalised/topgo_summary_all_species_all_categories",
+            quote      = FALSE,
+            row.names  = FALSE,
+            sep        = "\t")
+      
+
+    
+    
+  
+
+
+
+```
+
+
+## Aim 4: GO Terms associated for each species - DEG input
+
+This section should go in DEG folder. This is a query to explore the GO Terms that are enriched in the differentially expressed genes that are statistically different based on DESeq2 results. Specifically, we ran DESEQ2 on the read counts of the 3718 orthogenes in each of the six species. We had previously ran this analysis, but with a slightly different input (in which the number of genes was higher because we took all possible genes available from the sequencing run). The output will put in the supplementary table file. Actually this was pointless bec
+
+```{r aim 4 DEG genes using relaxed filtering orthologs, eval = TRUE, echo = FALSE, include = TRUE}
+# obtain GO Terms associated with the DEG genes (the environment is 3718 orthogroups)
+# all_predictor_genes_vec
+library("biomaRt")
+library("topGO")
+                     
+
+# vector of all categories available
+goCategory_vec <- c("BP", "MF", "CC")
+
+# loop over the species
+for(myspecies in all_species){
+    # loop over the categories
+    for(gocat in goCategory_vec){
+      
+      # set the arguments
+      args <- c(myspecies, 
+                gocat)
+      
+      # set experiment details (species, GO Category)
+      this_species     <- args[1]
+      this_goCategory  <- args[2]
+
+      # set species data input
+      raw_results_file         <- paste("../input/", this_species,
+                                        "_3718_gene_orthogroups_list", 
+                                        sep = "")
+      raw_selectionGenes_file  <- paste("../input/", this_species,
+                                        "_all_DEGs.txt", 
+                                        sep = "")
+      raw_blast_results_file   <- paste("../../ortho-enrichment/resultOnScratch/",
+                                        this_species,
+                                        "_filtered", sep = "")
+      hash_table <- paste("../../ortho-enrichment/tmp/", this_species,
+                          "_protein_gene_hash_table", sep = "")
+      
+      
+      # import all orthogroups
+      # columns: orthogroup, gene name
+      raw_results <- read.delim(raw_results_file,
+                                stringsAsFactors = FALSE, header = FALSE)
+      
+      # import predictor genes
+      # one column with names of orthogroups
+      raw_selectionGenes <- read.table(raw_selectionGenes_file,quote="\"",
+           comment.char="", stringsAsFactors = FALSE)
+      
+      
+      # blast results: each Drosophila Orthogroup has a match in similarity with a species' protein
+      raw_blast_results <- read.table(raw_blast_results_file,
+                                      stringsAsFactors = FALSE)
+      
+      # hash table: protein in column 1, gene in column 2
+      hash_df <- read.table(hash_table,
+                            stringsAsFactors = FALSE)
+      
+      # add column names 
+      colnames(raw_results) <- c("orthogroup", "gene")
+      colnames(raw_selectionGenes) <- "gene"
+      colnames(raw_blast_results) <- c("qseqid", "sseqid", "pident", "length",
+                                       "mismatch", "gapopen", "qstart",
+                                       "qend", "sstart", "send", "evalue",
+                                       "bitscore")
+      
+      colnames(hash_df) <- c("qseqid", "gene")
+      
+      # add a colum for orthogroup
+      raw_selectionGenes$orthogroup <- raw_results$orthogroup[match(raw_selectionGenes$gene,
+                                                        raw_results$gene)]
+      
+      # update blast query sequence id (to gene-LOCXXX, matching DESeq2 result table)
+      raw_blast_results$qseqid <- hash_df$gene[match(raw_blast_results$qseqid,
+                                                     hash_df$qseqid)]
+    
+      
+      # connect to the genes services
+      ensembl <- useEnsembl(biomart = "ensembl",
+                            dataset = "dmelanogaster_gene_ensembl")
+      
+      
+      
+      # list of droso genes transcript id
+      droso_gene_list <- raw_blast_results$sseqid
+      
+      # obtain GO terms for these genes (they match to our species)
+      gene2Go_raw <- getBM(attributes = c("flybase_translation_id", "go_id"), 
+                           filters     = "flybase_translation_id", 
+                           values      = droso_gene_list, 
+                           mart        = ensembl,
+                           useCache    = FALSE)
+      
+      # Remove the genes without GO terms
+      gene2Go_df <- subset(x = gene2Go_raw,
+                           subset = !go_id == "")
+      
+      # update the object to fit topgo
+      gene_to_go <- aggregate(go_id ~ flybase_translation_id,
+                              data = gene2Go_df,
+                              c)
+      # vector of GO identifiers
+      go_id <- gene_to_go$go_id
+      
+      # add names to the vector
+      gene2go <- setNames(go_id,
+                          gene_to_go$flybase_translation_id)
+      
+      ##### GO term enrichment 
+      
+      # aim to change species's protein names for drosophila names
+      # because the TopGO database does not contain non-model data
+      # there are NA because blasting droso against the species might have produced no hit
+      raw_results$droso_gene <- raw_blast_results$sseqid[match(raw_results$gene,
+                                                               raw_blast_results$qseqid)]
+      
+      raw_selectionGenes$droso_gene <- raw_blast_results$sseqid[match(raw_selectionGenes$gene,
+                                                                      raw_blast_results$qseqid)]
+      
+      
+      # remove NA. 
+      raw_results <- raw_results[!is.na(raw_results$droso_gene), ]
+      raw_selectionGenes <- raw_selectionGenes[!is.na(raw_selectionGenes$droso_gene), ]
+      
+      
+      ## make a vector with 0 or 1 values depending if a gene is predictor or not
+      # results: lists of predictor genes 
+      geneList <- rep(0, times = nrow(raw_results))
+      
+      # name each value with the droso genes names
+      names(geneList) <- raw_results$droso_gene
+      
+      # selectionGenes: list of predictor genes  for selection
+      PredictorGenes <- raw_selectionGenes$droso_gene
+      
+      # for each gene that is the focus of the analysis, change the value 0 for 1
+      geneList[PredictorGenes] <- 1
+      
+      # change the class to factor
+      geneList <-  as.factor(geneList)
+      
+      ## Build the topGO object for biological process ontology
+      this_topGOdata <- new("topGOdata",
+                            ontology = this_goCategory,
+                            allGenes = geneList,
+                            geneSel  = PredictorGenes,
+                            nodeSize = 5,
+                            annot    = annFUN.gene2GO,
+                            gene2GO  = gene2go)
+      
+      # test for enrichment
+      # because we coded the genes 1 or 0 for Predictor gene presence or absence,
+      # Fisher test (gene count) is probably the best algorithm
+      # classic: each GO category is tested independently
+      this_topGOresult <- runTest(this_topGOdata,
+                                  algorithm = "classic",
+                                  statistic = "fisher")
+      
+      
+      
+      # create a result table
+      # GO Terms identified by fisher test
+      myTable <- GenTable(this_topGOdata,
+                          pvalue = this_topGOresult,
+                          topNodes = length(this_topGOdata@graph@nodes),
+                          numChar = 100)
+      
+      
+      # add columns to specify test details
+      myTable$species    <- this_species
+      myTable$goCategory <- this_goCategory
+      
+      # make a file name
+      this_file_name <- paste("../result/DEG-on-relaxed-orthologs/topgo_result",
+                              this_species,
+                              this_goCategory,
+                              sep = "_")
+      # save table
+      write.table(x          = myTable,
+                  file       = this_file_name,
+                  quote      = FALSE,
+                  row.names  = FALSE,
+                  sep        = "\t")
+      
+    }   
+    
+    
+  
+}
+
+```
+
+
+Conclusion
+
+```{r record versions of session, eval = TRUE, echo = FALSE, include = FALSE}
+# record versions of R and packages here
+sessionInfo()
+# R version 3.6.3 (2020-02-29)
+# Platform: x86_64-apple-darwin15.6.0 (64-bit)
+# Running under: macOS Catalina 10.15.4
+# 
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+# 
+# locale:
+# [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.4     readr_1.3.1    
+# [6] tidyr_1.0.3     tibble_3.0.1    tidyverse_1.3.0 ggplot2_3.3.0  
+# loaded via a namespace (and not attached):
+#  [1] Rcpp_1.0.4.6     cellranger_1.1.0 pillar_1.4.4     compiler_3.6.3   dbplyr_1.4.3    
+#  [6] tools_3.6.3      lubridate_1.7.8  jsonlite_1.6.1   lifecycle_0.2.0  gtable_0.3.0    
+# [11] nlme_3.1-147     lattice_0.20-41  pkgconfig_2.0.3  rlang_0.4.6      reprex_0.3.0    
+# [16] cli_2.0.2        DBI_1.1.0        rstudioapi_0.11  yaml_2.2.1       haven_2.2.0     
+# [21] xfun_0.13        xml2_1.3.2       withr_2.2.0      httr_1.4.1       knitr_1.28      
+# [26] fs_1.4.1         generics_0.0.2   vctrs_0.3.0      hms_0.5.3        grid_3.6.3      
+# [31] tidyselect_1.1.0 glue_1.4.1       R6_2.4.1         fansi_0.4.1      readxl_1.3.1    
+# [36] modelr_0.1.7     magrittr_1.5     scales_1.1.1     backports_1.1.7  ellipsis_0.3.0  
+# [41] rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1 stringi_1.4.6    munsell_0.5.0   
+# [46] broom_0.5.6      crayon_1.3.4 
+```
