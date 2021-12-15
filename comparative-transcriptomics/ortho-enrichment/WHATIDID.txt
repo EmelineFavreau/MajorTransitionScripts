@@ -12,6 +12,7 @@
 # Aim 6 : Obtain gene annotation file for GO Slim (GO Slimmer, WGCNA genes as focus loci)
 # Aim 7: Overrepresentation test for GO Slim (PANTHER, DEG genes as focus loci)
 # Aim 8: Overrepresentation test for GO Slim (PANTHER, WGCNA genes as focus loci)
+# Aim 9: Run GO Term enrichment for DEG consensus
 
 ###############################################################################
 # Obtaining data
@@ -330,6 +331,39 @@ sed 1,12d resultOnScratch/WGCNA-Liostenogaster_flavolineata_PANTHER-GOSlim-BP-ov
 # analysis of results 
 2021-05-11-analysis-GOSlimTerms-WGCNA-PANTHER.Rmd
 resultOnScratch/2021-05-11-WGCNA-PANTHER-GOSlim_BP-result-overview
+
+
+############################
+# Obtain list of Apis protein names and orthogroups
+# make a list of the relaxed single-orthologous genes (n = 3718)
+cut -d " " -f 1 /lustre/home/ucfaeef/projects/MajorTransitionScripts/comparative-transcriptomics/orthology-analysis/2021-04-23-relaxed-filtered-orthogroup-list | tail -n+2 > tmp/orthogroups-list
+
+
+# select only Apis 3,718 orthogroups (proteins)
+cut -f 1,2 /lustre/scratch/scratch/ucfaeef/ortho-enrichment/input/Orthogroups.tsv | grep -f tmp/orthogroups-list > tmp/Apis_proteins_orthogroups_raw
+
+# tidy in R
+Rscript scripts/tidy-apis-orthogroups-protein-names.R
+
+
+
+##############################################################
+# Aim 9: GO Term enrichment from Consensus DEGs
+
+# Katie ran DESeq2 from a consensus input of all six species
+# as a result, these are the orthogroups that are consistently up/downregulated by caste
+cd inputOnScratch
+ln -s ~/projects/MajorTransitionScripts/comparative-transcriptomics/dge-DESeq2/orthology-dependent/orthogroups3718_all6spp_together/all_DEGs.txt .
+
+# obtain a table of Caus genes and OG (for input to following R script)
+grep -f inputOnScratch/all_DEGs.txt inputOnScratch/Orthogroups.tsv | cut -f 1,3 | sed "s/,.*//g" > resultOnScratch/all_DEGs_Caus_genes
+
+
+# run TopGo on this list
+Rscript scripts/2021-12-14-go-terms-enrichment-from-consensus-degs.R
+
+
+
 
 ##############################################################
 # DRAFT

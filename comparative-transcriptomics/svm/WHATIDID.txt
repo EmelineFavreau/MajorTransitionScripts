@@ -236,6 +236,37 @@ FBgn0261434
 overrepresentation-test-TF-in-predictor-genes.R
 
 
+### esearching Apis definitions of svm-wasp-only and svm-bee-only predictor genes
+# find bee/wasp predictor genes in OrthoFinder result for Apis protein name
+grep -f svm/result/regression-on-wasp-orthologs/20_common_wasp_predictor_genes orthology-analysis/result/WaspsDrosoApis/Orthogroups/Orthogroups.tsv | cut -f 2 | sed "s/, /\n/g" | sort | sed '/^[[:space:]]*$/d' > svm/result/Apis_mellifera_wasp_predictor_protein_list
+
+grep -f svm/result/regression-on-bee-orthologs/16_common_bee_predictor_genes orthology-analysis/result/BeesDrosoApis/Orthogroups/Orthogroups.tsv | cut -f 2 | sed "s/, /\n/g" | sort | sed '/^[[:space:]]*$/d' > svm/result/Apis_mellifera_bee_predictor_protein_list
+
+# obtain protein sequences
+seqtk subseq orthology-analysis/inputOnScratch/Apis_mellifera-short-name.faa svm/result/Apis_mellifera_wasp_predictor_protein_list > svm/result/Apis_mellifera_wasp_predictor_genes.faa
+
+seqtk subseq orthology-analysis/inputOnScratch/Apis_mellifera-short-name.faa svm/result/Apis_mellifera_bee_predictor_protein_list > svm/result/Apis_mellifera_bee_predictor_genes.faa
+
+# run a blast search
+svm/scripts/blast-wasp-predictor-genes.sh # 9695223
+svm/scripts/blast-bee-predictor-genes.sh # 9695224
+
+# tool is not responsive on Myriad
+svm/result/Apis_mellifera_wasp_predictor_gene
+svm/result/Apis_mellifera_bee_predictor_gene
+
+
+# Using ncbi website, I obtained protein definitions for those sets
+# save these list for supplementary info
+
+###########################
+# plot the SVM results
+# scripts from svm/R-scripts
+2021-12-15-127-svn-upset-figure.R # makes the upset plot for the manuscript. 
+2021-12-15-svm-heatmap-for-manuscript.R # makes the heatmap for the manuscript
+
+2021-12-09-svm-result-exploration.Rmd # makes figures for supplementary
+2021-12-09-overlap-svm-degs-wgcna.Rnd # makes upset plots for understanding data, but not for the MS
 
 
 

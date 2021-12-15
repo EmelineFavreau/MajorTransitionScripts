@@ -45,34 +45,34 @@ for (lib in basic_libraries) {
 ```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
 # list of predicted genes in C.aus
 # obtained by SVM 
-Ceratina_australensis_svm_gene <- read.table("result/regression-on-bee-orthologs/Ceratina_australensis_Caus_bee_regression_predicted_gene_list_tidy",
+Ceratina_australensis_svm_gene <- read.table("../result/regression-on-bee-orthologs/Ceratina_australensis_Caus_bee_regression_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in C.cal
-Ceratina_calcarata_svm_gene <- read.table("result/regression-on-bee-orthologs/Ceratina_calcarata_Ccal_bee_regression_predicted_gene_list_tidy",
+Ceratina_calcarata_svm_gene <- read.table("../result/regression-on-bee-orthologs/Ceratina_calcarata_Ccal_bee_regression_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in M.gen
 # obtained by SVM 
-Megalopta_genalis_svm_gene <- read.table("result/regression-on-bee-orthologs/Megalopta_genalis_Mgen_bee_regression_predicted_gene_list_tidy",
+Megalopta_genalis_svm_gene <- read.table("../result/regression-on-bee-orthologs/Megalopta_genalis_Mgen_bee_regression_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in Pdom
-Polistes_dominula_svm_gene <- read.table("result/regression-on-wasp-orthologs/Polistes_dominula_Pdom_wasp_regression_predicted_gene_list_tidy",
+Polistes_dominula_svm_gene <- read.table("../result/regression-on-wasp-orthologs/Polistes_dominula_Pdom_wasp_regression_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in LF
 # obtained by SVM 
-Liostenogaster_flavolineata_svm_gene <- read.table("result/regression-on-wasp-orthologs//Liostenogaster_flavolineata_Lfla_wasp_regression_predicted_gene_list_tidy",
+Liostenogaster_flavolineata_svm_gene <- read.table("../result/regression-on-wasp-orthologs//Liostenogaster_flavolineata_Lfla_wasp_regression_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
 # list of predicted genes in Pcan
-Polistes_canadensis_svm_gene <- read.table("result/regression-on-wasp-orthologs/Polistes_canadensis_Pcan_wasp_regression_predicted_gene_list_tidy",
+Polistes_canadensis_svm_gene <- read.table("../result/regression-on-wasp-orthologs/Polistes_canadensis_Pcan_wasp_regression_predicted_gene_list_tidy",
            quote="\"",
            comment.char="", stringsAsFactors = FALSE)
 
@@ -228,14 +228,16 @@ common_bee_predictor_genes <- bee_wide_df %>%
 
 # save those genes to explore GO Terms and literature review
 write.table(x = common_wasp_predictor_genes,
-            file = "result/regression-on-wasp-orthologs/20_common_wasp_predictor_genes",
+            file = "../result/regression-on-wasp-orthologs/20_common_wasp_predictor_genes",
             quote = FALSE,
-            row.names = FALSE)
+            row.names = FALSE,
+            sep = "\t")
 
 write.table(x = common_bee_predictor_genes,
-            file = "result/regression-on-bee-orthologs/16_common_bee_predictor_genes",
+            file = "../result/regression-on-bee-orthologs/16_common_bee_predictor_genes",
             quote = FALSE,
-            row.names = FALSE)
+            row.names = FALSE,
+            sep = "\t")
   
 
 ```
@@ -262,10 +264,10 @@ for(gocat in goCategory_vec){
       this_goCategory  <- gocat
       
       # set data input
-      raw_results_file         <- "input/Ceratina_australensis_5787_gene_orthogroups_list" 
-      raw_selectionGenes_file  <- "result/regression-on-bee-orthologs/16_common_bee_predictor_genes"
-      raw_blast_results_file   <- "../ortho-enrichment/resultOnScratch/Ceratina_australensis_filtered"
-      hash_table <- "../ortho-enrichment/tmp/Ceratina_australensis_protein_gene_hash_table"
+      raw_results_file         <- "../input/Ceratina_australensis_5787_gene_orthogroups_list" 
+      raw_selectionGenes_file  <- "../result/regression-on-bee-orthologs/16_common_bee_predictor_genes"
+      raw_blast_results_file   <- "../../ortho-enrichment/resultOnScratch/Ceratina_australensis_filtered"
+      hash_table <- "../../ortho-enrichment/tmp/Ceratina_australensis_protein_gene_hash_table"
       
       
       # import all orthogroups
@@ -401,8 +403,14 @@ for(gocat in goCategory_vec){
       myTable$species    <- "common to all"
       myTable$goCategory <- this_goCategory
       
+      # sort by p value (lowest first)
+      myTable <- myTable[order(myTable$pvalue),]
+      
+      # add adjusted pvalue
+      myTable$padj <- p.adjust(myTable$pvalue, method = "BH")
+      
       # make a file name
-      this_file_name <- paste("result/regression-on-bee-orthologs/topgo_result",
+      this_file_name <- paste("../result/regression-on-bee-orthologs/topgo_result",
                               "common-to-all-bees",
                               this_goCategory,
                               sep = "_")
@@ -423,10 +431,10 @@ for(gocat in goCategory_vec){
       this_goCategory  <- gocat
       
       # set data input
-      raw_results_file         <- "input/Polistes_canadensis_6983_gene_orthogroups_list" 
-      raw_selectionGenes_file  <- "result/regression-on-wasp-orthologs/20_common_wasp_predictor_genes"
-      raw_blast_results_file   <- "../ortho-enrichment/resultOnScratch/Polistes_canadensis_filtered"
-      hash_table <- "../ortho-enrichment/tmp/Polistes_canadensis_protein_gene_hash_table"
+      raw_results_file         <- "../input/Polistes_canadensis_6983_gene_orthogroups_list" 
+      raw_selectionGenes_file  <- "../result/regression-on-wasp-orthologs/20_common_wasp_predictor_genes"
+      raw_blast_results_file   <- "../../ortho-enrichment/resultOnScratch/Polistes_canadensis_filtered"
+      hash_table <- "../../ortho-enrichment/tmp/Polistes_canadensis_protein_gene_hash_table"
       
       
       # import all orthogroups
@@ -562,8 +570,14 @@ for(gocat in goCategory_vec){
       myTable$species    <- "common to all"
       myTable$goCategory <- this_goCategory
       
+      # sort by p value (lowest first)
+      myTable <- myTable[order(myTable$pvalue),]
+      
+      # add adjusted pvalue
+      myTable$padj <- p.adjust(myTable$pvalue, method = "BH")
+      
       # make a file name
-      this_file_name <- paste("result/regression-on-wasp-orthologs/topgo_result",
+      this_file_name <- paste("../result/regression-on-wasp-orthologs/topgo_result",
                               "common-to-all-wasp",
                               this_goCategory,
                               sep = "_")

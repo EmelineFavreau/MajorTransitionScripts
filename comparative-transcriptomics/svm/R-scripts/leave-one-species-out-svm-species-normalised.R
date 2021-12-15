@@ -40,12 +40,12 @@ for (lib in basic_libraries) {
 # load a gene count df with samples in columns and gene id in rownames 
 # matrix with orthogroups as row names, samples are column names
 # 3718 obs. of  82 variables
-counts_clean <- read.csv("../input/readcounts_3718orthogroups_6species.txt",
+counts_clean <- read.csv("input/readcounts_3718orthogroups_6species.txt",
                          sep = "", stringsAsFactors = FALSE)
 
 # load a df with columns
 # Species Phenotype SampleName
-pheno_data <- read.delim("../input/species-pheno-sampleName.txt",
+pheno_data <- read.delim("input/species-pheno-sampleName.txt",
                          stringsAsFactors = FALSE)
 
 # replace space by underscore between binomial taxon
@@ -88,8 +88,8 @@ this_testdata <- pheno_data %>%
 
 # create filenames for gene list in full model
 GeneListFileName <- paste(focus_species, experiment_name,
-                  "predicted_gene_list",
-                  sep = "_")
+                          "predicted_gene_list",
+                          sep = "_")
 # for plot
 plotFileName <- paste(focus_species, experiment_name,
                       "plot.pdf",
@@ -97,8 +97,8 @@ plotFileName <- paste(focus_species, experiment_name,
 
 # for error rate table
 ErrorRateTableFileName <- paste(focus_species, experiment_name,
-                        "error_rates",
-                        sep = "_")
+                                "error_rates",
+                                sep = "_")
 
 # for prediction probability table
 predictionsTableFileName <- paste(focus_species, experiment_name,
@@ -107,8 +107,14 @@ predictionsTableFileName <- paste(focus_species, experiment_name,
 
 # for workspace
 workspaceFileName <- paste(focus_species, experiment_name,
-                                ".RData",
-                                sep = "")
+                           ".RData",
+                           sep = "")
+
+# make a pheno dataframe with sample names as rownames
+# and column names: Species and Phenotype
+pheno <- data.frame(Species = pheno_data$Species,
+                    Phenotype = pheno_data$Phenotype, 
+                    row.names = pheno_data$SampleName)
 
 #### Define SVM function
 # the intended inputs for this function are a 2xn dataframe,
@@ -158,26 +164,37 @@ svm.train <- function(readcounts,
   # normalise data
   svm.counts <- readcounts
   
+  
+  # construct the data matrix with species as a design
+  # Rows of colData correspond to columns of countData
+  dds <- DESeqDataSetFromMatrix(countData = svm.counts,
+                                colData = pheno,
+                                design = ~ Species)
+  
+  # returns a DESeqDataSet object
+  dds <- DESeq(dds)
+  
   # perform DESeq's variance stabilizing tranformation, 
   # which is preferable to logging for gene expression data
   if(vstCheck){
-    svm.counts.vst <- vst(svm.counts)
+    svm.counts.vst <- vst(dds)
   } else {
-    svm.counts.vst <- varianceStabilizingTransformation(svm.counts)
+    svm.counts.vst <- varianceStabilizingTransformation(dds,
+                                blind = FALSE,
+                                fitType = "parametric")
   }
   
-  # normalize counts between samples 
-  svm.counts.vst.quantiles <- normalizeBetweenArrays(svm.counts.vst,
-                                                     method = "quantile")
+
+  # the matrix of values is now approximately homoskedastic
   
   # scale counts and remove zero-variance features
-  svm.counts.vst.quantiles.scale <- t(scale(t(svm.counts.vst.quantiles)))
+  svm.counts.vst.quantiles.scale <- t(scale(t(assay(svm.counts.vst))))
   svm.counts.vst.quantiles.scale <- na.omit(svm.counts.vst.quantiles.scale)
   
   # Divide transcriptomic data into training set 
   # (all other species) and test set (that species) 
   svm.counts.train <- svm.counts.vst.quantiles.scale[ ,
-      which(colnames(svm.counts.vst.quantiles.scale) %in% traindata$SampleName)]
+   which(colnames(svm.counts.vst.quantiles.scale) %in% traindata$SampleName)]
   
   if(length(testdata) > 1){
     svm.counts.test <- svm.counts.vst.quantiles.scale[ ,
@@ -268,9 +285,9 @@ iterations <- data.frame(feature              = character(),
 
 # instantiate data frame to hold probability prediction data for each model
 predictions <- as.data.frame(matrix(NA,
-                                   ncol = length(this_testdata$SampleName)+2))
+                                    ncol = length(this_testdata$SampleName)+2))
 
- 
+
 # name columns
 colnames(predictions) <- c("nfeatures", "orthogroup", this_testdata$SampleName)
 
@@ -285,15 +302,15 @@ while(nfeatures > nfeatures_target){
     #print("starting the loop of 1:1")
     # Perform a grid search to optimise SVM parameters
     svm.counts.tuneResult <- tune("svm", 
-                          train.x     = t(svm.counts.train.iterate), 
-                          train.y     = as.numeric(traindata$Phenotype == "R"),
-                          probability = TRUE, 
-                          scale       = FALSE,
-                          kernel      = "radial", 
-                          tunecontrol = tune.control(sampling = "cross", 
-                                                     cross  = crossfold_level),
-                          ranges      = list(gamma = 10^(-5:-7),
-                                             cost  = 2^(4:6)))
+                                  train.x     = t(svm.counts.train.iterate), 
+                                  train.y     = as.numeric(traindata$Phenotype == "R"),
+                                  probability = TRUE, 
+                                  scale       = FALSE,
+                                  kernel      = "radial", 
+                                  tunecontrol = tune.control(sampling = "cross", 
+                                                             cross  = crossfold_level),
+                                  ranges      = list(gamma = 10^(-5:-7),
+                                                     cost  = 2^(4:6)))
     
     # record error
     error <- c(error, svm.counts.tuneResult$best.performance)
@@ -331,8 +348,8 @@ while(nfeatures > nfeatures_target){
   
   # remove lowest-weight feature from data frame (test data)
   svm.counts.test.iterate <- subset(svm.counts.test.iterate,
-                                     !(rownames(svm.counts.test.iterate) %in%
-                                         c(weakfeature)))
+                                    !(rownames(svm.counts.test.iterate) %in%
+                                        c(weakfeature)))
   
   # store removed feature name and error value before removing that feature
   iterations <- rbind(iterations, tibble(feature = weakfeature,
@@ -343,7 +360,7 @@ while(nfeatures > nfeatures_target){
   # output every 100 runs to track progress
   if((nfeatures/100)%%1==0){print(paste0("Features remaining: ",
                                          nfeatures))
-    }
+  }
 }
 
 # vector of number of iterations that the model went through
