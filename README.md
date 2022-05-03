@@ -1,5 +1,4 @@
-# Scripts
+# Contents
+[Scripts](https://github.com/EmelineFavreau/MajorTransitionScripts/tree/master/comparativeranscriptomics) for **Favreau, Geist al** (submitted) _Co-expression gene networks and machine-learning algorithms unveil a core genetic toolkit for reproductive division of labour in rudimentary insect societies_
 
-Favreau, Geist al (submitted) Co-expression gene networks and machine-learning algorithms unveil a core genetic toolkit for reproductive division of labour in rudimentary insect societies
 
-comparative-transcriptomics
