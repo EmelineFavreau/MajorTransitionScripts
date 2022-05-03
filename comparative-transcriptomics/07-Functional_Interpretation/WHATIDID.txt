@@ -1,0 +1,9 @@
+# getting an overlap of genes common to the three analyses
+Rscript 2021-12-09-overlap-svm-degs-wgcnas.Rmd  
+
+# running REVIGO here: http://revigo.irb.hr/
+# resulting list medium (0.7), no associated values, remove obsolete GO terms, work with Drosophila, use SimRel as semanic similarity measure
+
+#running TopGo on DEGs
+2021-12-14-go-terms-enrichment-from-consensus-degs.R
+

@@ -1,0 +1,8 @@
+# running DESeq2 on data (using resampling approach)
+scripts/desq2_fulldata_2021.03.06.Rmd
+
+# running DESeq2 on data (using all data, including species and clade as additional variables)
+orthology-dependent/deseq2_orthogroups_all6spp+bees+wasps.Rmd
+
+# making a heatmap of Variance Stabilized read counts
+scripts/2021-08-03-heatmap-variant-stabilised-read-count.R

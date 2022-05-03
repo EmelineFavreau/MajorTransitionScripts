@@ -1,0 +1,36 @@
+## Author: Emeline Favreau
+## Objective: Running QC steps for Megalopta genalis
+
+# set project structure
+Genusspecies="Megalopta_genalis"
+./obtain-NCBI-Megalopta-genalis.sh
+
+# Run Nextflow on all samples 
+mkdir tmp/star-all-fwd-samples
+
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples
+
+cp myriad.config tmp/star-all-fwd-samples/.
+
+cd tmp/star-all-fwd-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+        -profile singularity \
+        --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/Jones2017fwd/*{1,2}.fastq.gz' \
+        --fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.fna.gz' \
+        --gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/input/GCF_011865705.1_USU_MGEN_1.2_genomic.gff.gz' \
+        --forwardStranded \
+        --skipBiotypeQC \
+        --fc_group_features gene_id \
+        -r 1.4.2 \
+        -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/tmp/star-all-fwd-samples/myriad.config \
+        -with-tower \
+        -resume \
+        --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Megalopta-genalis/result/star-all-fwd-samples
+

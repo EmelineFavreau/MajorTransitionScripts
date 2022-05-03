@@ -1,0 +1,35 @@
+## Author: Emeline Favreau
+## Objective: Running QC steps for Liostenogaster flavolineata
+
+# set project structure
+Genusspecies="Liostenogaster-flavolineata"
+# data obtained from Ben Taylor's PhD thesis
+
+# Run Nextflow on all samples 
+mkdir tmp/star-all-samples
+
+mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Liostenogaster-flavolineata/result/star-all-samples
+
+cp myriad.config tmp/star-all-samples/.
+
+cd tmp/star-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+        -profile singularity \
+        --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Liostenogaster-flavolineata/input/*{1,2}.fq.gz' \
+        --fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Liostenogaster-flavolineata/input/Liostenogaster_flavolineata.fna.gz' \
+        --gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Liostenogaster-flavolineata/input/Liostenogaster_flavolineata.gff3.gz' \
+        --unStranded \
+        --skipBiotypeQC \
+        --fc_group_features gene_id \
+        -r 1.4.2 \
+        -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Liostenogaster-flavolineata/tmp/star-all-samples/myriad.config \
+        -with-tower \
+        -resume \
+        --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Liostenogaster-flavolineata/result/star-all-samples

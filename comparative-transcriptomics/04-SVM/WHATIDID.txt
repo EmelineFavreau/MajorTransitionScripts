@@ -1,0 +1,17 @@
+## Author: Emeline Favreau
+## Objective: Searching for social toolkit using machine learning algorithms
+
+# make one file with samples in columns, orthogroups in rows, read counts as values
+# if a species does not have the orthogroup, the read count for that orthogroup is 10
+Rscript make-input-file-for-svm.R
+
+# test between radial and linear kernel (radial had better accuracy rate)
+Rscript kernel-selection.R
+
+# running svm on 5-species training set, and on lineage-specific training set
+qsub running-svm-job-Caus.sh
+qsub running-svm-job-Caus-bee-only.sh
+
+# blast result
+qsub blast-predictor-genes.sh
+

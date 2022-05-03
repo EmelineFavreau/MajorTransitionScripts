@@ -1,0 +1,7 @@
+# use a single primary/longest transcript variant for each gene
+ ./obtain-longest-transcripts-australensis.sh
+
+# run orthofinder
+qsub run-orthofinder.sh
+
+

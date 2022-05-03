@@ -1,0 +1,37 @@
+## Author: Emeline Favreau
+## Objective: Running QC steps for Ceratina australensis
+
+# set project structure
+Genusspecies="Ceratina-australensis"
+./obtain-NCBI-Ceratina-australensis.sh
+
+# Run Nextflow on all samples 
+mkdir -p tmp/star-all-samples
+
+mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples
+
+cp myriad.config tmp/star-all-samples/.
+
+cd tmp/star-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+        -profile singularity \
+        --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/*{1,2}.fastq.gz' \
+        --fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis_DNA.noNUL.fasta.gz' \
+        --gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/input/australensis.MAKER_run_v1.cfig_v5.MAKER_ONLY_FORMATTED.gff.filtered.gz' \
+        --reverseStranded \
+        --skipBiotypeQC \
+        --fc_group_features gene_id \
+        -r 1.4.2 \
+        -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/tmp/star-all-samples/myriad.config \
+        -with-tower \
+        -resume \
+        --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-australensis/result/star-all-samples
+
+		

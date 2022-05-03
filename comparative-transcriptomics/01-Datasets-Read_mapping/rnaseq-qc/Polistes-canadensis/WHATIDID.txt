@@ -1,0 +1,35 @@
+## Author: Emeline Favreau
+## Objective: Running QC steps for Polistes canadensis
+
+# set project structure
+Genusspecies="Polistes-canadensis"
+./obtain-NCBI-Polistes-canadensis.sh
+
+# Run Nextflow on all samples 
+mkdir -p tmp/Patalano/star-all-samples
+
+mkdir -p /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/Patalano/star-all-samples
+
+cp myriad.config tmp/Patalano/star-all-samples/.
+
+cd tmp/Patalano/star-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+        -profile singularity \
+        --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/Patalano/*{1,2}.fastq.gz' \
+        --fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.fna.gz' \
+        --gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/input/GCF_001313835.1_ASM131383v1_genomic.gff.gz' \
+        --reverseStranded \
+        --skipBiotypeQC \
+        --fc_group_features gene_id \
+        -r 1.4.2 \
+        -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/tmp/star-all-samples/myriad.config \
+        -with-tower \
+        --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-canadensis/result/Patalano/star-all-samples
+

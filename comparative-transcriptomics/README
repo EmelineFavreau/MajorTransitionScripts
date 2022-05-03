@@ -1,5 +1,13 @@
-Analyses performed in view of a manuscript about comparative transcriptomics in wasps and bees
+01-Datasets-Read_mapping # Nextflow rnaseq-qc, obtaining data
 
- * rnaseq-qc contains scripts and results for all species' RNA sequences passed through Nextflow rnaseq-qc pipeline
+02-Orthogroup_identification # orthology analysis, busco analysis
 
- * orthology-analysis contains scripts and results for all species' protein files passed through OrthoFinder
+03-PCA # principal component analysis
+
+04-SVM # Support Vector Machine to predict genes associated with reproductive status
+
+05-WGCNA # Co-expressed gene network analyses
+
+06-DEGs # Differentially expressed gene analyses
+
+07-Functional_Interpretation # Overlap between results, GO Term analyses

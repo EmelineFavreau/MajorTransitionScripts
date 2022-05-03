@@ -1,0 +1,35 @@
+# Author: Emeline Favreau
+## Objective: Running QC steps for Ceratina calcarata
+
+# set project structure
+Genusspecies="Ceratina-calcarata"
+./obtain-NCBI-Ceratina-calcarata.sh
+
+# Run Nextflow on all samples 
+mkdir tmp/star-all-samples
+
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples
+
+cp myriad.config tmp/star-all-samples/.
+
+cd tmp/star-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+        --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/SRR132*{1,2}.fastq.gz' \
+        --fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/GCF_001652005.1_ASM165200v1_genomic.fna.gz' \
+        --gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/input/GCF_001652005.1_ASM165200v1_genomic.gff.gz' \
+        --reverseStranded \
+        --skipBiotypeQC \
+        --fc_group_features gene_id \
+        -r 1.4.2 \
+        -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/tmp/star-all-samples/myriad.config \
+        -with-tower \
+        -resume \
+        --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Ceratina-calcarata/result/star-all-samples
+

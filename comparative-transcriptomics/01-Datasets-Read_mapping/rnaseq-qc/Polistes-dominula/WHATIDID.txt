@@ -1,0 +1,35 @@
+## Author: Emeline Favreau
+## Objective: Running QC steps for Polistes dominula
+
+# set project structure
+Genusspecies="Polistes-dominula"
+# data obtained from Sumner lab
+
+# Run Nextflow on all samples 
+mkdir tmp/${dataset}/star-all-samples
+
+mkdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/${dataset}/star-all-samples
+
+cp myriad.config tmp/${dataset}/star-all-samples/.
+
+cd tmp/${dataset}/star-all-samples
+
+tmux new-session
+
+module load blic-modules
+
+module load nextflow/19.10.0.5170
+
+nextflow run nf-core/rnaseq \
+        -profile singularity \
+        --reads '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/Taylor/*{1,2}.fq.gz' \
+        --fasta '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/GCF_001465965.1_Pdom_r1.2_genomic.fna.gz' \
+        --gff '/lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/input/GCF_001465965.1_Pdom_r1.2_genomic.gff.gz' \
+        --unStranded \
+        --skipBiotypeQC \
+        --fc_group_features gene_id \
+        -r 1.4.2 \
+        -c /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/tmp/Taylor/star-all-samples/myriad.config \
+        -with-tower \
+        -resume \
+        --outdir /lustre/scratch/scratch/ucfaeef/comparative-transcriptomics/Polistes-dominula/result/Taylor/star-all-samples

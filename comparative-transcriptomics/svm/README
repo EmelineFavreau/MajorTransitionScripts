@@ -1,2 +1,0 @@
-# run the svm
-Rscript leave-one-species-out-svm.R Ceratina_australensis SVM_all_species Ceratina_calcarata Megalopta_genalis Polistes_dominula Polistes_cnanadensis Liostenogaster_flavolineata

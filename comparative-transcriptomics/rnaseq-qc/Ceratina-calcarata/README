@@ -1,5 +1,0 @@
-Ceratina calcarata Shell & Rehan 2019 that has gone through Nextflow QC pipeline:
-- information about data: Ceratina-calcarata-raw-reads-readme
-- raw read counts: result/ShellRehan2019/merged_gene_counts.txt 
-- FPKM: result/ShellRehan2019/FPKM
-- gff file: input/GCF_001652005.1_ASM165200v1_genomic.gff.gz

@@ -1,0 +1,12 @@
+# We obtained data from NCBI
+obtaining-ncbi-data/${species}/obtaining-ncbi.sh
+
+# We ran data from each species through Nextflow pipeline for RNA quality check
+rnaseq-qc/${species}/WHATIDID.txt
+
+# We counted merged read counts, and sequences after QC
+checking-result/${species}/count-merged-read-counts.sh  
+checking-result/${species}/count-sequences-after-qc.sh 
+checking-result/${species}/count-sequences-before-qc.sh
+
+

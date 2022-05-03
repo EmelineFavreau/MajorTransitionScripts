@@ -1,0 +1,10 @@
+# running WGCNA on orthology dependent data
+orthology-dependent
+
+# running WGCNA on orthology independent data
+orthology-independent
+
+# analysing results with TopGO
+scripts/2021-10-11-topgo-on-consensus-wgcna.Rmd
+scripts/2021-10-25-go-terms-analysis-consensus-wgcna.Rmd
+
