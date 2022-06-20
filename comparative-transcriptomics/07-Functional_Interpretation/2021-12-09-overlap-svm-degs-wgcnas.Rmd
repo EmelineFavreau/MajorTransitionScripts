@@ -8,14 +8,14 @@ output: html_document
 Copyright 2021 Emeline Favreau, University College London.
 
 # Objective of analysis
-We obtained 127 predictor genes from SVM models: these genes are common to all six species ( _Ceratina australensis_, _C. calcarata_, _Megalopta genalis_, _Polistes canadensis_, _P. dominula_, _Liostenogaster flavolineata_).
-We want to qualify them: are they also differentially expressed between reproductives and non-reproductives? are they also significantly associated with reproductive status in WGCNA?
+
+We obtained 127 predictor genes from SVM models: these genes are common to all six species ( *Ceratina australensis*, *C. calcarata*, *Megalopta genalis*, *Polistes canadensis*, *P. dominula*, *Liostenogaster flavolineata*). We want to qualify them: are they also differentially expressed between reproductives and non-reproductives? are they also significantly associated with reproductive status in WGCNA?
 
 ## Analysis steps:
-- Obtaining data
-- Aim 1: Overlap of orthogroups (SVM, DEGs, WGCNA)
-- Aim 2: Common GO Terms enriched in all three analyses (SVM, DEGs, WGCNA)
 
+-   Obtaining data
+-   Aim 1: Overlap of orthogroups (SVM, DEGs, WGCNA)
+-   Aim 2: Common GO Terms enriched in all three analyses (SVM, DEGs, WGCNA)
 
 ```{r load all the libraries, eval = TRUE, echo = FALSE, include = FALSE}
 # get libraries
@@ -38,7 +38,7 @@ for (lib in basic_libraries) {
 ```{r import data, eval = TRUE, echo = FALSE, include = FALSE}
 # common predictor genes (SVM)
 predictor_genes <- 
-  read.csv("../svm/result/species-normalised/regression-on-all/127_common_predictor_genes",
+  read.csv("../04-SVM/result/species-normalised/regression-on-all/127_common_predictor_genes",
   sep = "", stringsAsFactors = FALSE)
 
 # common caste-specific genes (DEG)
@@ -72,7 +72,6 @@ wgcna_go <-
 ```
 
 # Aim 1: Overlap of orthogroups (SVM, DEGs, WGCNA)
-
 
 ```{r aim 1 orthogroup overlap, eval = TRUE, echo = FALSE, include = TRUE}
 # comparative analysis of orthogroups 
@@ -109,10 +108,7 @@ upset(fromList(OG_listInput),
 dev.off()
 ```
 
-There is little overlap between the three genes sets. 
-Two genes are common to all three:  "OG0000706" (uncharacterized protein LOC408365 isoform X2 [Apis mellifera]) and "OG0001935" (uncharacterized protein LOC408661 isoform X1 [Apis mellifera]).
-
-
+There is little overlap between the three genes sets. Two genes are common to all three: "OG0000706" (uncharacterized protein LOC408365 isoform X2 [Apis mellifera]) and "OG0001935" (uncharacterized protein LOC408661 isoform X1 [Apis mellifera]).
 
 # Aim 2: Common GO Terms enriched in all three analyses (SVM, DEGs, WGCNA)
 

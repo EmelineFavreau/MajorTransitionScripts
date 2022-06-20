@@ -131,3 +131,67 @@ accuracy_rate_linear
 # Mgen: radial (0.56 > 0.21)
 # Pcan: equal
 # Lfl: equal
+
+######################## ROC PLOTS #####################################
+
+
+# source: https://towardsdatascience.com/roc-curve-and-auc-explained-8ff3438b3154
+# source: https://rpubs.com/JanpuHou/359286
+# ROC (receiver operating characteristics) curve and 
+#AOC (area under the curve) are performance measures 
+#that provide a comprehensive evaluation of classification models.
+
+
+
+# train the model
+x.svm <- svm(formula = Phenotype ~ .,
+             data = training_set,
+             type = 'C-classification', 
+             kernel = 'radial',
+             probability = TRUE)
+
+# test the testing data
+x.svm.prob <- predict(x.svm,
+                      type = "prob",
+                      newdata = testing_set,
+                      probability = TRUE)
+
+# create prediction objects
+x.svm.prob.rocr <- prediction(attr(x.svm.prob,
+                                   "probabilities")[,2],
+                              this_testdata$Phenotype)
+
+# predictor evaluations are performed: True positive rate AND False positive rate
+x.svm.perf <- performance(x.svm.prob.rocr,
+                          "tpr","fpr")
+
+# collect info
+#Ccal.x.svm.perf <- x.svm.perf
+#Pdom.x.svm.perf <- x.svm.perf
+#Mgen.x.svm.perf <- x.svm.perf
+#Pcan.x.svm.perf <- x.svm.perf
+#Caus.x.svm.perf <- x.svm.perf
+#Lfl.x.svm.perf <- x.svm.perf
+
+plotName <- "../R-plots/SVM_ROC.pdf"
+
+pdf(plotName)
+
+plot(Caus.x.svm.perf, col=1, main="ROC curves for each species testing")
+# Draw a legend.
+legend(0,
+       1,
+       c('C.australensis',
+         'C.calcarata',
+         'M.genalis',
+         'L.flavolineata',
+         'P.canadensis',
+         'P.dominula'),
+       1:6)
+plot(Ccal.x.svm.perf, col=2, add=TRUE)
+plot(Mgen.x.svm.perf, col=3, add=TRUE)
+plot(Lfl.x.svm.perf, col=4, add=TRUE)
+plot(Pcan.x.svm.perf, col=5, add=TRUE)
+plot(Pdom.x.svm.perf, col=6, add=TRUE)
+
+dev.off()
