@@ -1,0 +1,713 @@
+---
+title: "WGCNA: Species-specific (Orthogroup Agnostic)"
+author: "K.S. Geist, Iowa State University"
+date: "22 Feb 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Install and load requisite libraries.
+```{r, warning=FALSE, include = FALSE, warning = FALSE}
+#install.packages("BiocManager")
+#BiocManager::install("WGCNA")
+## This may take a while, as there are a lot of dependencies. I suggest doing this in R rather than R Studio if you run into issues.
+## Note that if you are on a Mac, you may be missing pkg-config and/or zlib. If so, you will need to use Homebrew to get them.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+# Function that loads an RData file, and returns it with your custom name
+loadRData <- function(fileName){    
+    load(fileName)
+    get(ls()[ls() != "fileName"])
+}
+
+## Load libraries
+library(RCurl)
+library(DESeq2)
+library(WGCNA)
+library(preprocessCore)
+library(ggplot2)
+library(tidyverse)
+library(flashClust)
+```
+
+Akin to what was done in **Patalano *et al.* 2015** out of Seirian's group, we will run an orthogroup-agnostic network. This will be species-specific and use all of the coexpressed genes in any given species network.
+
+## Read in all 6 Species Variance Stabilized Values
+
+##### Read in the metadata:
+```{r}
+meta <- read.csv(file = "../deg-DESeq2/Comparative_Transcriptomics_Metadata.csv", strip.white = T, header = T)
+#str(meta)
+```
+https://support.bioconductor.org/p/115583/ & From WGCNA guide: *"We suggest removing features whose counts are consistently low (for example, removing all features that have a count of less than say 10 in more than 90% of the samples) because such low-expressed features tend to reflect noise and correlations based on counts that are mostly zero aren't really meaningful. The actual thresholds should be based on experimental design, sequencing depth and sample counts."*
+
+*"We then recommend a variance-stabilizing transformation. For example, package DESeq2 implements the function varianceStabilizingTransformation which we have found useful, but one could also start with normalized counts (or RPKM/FPKM data) and log-transform them using log2(x+1). For highly expressed features, the differences between full variance stabilization and a simple log transformation are small."*
+
+*"Whether one uses RPKM, FPKM, or simply normalized counts doesn't make a whole lot of difference for WGCNA analysis as long as all samples were processed the same way. These normalization methods make a big difference if one wants to compare expression of gene A to expression of gene B; but WGCNA calculates correlations for which gene-wise scaling factors make no difference. (Sample-wise scaling factors of course do, so samples do need to be normalized.)*
+
+*If data come from different batches, we recommend to check for batch effects and, if needed, adjust for them. We use ComBat for batch effect removal but other methods should also work.*
+
+*Finally, we usually check quantile scatterplots to make sure there are no systematic shifts between samples; if sample quantiles show correlations (which they usually do), quantile normalization can be used to remove this effect."* 
+
+
+**This was accomplished when I ran DESeq2. I filtered such that there were not fewer than 5 counts per gene across 1/2 the samples, and then applied the Variance Stabilizing Transformation.**
+
+Read in the Rdata:
+```{r}
+## Set the species:
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata") 
+wasps <- species[4:6]
+bees <- species[1:3]
+
+Ccal.vst <- loadRData(paste("../deg-deseq2/full_set/", species[1], "/", species[1], "_VST_lowExprfiltered.Rdata", sep=""))
+
+Caus.vst <- loadRData(paste("../deg-deseq2/full_set/", species[2], "/", species[2], "_VST_lowExprfiltered.Rdata", sep=""))
+
+Mgen.vst <- loadRData(paste("../deg-deseq2/full_set/", species[3], "/", species[3], "_VST_lowExprfiltered.Rdata", sep=""))
+
+Pcan.vst <- loadRData(paste("../deg-deseq2/full_set/", species[4], "/", species[4], "_VST_lowExprfiltered.Rdata", sep=""))
+
+Pdom.vst <- loadRData(paste("../deg-deseq2/full_set/", species[5], "/", species[5], "_VST_lowExprfiltered.Rdata", sep=""))
+
+Lfla.vst <- loadRData(paste("../deg-deseq2/full_set/", species[6], "/", species[6], "_VST_lowExprfiltered.Rdata", sep=""))
+
+## Then, to access the data, use the assay() function:
+vst.assays <- list(assay(Ccal.vst), assay(Caus.vst), assay(Mgen.vst), assay(Pcan.vst), assay(Pdom.vst), assay(Lfla.vst))
+```
+
+##### Boxplots of the Raw Feature Counts:
+```{r}
+# str(vst.assays)
+
+## What's the largest number of samples I have?
+maxSamples <- ncol(assay(Pdom.vst))
+   
+for (i in 1:length(vst.assays)) {
+  temp <- stack(as.data.frame(vst.assays[[i]]))
+  boxplot(vst.assays[[i]], col = "light gray", )
+  # p <- ggplot(data = temp, aes(x = ind, y = values)) + geom_boxplot(outlier.colour = "orange",  width=10/maxSamples)
+  # p <- p + theme(axis.title.x = element_blank()) + labs(y = "Total Reads Mapped")
+  # print(p)
+  hist(temp$values, main = NULL, xlab = "VS-transformed Expression Values")
+  ## Add a normal curve
+  ## Do qqplots
+}
+
+```
+They are gorgeous (for RNAseq data)!
+
+#### Let's next transpose the dataframes and get the phenotype metadata created:
+Create the WGCNA dataframes:
+```{r}
+Ccal.wgcna <- t(assay(Ccal.vst))
+# head(Ccal.wgcna[,1:6])
+Caus.wgcna <- t(assay(Caus.vst))
+Mgen.wgcna <- t(assay(Mgen.vst))
+Pcan.wgcna <- t(assay(Pcan.vst))
+Pdom.wgcna <- t(assay(Pdom.vst))
+Lfla.wgcna <- t(assay(Lfla.vst))
+```
+
+Create the traits data:
+```{r}
+# df <- Ccal.wgcna
+# spp <- species[1]
+
+traitsDF <- function(df, spp) {
+  id <- rownames(df)
+  phenotype <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR") & meta$Species == spp),"R.NR_Phenotype"]
+  R <- ifelse(phenotype == "R", 1, 0)
+  NR <- ifelse(phenotype == "NR", 1, 0)
+  traits <- as.data.frame(cbind(as.numeric(R), as.numeric(NR)))
+  rownames(traits) <- id
+  colnames(traits) <- c("R", "NR")
+  return(traits)
+} 
+
+Ccal.traits <- traitsDF(Ccal.wgcna, species[1])
+Caus.traits <- traitsDF(Caus.wgcna, species[2])
+Mgen.traits <- traitsDF(Mgen.wgcna, species[3])
+Pcan.traits <- traitsDF(Pcan.wgcna, species[4])
+Pdom.traits <- traitsDF(Pdom.wgcna, species[5])
+Lfla.traits <- traitsDF(Lfla.wgcna, species[6])
+
+##  Lastly, let's make sure that our datasets align correctly:
+table(rownames(Ccal.traits)==rownames(Ccal.wgcna)) #should return TRUE if datasets align correctly, otherwise your names are out of order
+table(rownames(Caus.traits)==rownames(Caus.wgcna))
+table(rownames(Mgen.traits)==rownames(Mgen.wgcna))
+table(rownames(Pcan.traits)==rownames(Pcan.wgcna))
+table(rownames(Pdom.traits)==rownames(Pdom.wgcna))
+table(rownames(Lfla.traits)==rownames(Lfla.wgcna))
+```
+
+#### Next, let's remove any genes due to "excessive" missing values or no variance:
+*N.B.: This function iteratively identifies samples and genes with too many missing entries and genes with zero variance. If weights are given, entries with relative weight (weight divided by maximum weight in the column) below minRelativeWeight will be considered missing. The process is repeated until the lists of good samples and genes are stable. The constants ..minNSamples and ..minNGenes are both set to the value 4.*
+```{r}
+## Let's use WGCNA's built-in function goodSamplesGenes() to remove low-expression genes.
+removelowExpr <- function(df) {
+  gsg <- goodSamplesGenes(df, minFraction = 0.5)   # 50% is the default
+  ## Let's store the sample size of genes remaining for each sample for future use:
+  sampleSize <- sum(gsg$goodGenes == "TRUE")
+  df.filtered = df[gsg$goodSamples, gsg$goodGenes]
+  
+  if(ncol(df) == sampleSize) {
+    print(paste("No filtering was done.", sep = ""))
+  }
+  else {
+    print(paste("The new sample size is:   ", sampleSize, sep = ""))
+  }
+  return(df.filtered)
+}
+
+Ccal.filt <- removelowExpr(Ccal.wgcna)
+Caus.filt <- removelowExpr(Caus.wgcna)
+Mgen.filt <- removelowExpr(Mgen.wgcna)
+Pcan.filt <- removelowExpr(Pcan.wgcna)
+Pdom.filt <- removelowExpr(Pdom.wgcna)
+Lfla.filt <- removelowExpr(Lfla.wgcna)
+```
+This isn't surprising, but it's a nice proof of concept. We will not use the filtered datasets moving forward as there's no point.
+
+*N.B.: We have so few samples, that we will not trim any samples based on clustering despite what the vignette recommends. Further, we've done verification of this step with DESeq2.*
+
+
+## Automatic Construction of the Gene Network and Modules
+
+*N.B.: We did not enable WGCNA threads to allow for multi-threading within WGCNA because we are running through RStudio/knitting. We may decide to do this else-wise for resampling? enableWGCNAThreads() -- see Vignette.*
+```{r, include = FALSE}
+# Allow multi-threading within WGCNA. This helps speed up certain calculations.
+# At present this call is necessary for the code to work.
+# Any error here may be ignored but you may want to update WGCNA if you see one. # Caution: skip this line if you run RStudio or other third-party R environments. # See note above.
+#enableWGCNAThreads()
+```
+
+#### Find the Soft-Thresholding Power Needed For Each Species: #from this plot, we would choose a power of 18 because it's the lowest power for which the scale free topology index reaches 0.90
+
+This is the analysis of the network topology using various soft-thresholding powers. In the graphs generated, the left panel is shows the scale-free fit index as a function of the soft-thresholding power. The right panel displays the mean connectivity as a function of the soft-thresholding power. I explicitly state that the  \(R^2\) cutoff is 0.8.
+
+**Note that I verify this with my own code:**
+$powerEstimate is the estimate of an appropriate soft-thresholding power: the lowest power for which the scale free topology fit \(R^2\) exceeds RsquaredCut. If \(R^2\) is below RsquaredCut for all powers, NA is returned.
+This gives us a replicable way to grab the best soft-thresholding power for each species for network construction.
+```{r}
+# Choose a set of soft-thresholding powers
+powers = c(c(1:10), seq(from =12, to=40, by=2)) ## Goes by 1 for 1:10, then by 2 for 12:40.
+
+## Do for each of the species; and record below the soft threshold I choose
+# Call the network topology analysis function
+topology <- function(wgcna, spp) {
+  soft = pickSoftThreshold(wgcna, powerVector = powers, verbose = 5, RsquaredCut = 0.8)
+  
+  par(mfrow = c(1,2))
+  cex1 = 0.9
+  
+  # Save the plots as a PDF
+  pdf(file = paste("full_set/", spp, "/", spp, "_Choose_Soft_Threshold_power.pdf", sep=""), width = 8, height = 6)
+  
+  # Scale-free topology fit index as a function of the soft-thresholding power 
+  plot(soft$fitIndices[,1], -sign(soft$fitIndices[,3])*soft$fitIndices[,2], xlab="Soft Threshold (power)", ylab="Scale Free Topology Model Fit,signed R^2", type="n",main = paste(spp, "\nScale Independence", sep = ""), ylim = c(0,1))
+  text(soft$fitIndices[,1], -sign(soft$fitIndices[,3])*soft$fitIndices[,2], labels=powers,cex=cex1,col="red")
+  # this line corresponds to using an R^2 cut-off of h 
+  abline(h=0.90,col="red")
+  
+  # Mean connectivity as a function of the soft-thresholding power 
+  plot(soft$fitIndices[,1], soft$fitIndices[,5], xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n", main = paste(spp, "\nMean Connectivity", sep = ""))
+  text(soft$fitIndices[,1], soft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+  
+  dev.off()
+  
+  return(soft)
+}
+
+# results1 <- topology(Ccal.wgcna, species[1])
+# write.table(results1, file = paste("full_set/", species[1], "/", species[1], "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+# results1$powerEstimate
+# ## Proof of concept that powerEstimate returns what I expect:
+# min(subset(results1$fitIndices, SFT.R.sq >= 0.9)$Power)
+# ## Let's store the soft thresholds as we go: ## Come back to this
+# soft.thresholds <- c(results1$powerEstimate)
+# 
+# results2 <- topology(Caus.wgcna, species[2])
+# write.table(results2, file = paste("full_set/", species[2], "/", species[2], "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+# results2$powerEstimate
+# ## Proof of concept that powerEstimate returns what I expect:
+# min(subset(results2$fitIndices, SFT.R.sq >= 0.9)$Power)
+# soft.thresholds <- c(soft.thresholds, results2$powerEstimate)
+# 
+# results3 <- topology(Mgen.wgcna, species[3])
+# write.table(results3, file = paste("full_set/", species[3], "/", species[3], "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+# results3$powerEstimate
+# ## Proof of concept that powerEstimate returns what I expect:
+# min(subset(results3$fitIndices, SFT.R.sq >= 0.9)$Power)
+# soft.thresholds <- c(soft.thresholds, results3$powerEstimate)
+# 
+# results4 <- topology(Pcan.wgcna, species[4])
+# write.table(results4, file = paste("full_set/", species[4], "/", species[4], "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+# results4$powerEstimate
+# ## Proof of concept that powerEstimate returns what I expect:
+# min(subset(results4$fitIndices, SFT.R.sq >= 0.9)$Power)
+# soft.thresholds <- c(soft.thresholds, results4$powerEstimate)
+# 
+# results5 <- topology(Pdom.wgcna, species[5])
+# write.table(results5, file = paste("full_set/", species[5], "/",species[5], "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+# results5$powerEstimate
+# ## Proof of concept that powerEstimate returns what I expect:
+# min(subset(results5$fitIndices, SFT.R.sq >= 0.9)$Power)
+# soft.thresholds <- c(soft.thresholds, results5$powerEstimate)
+# 
+# results6 <- topology(Lfla.wgcna, species[6])
+# write.table(results6, file = paste("full_set/", species[6], "/", species[6], "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+# results6$powerEstimate
+# ## Proof of concept that powerEstimate returns what I expect:
+# min(subset(results6$fitIndices, SFT.R.sq >= 0.9)$Power)
+# soft.thresholds <- c(soft.thresholds, results6$powerEstimate)
+```
+C.calcarata = 1
+C. australensis = 24
+M. genalis = 14
+P. canadensis = 6
+P. dominula = 28
+L. flavolineata = 14
+**If I should need it downstream (without rerunning the above code chunk):**
+soft.thresholds = c(1, 24, 14, 6, 28, 14)
+
+## Save the data & metadata for future use:
+```{r}
+# soft.thresholds = c(1, 24, 14, 6, 28, 14)
+
+exprdata <- list(Ccal.wgcna, Ccal.traits)
+save(Ccal.wgcna, file = paste("full_set/", species[1], "/", species[1], "_WGCNA_ExprData.RData", sep=""))
+
+exprdata <- list(Caus.wgcna, Caus.traits)
+save(exprdata, file = paste("full_set/", species[2], "/", species[2], "_WGCNA_ExprData.RData", sep=""))
+
+exprdata <- list(Mgen.wgcna, Mgen.traits)
+save(exprdata, file = paste("full_set/", species[3], "/", species[3], "_WGCNA_ExprData.RData", sep=""))
+
+exprdata <- list(Pcan.wgcna, Pcan.traits)
+save(exprdata, file = paste("full_set/", species[4], "/", species[4], "_WGCNA_ExprData.RData", sep=""))
+
+exprdata <- list(Pdom.wgcna, Pdom.traits)
+save(exprdata, file = paste("full_set/", species[5], "/", species[5], "_WGCNA_ExprData.RData", sep=""))
+
+exprdata <- list(Lfla.wgcna, Lfla.traits)
+save(exprdata, file = paste("full_set/", species[6], "/", species[6], "_WGCNA_ExprData.RData", sep=""))
+```
+
+#### Run the Automatic Construction process with the Soft-Thresholding Power determined for each species:
+N.B.: With a mergeCutHeight = 0.25, that corresponds to collapsing/merging any modules with correlation of 75% or higher.
+
+Function follows to run either a signed or unsigned network; we  proceed with the **signed** results.
+
+```{r, warning = FALSE}
+## Sample Sizes
+sample.sizes <- c()  ## empty vector of sample sizes
+gene.counts <- c()  ## empty vector of gene counts that went into WGCNA
+for (i in 1:length(vst.assays)) {
+  sample.sizes <- c(sample.sizes, ncol(vst.assays[[i]]))
+  gene.counts <- c(gene.counts, nrow(vst.assays[[i]]))
+}
+
+#####################################
+## SET THE SIGN FLAG  ###############
+#####################################
+signed.flag <- 1
+file.flag <- ifelse(signed.flag == 0,  "Unsigned", "Signed")
+#####################################
+#####################################
+#####################################
+
+buildNetwork <- function(wgcna, softThreshold, genomeSize, spp, signed.flag) {
+  start_time <- Sys.time()
+  file.flag <- ifelse(signed.flag == 0,  "Unsigned", "Signed")
+
+      net = blockwiseModules(wgcna, 
+                           power = softThreshold, 
+                           TOMType = ifelse(signed.flag == 0,  "unsigned", "signed"), 
+                           minModuleSize = 30, 
+                           reassignThreshold = 0, 
+                           mergeCutHeight = 0.25, 
+                           numericLabels = TRUE, 
+                           pamRespectsDendro = FALSE, 
+                           saveTOMs = TRUE, 
+                           saveTOMFileBase = paste("full_set/", spp, "/", spp, "_", file.flag, "_TOM", sep=""), 
+                           verbose = 3, 
+                           maxBlockSize=genomeSize)    
+      save(net, file = paste("full_set/", spp, "/", spp, "_", file.flag, "_Network.RData", sep=""))
+
+end_time <- Sys.time()
+  print("System Run Time:")
+  print(end_time - start_time)
+  return(net)
+}
+# wgcna <- Ccal.wgcna
+# softThreshold <- soft.thresholds[1]
+# genomeSize <- gene.counts[1]
+# spp <- species[1]
+
+# Ccal.net <- buildNetwork(Ccal.wgcna, soft.thresholds[1], gene.counts[1], species[1], signed.flag)
+# Caus.net <- buildNetwork(Caus.wgcna, soft.thresholds[2], gene.counts[2], species[2], signed.flag)
+# Mgen.net <- buildNetwork(Mgen.wgcna, soft.thresholds[3], gene.counts[3], species[3], signed.flag)
+# Pcan.net <- buildNetwork(Pcan.wgcna, soft.thresholds[4], gene.counts[4], species[4], signed.flag)
+# Pdom.net <- buildNetwork(Pdom.wgcna, soft.thresholds[5], gene.counts[5], species[5], signed.flag)
+# Lfla.net <- buildNetwork(Lfla.wgcna, soft.thresholds[6], gene.counts[6], species[6], signed.flag)
+
+```
+Notice that compared to the default settings I **set the maxBlockSize to the number of genes in each dataset** to make sure that all of the genes could be included in a block (we have so many more genes than the example run by the Vignette for WGCNA). Note that I am running 64GB of RAM, though.
+
+#### Load in the networks & TOMs:
+To save from running WGCNA again (or if someone is using a computer with insufficient RAM to re-run):
+```{r}
+Ccal.net <- loadRData(paste("full_set/", species[1], "/", species[1], "_Signed_Network.RData", sep=""))
+Ccal.TOM <- loadRData(paste("full_set/", species[1], "/", species[1], "_Signed_TOM-block.1.RData", sep=""))
+
+Caus.net <- loadRData(paste("full_set/", species[2], "/", species[2], "_Signed_Network.RData", sep=""))
+Caus.TOM <- loadRData(paste("full_set/", species[2], "/", species[2], "_Signed_TOM-block.1.RData", sep=""))
+
+Mgen.net <- loadRData(paste("full_set/", species[3], "/", species[3], "_Signed_Network.RData", sep=""))
+Mgen.TOM <- loadRData(paste("full_set/", species[3], "/", species[3], "_Signed_TOM-block.1.RData", sep=""))
+
+Pcan.net <- loadRData(paste("full_set/", species[4], "/", species[4], "_Signed_Network.RData", sep=""))
+Pcan.TOM <- loadRData(paste("full_set/", species[4], "/", species[4], "_Signed_TOM-block.1.RData", sep=""))
+
+Pdom.net <- loadRData(paste("full_set/", species[5], "/", species[5], "_Signed_Network.RData", sep=""))
+Pdom.TOM <- loadRData(paste("full_set/", species[5], "/", species[5], "_Signed_TOM-block.1.RData", sep=""))
+
+Lfla.net <- loadRData(paste("full_set/", species[6], "/", species[6], "_Signed_Network.RData", sep=""))
+Lfla.TOM <- loadRData(paste("full_set/", species[6], "/", species[6], "_Signed_TOM-block.1.RData", sep=""))
+```
+
+#### What are the summary statistics on the modules?
+```{r}
+
+## Need to extract the modules from each network:
+Ccal.modules <- (table(Ccal.net$colors))
+Caus.modules <- (table(Caus.net$colors))
+Mgen.modules <- (table(Mgen.net$colors))
+Pcan.modules <- (table(Pcan.net$colors))
+Pdom.modules <- (table(Pdom.net$colors))
+Lfla.modules <- (table(Lfla.net$colors))
+
+## Let's make a summary statistics table we can start to store valuable info into:
+modules.Summary <- function(modules, spp, geneCount) {
+  ## Passed as a table; let's make a df version too:
+  df <- as.data.frame(modules)
+  df
+  ## First, remove the unassigned genes from bin 0
+  if(any(df$Var1 == 0) == FALSE) {     ## If there is no unassigned bin, df stays as is.
+    numUnassigned <- 0
+  }  
+  if(any(df$Var1 == 0) == TRUE) {     ## If there is an unassigned bin
+    numUnassigned <- subset(df, Var1 == 0)$Freq
+    df <- df[-1,]     ## Remove the unassigned row
+  }
+  
+  summaryStats.df <- c(sprintf("%1.0f", nrow(df)),   ## number of modules assigned
+                     sprintf("%1.2f", mean(df$Freq)), ## mean number of genes in the assigned modules
+                     sprintf("%1.0f", min(df$Freq)),  ## min number of genes in the assigned modules
+                     sprintf("%1.0f", max(df$Freq)),  ## max number of genes in the assigned modules
+                     sprintf("%1.0f", numUnassigned),   ## number of genes in the unassigned bin, 0
+                     sprintf("%1.0f", geneCount))  ## number of genes run in WGCNA       
+  summaryStats.df <- as.data.frame(summaryStats.df)
+  rownames(summaryStats.df) <- c("NModules", "MeanGenesPerModule", "MinGenesPerModule", "MaxGenesPerModule", 
+                            "NumGenesUnassigned", "totalGenes")
+  colnames(summaryStats.df) <- spp
+  return(summaryStats.df)
+}
+
+# modules <- Ccal.modules
+# modules <- Caus.modules
+# modules <- Lfla.modules
+
+# spp <- species[1]
+# spp <- species[2]
+# geneCount <- gene.counts[1]
+
+summaryStats.df <- cbind(modules.Summary(Ccal.modules, species[1], gene.counts[1]),
+                         modules.Summary(Caus.modules, species[2], gene.counts[2]),
+                         modules.Summary(Mgen.modules, species[3], gene.counts[3]),
+                         modules.Summary(Pcan.modules, species[4], gene.counts[4]),
+                         modules.Summary(Pdom.modules, species[5], gene.counts[5]),
+                         modules.Summary(Lfla.modules, species[6], gene.counts[6]))
+summaryStats.df
+
+write.table(summaryStats.df, file = paste("full_set/", file.flag, "_Network_Summary_Statistics.txt", sep = ""), sep = "\t", append = F, quote = F, row.names = T, col.names = T)
+```
+
+There seems to be a disproportionate number of genes unassigned to modules in two of the species; disproportionate is it?
+```{r}
+## Because of the way I stored the data, I first need to take the row and turn it into a vector with unlist() and then I need to disassociate the names with unname()
+numunassign <- unname(unlist(summaryStats.df["NumGenesUnassigned",]))
+## From there, because it was a factor (thanks, sprintf!), I need to turn them into a character vector from which I can then make a numeric vector:
+numnassign <- as.numeric(as.character(numunassign))
+numnassign
+
+v1 <- numnassign
+v2 <- gene.counts
+
+## Save the species labels for plotting:
+spp.labels <-  c("C. australensis", "C. calcarata", "M. genalis", "P.canadensis", "P. dominula", "L. flavolineata")
+
+# Save the plot as a PDF
+pdf(file = paste("full_set/", file.flag, "_Network_Proportion_Unassigned_Genes.pdf", sep=""), width =15, height = 9)
+
+barplot(v1/v2, main=paste("Proportion of Genes Unassigned \n (", file.flag, " Network)", sep = ""), horiz=F, las=1, names.arg=spp.labels, col = "light yellow", cex.names = 1.2, ylim = c(0, 1), cex = 1.2, border = "orange")
+dev.off() 
+
+temp <- cbind(species, as.numeric(v1/v2))
+temp <- as.data.frame(temp)
+colnames(temp) <- c("species", "prop.unassigned")
+temp
+
+prop.test(v1, v2)
+## The proportions are not equal
+```
+
+Let's look at the numbers of modules per species (when we resample, we'll actually have variation):
+```{r}
+## Barplot for the numbers of modules
+t <- as.data.frame(t(summaryStats.df["NModules",])) 
+t$Species <- rownames(t)
+t$NModules <- as.numeric(as.character(t$NModules))
+## Reorder the species
+t$Species <- factor(t$Species, levels = c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", 
+                                          "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata"))  
+
+# Save the plot as a PDF
+pdf(file = paste("full_set/", file.flag, "_Network_Number_Genes_in_Modules.pdf", sep=""), width = 8, height = 6)
+
+barplot(t$NModules~t$Species, main = paste("Numbers of Modules \n (", file.flag, " Network)", sep = ""), xlab = NA, ylab = "N Modules", col = "cornflower blue", border = "navy", cex.names = 0.8, names = spp.labels)
+dev.off()
+```
+
+```{r}
+## Boxplot for the numbers of genes in modules
+genesInModules <- list(as.numeric(unname(unlist(Caus.modules[-1]))), 
+     as.numeric(unname(unlist(Ccal.modules[-1]))), 
+     as.numeric(unname(unlist(Mgen.modules[-1]))),
+     as.numeric(unname(unlist(Pcan.modules[-1]))), 
+     as.numeric(unname(unlist(Pdom.modules[-1]))), 
+     as.numeric(unname(unlist(Lfla.modules[-1]))))
+
+# Save the plot as a PDF
+pdf(file = paste("full_set/", file.flag, "_Network_Modules_Sizes.pdf", sep=""), width = 12, height = 6)
+
+boxplot(genesInModules, names = spp.labels, cex.names = 0.5, ylab = "N Genes", col = "cornflower blue", border = "navy", main = paste("Modules Sizes \n (", file.flag, " Network)", sep = ""), lwd = 1.5, pch = 1)
+dev.off()
+```
+
+
+### 3. Visualize the modules:
+```{r}
+plotDendro <- function(net, spp) {
+  # Convert labels to colors for plotting
+  mergedColors = labels2colors(net$colors)
+  
+  dev.new()
+  # sizeGrWindow(width, height)   ## Isn't 
+
+  # Plot the dendrogram and the module colors underneath
+  pdf(file = paste("full_set/", spp, "/", spp, "_Network_Dendrogram_", file.flag, "_Network.pdf", sep=""), width = 8, height = 10)
+  plotDendroAndColors(net$dendrograms[[1]], mergedColors[net$blockGenes[[1]]], "Module colors", dendroLabels = FALSE, hang = 0.03, addGuide = TRUE, guideHang = 0.05, main = paste(spp, " Cluster Dendrogram \n (", file.flag, " Network)", sep=""), saveMar = F, marAll = c(7, 5, 12, 1), setLayout = T)
+ 
+  dev.off()
+}
+
+# plotDendro(Ccal.net, species[1])
+# plotDendro(Caus.net, species[2])
+# plotDendro(Mgen.net, species[3])
+# plotDendro(Pcan.net, species[4])
+# plotDendro(Pdom.net, species[5])
+# plotDendro(Lfla.net, species[6])
+```
+
+## Quantifying module–trait associations:
+
+#### Reproductive vs. Non-reproductive as traits:
+```{r}
+
+net <- Lfla.net
+wgcna <- Lfla.wgcna
+traits <- Lfla.traits
+spp <- species[6]
+
+getModuleMembership <- function(net, wgcna, traits, spp) {
+  nGenes <- ncol(wgcna)
+  nSamples <- nrow(wgcna)
+  moduleLabels <- net$colors   ## Assigns modules to genes
+  levels(as.factor(moduleLabels))
+  moduleColors <- labels2colors(net$colors)  ## Translates the module # to the color
+  # Recalculate module eigengenes (MEs) with color labels
+  MEs0 <- moduleEigengenes(wgcna, moduleColors)$eigengenes
+  # Puts close eigenvectors next to each other
+  MEs <- orderMEs(MEs0)
+
+  ## Performs the module-trait correlation using the Pearson method
+  moduleTraitCor <- cor(MEs, traits[1:2], use = "p") ## I don't want it to correlate with the id numbers
+  ## This gives you the correlation p-values for the two phenotypes
+  moduleTraitPvalue <- corPvalueStudent(moduleTraitCor, nSamples)
+
+  ## Correlation between all genes with their module memberships regardless of trait
+  geneModuleMembership <- as.data.frame(cor(wgcna, MEs, use = "p"))
+
+  #### Display correlations and their p-values. This makes a heat map of the modules with the correlation coefficients and p-values for the trait-module correlations:
+  pdf(file = paste("full_set/", spp, "/", spp, "_Trait_Correlations_", file.flag, "_Network.pdf", sep = ""), width = 8, height = 10)
+
+  textMatrix <- paste(signif(moduleTraitCor, 2), "\n(", signif(moduleTraitPvalue, 1), ")", sep = "")
+  dim(textMatrix) <- dim(moduleTraitCor)
+  par(mar <- c(5, 8.5, 3, 3))
+  # Display the correlation values within a heatmap plot
+  labeledHeatmap(Matrix = moduleTraitCor,
+             xLabels = names(traits[,1:2]), ## I don't want it to correlate with the id numbers
+             yLabels = names(MEs),
+             ySymbols = names(MEs),
+             colorLabels = FALSE,
+             colors = blueWhiteRed(50), 
+             textMatrix = textMatrix, 
+             setStdMargins = FALSE, 
+             cex.text = 0.75,
+             zlim = c(-1,1),
+             main = paste(spp, " Module-Trait Correlations", sep = ""))
+  dev.off()
+  
+  # Names (colors) of the modules
+  moduleNames <- substring(names(MEs), 3)  ## Saves the module names as their colors
+  ## Store the Module Membership (MM) p-values in a dataframe with the modules and the traits: 
+  MMPvalue <- as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership), nSamples))
+  ## Modify the names to indicate that these are the module memberships:
+  names(geneModuleMembership) <- paste("MM", moduleNames, sep = "")
+  ## And the module membership p-values:
+  names(MMPvalue) <- paste("p.MM", moduleNames, sep = "")
+
+  #### Next, let's make a traits table to correlate the genes & traits  together:
+  trait <- as.data.frame(traits[,"R"])
+  names(trait) <- "Reproductives"
+  
+  ## Also record the gene-trait significance (GS), by correlating each gene with the traits:
+  geneTraitCorr <- as.data.frame(cor(wgcna, trait, use = "p"))
+  # geneTraitCorr   ## Correlation coefficients
+  ## Rename the columns appropriately to indicate they are the gene-trait significance (GS)
+  names(geneTraitCorr) <- c("GS.Reproductives")
+  ## Let's also make a column for the Nonreproductives
+  geneTraitCorr2 <- -geneTraitCorr    ## This is the negative of the gene-trait correlations for the other trait, NonReproductives
+  names(geneTraitCorr2) <- c("GS.NonReproductives")
+  ## Save the p-value associated with the gene-trait significance correlations
+  GSPvalue <- as.data.frame(corPvalueStudent(as.matrix(geneTraitCorr), nSamples))
+  ## And the associated p-value (No need to give two)
+  names(GSPvalue) <- c("p.GS.Reproductives")
+  
+  ## Next, order the modules by trait value:
+  modOrder = order(-abs(cor(MEs, trait, use = "p")))
+  geneInfo0 <- data.frame(geneID = colnames(wgcna),
+                    moduleColor = moduleColors,
+                    geneTraitCorr, geneTraitCorr2, 
+                    GSPvalue)
+  # geneInfo0
+  levels(as.factor(moduleColors))
+  
+  # Add module membership information in the chosen order
+  for (mod in 1:ncol(geneModuleMembership)) {
+     oldNames <- names(geneInfo0)
+     geneInfo0 <- data.frame(geneInfo0, geneModuleMembership[, modOrder[mod]],
+                       MMPvalue[, modOrder[mod]]);
+     names(geneInfo0) <- c(oldNames, paste("MM.", moduleNames[modOrder[mod]], sep = ""),
+                       paste("p.MM.", moduleNames[modOrder[mod]], sep = ""))
+  }
+
+  # Order the genes in the geneInfo variable first by module color, then by geneTraitSignificance
+  geneOrder <- order(geneInfo0$moduleColor, -abs(geneInfo0[,paste("GS.", names(trait), sep = "")]));
+  geneInfo <- geneInfo0[geneOrder, ]
+
+  write.table(geneInfo, file = paste("full_set/", spp, "/", spp, "_", "_Genes_Module_Correlations.txt", sep = ""), quote = F, append = F, row.names = F, col.names = T, sep = "\t")
+
+  return(list(moduleTraitPvalue, moduleTraitCor, geneModuleMembership, geneTraitCorr, geneInfo))
+}
+
+Ccal.TraitCorr <- getModuleMembership(Ccal.net, Ccal.wgcna, Ccal.traits, species[1])
+Caus.TraitCorr <- getModuleMembership(Caus.net, Caus.wgcna, Caus.traits, species[2])
+Mgen.TraitCorr <- getModuleMembership(Mgen.net, Mgen.wgcna, Mgen.traits, species[3])
+Pcan.TraitCorr <- getModuleMembership(Pcan.net, Pcan.wgcna, Pcan.traits, species[4])
+Pdom.TraitCorr <- getModuleMembership(Pdom.net, Pdom.wgcna, Pdom.traits, species[5])
+Lfla.TraitCorr <- getModuleMembership(Lfla.net, Lfla.wgcna, Lfla.traits, species[6])
+```
+In the resulting table that is saved, MM indicates the gene's correlation with the module membership (MM.color == correlation coefficient), and the p-value for that particular gene's correlation with the module (MM.p). GS stands for gene-trait significance. These abbreviations are standard to WGCNA and are not my own.
+
+
+Now, how many of these modules are significantly associated with reproductives and non-reproductives, and return those for downstream analysis:
+```{r}
+TraitCorr <- Lfla.TraitCorr
+spp <- species[6]
+
+filterSigModules <- function(TraitCorr, spp) { 
+  ## Next, find out how many of the modules were significant (p < 0.05):
+  temp <- as.data.frame(TraitCorr[[1]]) ## P-values
+  temp
+  temp2 <- as.data.frame(TraitCorr[[2]])  ## Correlation coefficients
+  temp2
+  ## Reproductives are positive correlation coefficients
+  
+  ## Filter on a p-value less than 0.10 and a correlation coefficient >= 0.75
+  # filt <- (temp[which(temp[,"R"] < 0.10 | temp2[,"R"] >= 0.75), ])
+  
+  # Filter on a p-value less than 0.05 regardless of correlation coefficients
+  filt.key <- which(temp[,"R"] < 0.05)
+  sig.filt <- temp[filt.key,]
+  sig.filt
+  # nonsig.filt <- temp[-filt.key, ]
+  sigColors <- rownames(sig.filt)
+  sigColors
+  
+  ## Which are reproductive modules?
+  sigRcolors <- rownames(sig.filt[which(temp2[sigColors,"R"] > 0),])
+  sigRcolors
+  
+  ## Which are the non-reproductive modules?
+  sigNRcolors <- rownames(sig.filt[which(temp2[sigColors,"R"] < 0),])
+  sigNRcolors
+  
+  ## Now, let's save those data separately for later use:
+  sigColors <- gsub("ME", "", sigColors)
+  sigRcolors <- gsub("ME", "", sigRcolors)
+  sigNRcolors <- gsub("ME", "", sigNRcolors)
+
+  temp3 <- as.data.frame(TraitCorr[[5]])
+
+  ## The which() function was failing, so I switched to %in% to avoid a vector-length error.
+  sigModules <- temp3[temp3$moduleColor %in% sigColors, ] 
+  nonSigModules <- temp3[! temp3$moduleColor %in% sigColors, ]
+ 
+  RsigModules <- temp3[temp3$moduleColor %in% sigRcolors, ]
+  NRsigModules <- temp3[temp3$moduleColor %in% sigNRcolors, ]
+
+  print(paste("There are ", nrow(sigModules), " significant genes across ", nrow(sig.filt), " modules.", sep = ""))
+  print(paste("There are ", nrow(nonSigModules), " non-significant genes across ", nrow(temp)-nrow(sig.filt) , " modules.", sep = ""))
+
+  save(sigModules, file = paste("/full_set/", spp, "/", spp, "_Significant_Trait_Modules.RData", sep = ""))
+  save(nonSigModules, file = paste("/full_set/", spp, "/", spp, "_Nonsignificant_Trait_Modules.RData", sep = ""))
+
+  return(list(nrow(sigModules), nrow(sig.filt), nrow(nonSigModules), nrow(temp)-nrow(sig.filt), nrow(temp3), nrow(temp)))  
+}
+
+header <- c("N.Genes.Sig.Modules", "N.Sig.Modules", "N.Genes.NonSig.Modules", "N.NonSig.Modules", "N.Genes", "N.Modules")
+results <- rbind(filterSigModules(Ccal.TraitCorr, species[1]),
+                 filterSigModules(Caus.TraitCorr, species[2]),
+                 filterSigModules(Mgen.TraitCorr, species[3]),
+                 filterSigModules(Pcan.TraitCorr, species[4]),
+                 filterSigModules(Pdom.TraitCorr, species[5]),
+                 filterSigModules(Lfla.TraitCorr, species[6]))
+colnames(results) <- header
+rownames(results) <- species
+results
+
+write.table(results, file = "full_set/Significant_Trait_Correlations_Modules_Summary.txt", row.names = T, col.names = T, append = F, quote = F, sep = "\t")
+```
+
+**Note** that I am *NOT* removing the grey module from the results -- this was not significant in any of the correlations *EXCEPT* for L. flavolineata! Very strange -- so for Lfla, there is a significant correlation with the traits (*significant in Reproductives*) with NOT being in a module. Very interesting. But this makes me realize that I also need to figure out how many of the DEGs are among those genes that are unassigned!
+

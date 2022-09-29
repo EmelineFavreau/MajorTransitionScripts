@@ -1,0 +1,539 @@
+---
+title: "Consensus WGCNA: Trait Correlation + Figures FOR RESAMPLED DATA"
+author: "K.S. Geist, Iowa State University"
+date: "1 July 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Install and load requisite libraries.
+```{r, warning=FALSE, include = FALSE}
+#install.packages("BiocManager")
+#BiocManager::install("WGCNA")
+## This may take a while, as there are a lot of dependencies. I suggest doing this in R rather than R Studio if you run into issues.
+## Note that if you are on a Mac, you may be missing pkg-config and/or zlib. If so, you will need to use Homebrew to get them.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+# Function that loads an RData file, and returns it with your custom name
+loadRData <- function(fileName){    
+    load(fileName)
+    get(ls()[ls() != "fileName"])
+}
+
+## Load libraries
+library(WGCNA)
+library(ggplot2)
+library(flashClust)
+```
+
+###### Set the switches:
+```{r}
+## 1 = all 6; 2 = bees, 3 = wasps
+#spp.switch <- 1
+spp.switch <- 2
+# spp.switch <- 3
+
+## Set it to equal the minimum module size you want, here 30:
+net.switch <- 30
+```
+
+###### Set the species:
+```{r}
+## All 6 species:
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata")
+path <- "consensusNetwork_orthogroups3718"
+```
+
+###### Choose bees or wasps (or neither for all 6 species):
+```{r}
+if (spp.switch == 2) {
+  ## Just the bees:
+  species <- species[1:3]
+  path <- "consensusNetwork_orthogroups5787_BEES"
+}
+if (spp.switch == 3) {
+  ## Just the wasps:
+  species <- species[4:6]
+  path <- "consensusNetwork_orthogroups6983_WASPS"
+}
+```
+
+###### Set up the minimum modules sizes that we are working with:
+*Note:* For the resampling, we are only comparing with a minimum module size = 30
+```{r}
+minModSize <- net.switch
+```
+
+#### Bring in the appropriate gene list from the point estimate to compare with the resampling to generate a p-value:
+We are using the unique genes from "SigModule-SigTraitAssociated". What this means is that these genes were in significantly trait-associated modules as identified by meta-analysis AND were genes with significant expression in those modules. The uniqueness aspect is that these genes could have had membership in more than one module, but we don't want to double count them.
+```{r}
+   PEsigGenes2 <- read.table(file = paste(path, "/minModuleSize", minModSize, "/orthogroupList_SigModule-SigTraitAssociated.txt", sep = ""), 
+                             header = T, sep = "\t")
+```
+
+
+###### Set the number of iterations (k):
+```{r}
+k = 1000
+```
+
+#### Iterate through k multiExpression datasets to identify the genes correlated with the "trait" of reproductive:
+Change eval = TRUE to run.
+```{r, echo = FALSE, warnings = FALSE, eval = FALSE}
+# iter = 1
+## Set up the final results table:
+dfResults <- data.frame(matrix(NA, nrow = k, ncol = 5))
+names(dfResults) <- c("num_sign_modules_in_iter", "num_unique_genes_in_iter", "num_PtEst_genes_in_iter", "prop_PE_genes_match", "prop_iter genes_match")
+
+  for(iter in 1:k) {
+    # print(iter)
+  ## 1. Read in the multiExpression datasets:
+    load(paste(path, "/resampling/consensusNetwork_input_data_", iter, ".RData", sep = ""))
+  
+  ## 2. Quick setup for downstream:
+    geneID <- colnames(multiExpr[[1]]$data)   ## Just use the first set as the default for all sets to get the geneIDs
+    nGenes <- exprSize$nGenes
+    nSamples <- exprSize$nSamples
+    nSets <- exprSize$nSets
+
+  ## 3. Load in the network & TOM:
+    net30 <- mget(load(file = paste(path, "/resampling/Consensus-NetworkConstruction-Manual_consensusMEs_MinModuleSize", minModSize, "_", iter, ".RData", sep = "")))
+  
+    ## Call that network as your only network henceforth
+    net <- get(paste("net", net.switch, sep = ""))
+  
+  ## 4. Set the module colors; I can  use one subnet to represent all colors for all networks:
+    moduleColors <- labels2colors(net$consMEs[[1]]$validColors)  ## Saves the module names as their colors for EACH GENE
+    
+    #### Also, extract the unordered consMEs excluding grey (for the trait-module associations)
+    consMEs.unord <- multiSetMEs(multiExpr, universalColors = moduleColors, excludeGrey = TRUE)
+
+    #### We also need to know how many modules there are and store their names:
+    MEnames.NoGrey <- colnames(consMEs.unord[[1]]$data)
+    nMEs.NoGrey <- checkSets(consMEs.unord)$nGenes
+
+    #### Lastly, get them INCLUDING grey (for some applications):
+    consMEs.unord.withGrey <- multiSetMEs(multiExpr, universalColors = moduleColors, excludeGrey = FALSE)
+    MEnames.WithGrey <- colnames(consMEs.unord.withGrey[[1]]$data)
+    nMEs.WithGrey <- checkSets(consMEs.unord.withGrey)$nGenes
+    
+    
+    ## 5. Perform Pearson correlations of modules with trait:
+    moduleTraitCor = list()
+    moduleTraitPvalue = list()
+    for (set in 1:nSets) {
+      subnet <- consMEs.unord[[set]]
+      wgcna <- multiExpr[[set]]$data
+      spp <- species[set]
+      ## Performs the module-trait correlation using the Pearson method
+      moduleTraitCor[[set]] = corAndPvalue(subnet$data, traits[[set]][,1:2], use = "p")
+      ## This gives you the correlation p-values for the two phenotypes
+      moduleTraitPvalue[[set]] = corPvalueFisher(moduleTraitCor[[set]]$cor, exprSize$nSamples[set])
+    }
+    
+  ## 6. Perform a meta-analysis to identify the genes correlated with module correlated with trait:
+    modTraitCorr.metaZsum <- 0
+    ## Calculate a meta Z-score of correlations from each set with a corresponding p-value:
+     ## Loop through and get the sums:
+      for(i in 1:nSets) {
+          modTraitCorr.metaZsum <- modTraitCorr.metaZsum + moduleTraitCor[[i]]$Z
+     }
+    ## Next, get the meta Z scores and p-values:
+    modTrait.metaZ <-  modTraitCorr.metaZsum/sqrt(nSets)
+    modTrait.metaP <- 2*pnorm(abs(modTrait.metaZ), lower.tail = FALSE)
+    ## Now, these are matrices; need to turn into dfs
+    modTrait.metaZ <- as.data.frame(modTrait.metaZ)
+    modTrait.metaZ$ME <- rownames(modTrait.metaZ)
+    modTrait.metaP <- as.data.frame(modTrait.metaP)
+    modTrait.metaP$ME <- rownames(modTrait.metaP)
+    ## The significant consensus modules correlated with trait:
+    sigConsensusModules <- modTrait.metaP[which(modTrait.metaP$R < 0.05), "ME"]
+    ## Next, make a combined table:
+    traitModuleDF <- merge(modTrait.metaZ, modTrait.metaP, by = "ME")
+    traitModuleDF <- traitModuleDF[-5]  ## Drop the extra p-value column
+    colnames(traitModuleDF) <- c("ME", "Reproductive.MetaZ", "Non-Reproductive.MetaZ", "MetaPval")
+    ## If I wanted the results of the module-trait meta-analysis:
+    # traitModuleDF
+    
+    ## 7. Meta-analyses of the gene-trait and module-trait correlations:
+    ## And create blank lists to store the Gene Significances and the kMEs:
+    GS <- list()
+    kME <- list()
+    GS.metaZsum <- 0
+    kME.metaZsum <- 0
+    
+    for (set in 1:nSets) {
+      GS[[set]] <- corAndPvalue(multiExpr[[set]]$data, traits[[set]])
+      kME[[set]] <- corAndPvalue(multiExpr[[set]]$data, consMEs.unord[[set]]$data)
+    }
+    # This returns a list of matrices of the correlations and their statistics
+        
+    ## Next,  calculate a meta Z-score of correlations from each set with a corresponding p-value:
+       ## Loop through and get the sums:
+        for(i in 1:nSets) {
+            GS.metaZsum <- GS.metaZsum + GS[[i]]$Z
+            kME.metaZsum <- kME.metaZsum + kME[[i]]$Z
+       }
+        ## Next, get the meta Z scores and p-values:
+        GS.metaZ <-  GS.metaZsum/sqrt(nSets)
+        GS.metaP <- 2*pnorm(abs(GS.metaZ), lower.tail = FALSE)
+        
+        ## Now, turn these into a df and merge (just the reproductives):
+        GS.metaZ <- data.frame(GS.metaZ[,1])
+        GS.metaZ$geneID <- geneID
+        GS.metaP <- data.frame(GS.metaP[,1])
+        GS.metaP$geneID <- geneID
+        GS.meta <- merge(GS.metaZ, GS.metaP, by = "geneID")  ## by = 0 indicates we are joining by row names
+        rownames(GS.meta) <- geneID
+        # head(GS.meta)
+        
+        kME.metaZ <- kME.metaZsum/sqrt(nSets)
+        kME.metaP <- 2*pnorm(abs(kME.metaZ), lower.tail = FALSE)
+        ## Now, turn these into a df and merge:
+        kME.metaZ <- as.data.frame(kME.metaZ)
+        kME.metaZ$geneID <- geneID
+        kME.metaP <- as.data.frame(kME.metaP)
+        kME.metaP$geneID <- geneID
+        kME.meta <- merge(kME.metaZ, kME.metaP, by = "geneID")
+        rownames(kME.meta) <- geneID
+  
+        ## Identify as correlation coefficients and P-values in the column names:
+        colnames(kME.meta) <- gsub("\\.x", ".Reproductive.metaZ.MM", colnames(kME.meta))
+        colnames(kME.meta) <- gsub("\\.y", ".Reproductive.metaPval.MM", colnames(kME.meta))
+  
+        ## Lastly, let's put the colors by each other:
+        sortedColumns <- order(colnames(kME.meta))
+        kME.meta <- kME.meta[, sortedColumns]
+  
+    ## 8. Make the gene-significance table for export:
+      columnNames <- c("geneID", "Reproductive.GS.metaZ", "Reproductive.GS.metaPval")    ## Set the column names list here
+      ct <- ncol(GS.meta)  ## Set a counter so we know how many of these are in here; start at the number of columns in the df
+    
+      ## Now add on for however many sets are remaining:
+      for(i in 1:nSets) {
+        tempCor <- data.frame(GS[[i]]$cor[,1])
+        tempCor$geneID <- geneID   
+        tempP <- data.frame(GS[[i]]$p[,1])
+        tempP$geneID <- geneID
+        ## Now do the merges:
+        GS.meta = merge(GS.meta, tempCor, by = "geneID")
+        GS.meta = merge(GS.meta, tempP, by = "geneID")
+        
+        ct = ct + 2   ## Increment by the two columns we added
+        columnNames <- c(columnNames, paste("Reproductive.GS.cor.", species[i], sep = ""), 
+                         paste("Reproductive.GS.pval.", species[i], sep = ""))   ## Add to  column names
+        ## Then set the column names before we run again:
+        colnames(GS.meta) <- columnNames
+      }
+      # dim(GS.meta)
+      # head(GS.meta)
+    
+      # write.table(as.data.frame(GS.meta), 
+      #             file = paste(path, "/resampling/Gene-Trait_MetaAnalysis_Results_", 
+      #                          iter, ".txt", sep = ""), 
+      #             row.names = F,
+      #             col.names = T,
+      #             quote = F, 
+      #             sep = "\t")
+    
+    ## 10. Now, do it again for kME (where we determine which modules are significantly correlated with trait)
+    ct <- ncol(kME.meta)  ## Set a counter so we know how many of these are in here; start at the number of columns in the df
+      
+      ## Now add on for however many sets are remaining:
+      for(i in 1:nSets) {
+        tempCor <- data.frame(kME[[i]]$cor)
+        tempCor$geneID <- geneID   
+        tempP <- data.frame(kME[[i]]$p)
+        tempP$geneID <- geneID
+        ## Now do the merges:
+        kME.meta = merge(kME.meta, tempCor, by = "geneID")
+        kME.meta = merge(kME.meta, tempP, by = "geneID")
+        
+        ## Identify as correlation coefficients and P-values in the column names (also where we are naming our column headers this time):
+        colnames(kME.meta) <- gsub("\\.x", paste(".Reproductive.MM.cor.", species[i], sep = ""), colnames(kME.meta))
+        colnames(kME.meta) <- gsub("\\.y", paste(".Reproductive.MM.Pval.", species[i], sep = ""), colnames(kME.meta))    
+        
+        ct = ct + 2*nMEs.NoGrey   ## Increment by the two columns we added
+      }
+
+      ## Lastly, let's put the colors by each other:
+      sortedColumns <- order(colnames(kME.meta))
+      kME.meta <- kME.meta[, sortedColumns]
+      
+      # write.table(as.data.frame(kME.meta), 
+      #             file = paste(path, "/resampling/Gene-Module-kME_Results_", 
+      #                          iter, ".txt", sep = ""), 
+      #             row.names = F,
+      #             col.names = T,
+      #             quote = F, 
+      #             sep = "\t")
+    
+      # View(GS.meta)
+      # View(kME.meta)
+    
+    ## 11. Export the genes for the consensus modules significantly associated the traits of interest:
+      ## First, make a df that contains just the significant modules from the kME.meta df:
+      # length(sigConsensusModules)
+      ## If there are no consensus modules (which may happen with the true resampling):
+      if (length(sigConsensusModules) > 0) {
+        sigColumnNames <- c("geneID")
+        for(i in 1:length(sigConsensusModules)) {
+          sigColumnNames <- c(sigColumnNames, 
+                              paste(sigConsensusModules[i], ".Reproductive.metaZ.MM", sep = ""), 
+                              paste(sigConsensusModules[i], ".Reproductive.metaPval.MM", sep = ""))
+          sigDF <- kME.meta[,sigColumnNames]
+        }
+      }
+      # write.table(sigDF, 
+      #             file = paste(path,"resampling/Trait-Module-Gene_MetaAnalysis_Only_Significant_Modules_", iter, ".txt", sep = ""),
+      #           row.names = F,
+      #           col.names = F,
+      #           quote = F,
+      #           sep = "\t")
+  
+      ## 12. Finally, some gene lists...
+        ## We originally filtered based on the following criteria:
+          # (1) If the gene is significantly associated with the module(s) of focus
+          # (2) If the gene is significantly associated with the module AND significantly associated with the trait across all species (using the results of that meta-analysis too)
+          # (R) If the gene is significantly associated with the module AND trait, AND divided into R
+          # (NR) vs NR
+  
+      ## NOTE: For the purposes of what we want to compare back to the point estimate, we really only want list 2 - significantly associated with module AND trait using the result of the meta-analysis. However, I'll keep the code just in case we decide to compare those also.
+
+        ## Make an empty list to match the number of significant MEs:
+        sigGenes.list1 <- vector("list", length = length(sigConsensusModules))
+        sigGenes.list2 <- vector("list", length = length(sigConsensusModules))
+        sigGenes.listR <- vector("list", length = length(sigConsensusModules))
+        sigGenes.listNR <- vector("list", length = length(sigConsensusModules))
+    
+        ## Name it with the ME colors
+        names(sigGenes.list1) <- sigConsensusModules
+        names(sigGenes.list2) <- sigConsensusModules
+        names(sigGenes.listR) <- sigConsensusModules
+        names(sigGenes.listNR) <- sigConsensusModules
+    
+        ## Couple more empty storage containers:
+        sigGenes1 <- c()
+        sigGenes2 <- c()
+        sigGenesR <- c()
+        sigGenesNR <- c()
+  
+        geneCounts1 <- c()
+        geneCounts2 <- c()
+        geneCountsR <- c()
+        geneCountsNR <- c()
+        info <- data.frame()
+  
+        ## IF  there are no consensus modules, then we have no choice but to populate the gene lists as empty:
+          if (length(sigConsensusModules) == 0) {
+            sigGenes1 <- c()
+            sigGenes2 <- c()
+            sigGenesR <- c()
+            sigGenesNR <- c()
+            geneCounts1 <- 0
+            geneCounts2 <- 0
+            geneCountsR <- 0
+            geneCountsNR <- 0
+          }
+          
+        ## BUT -  if there are  consensus modules, do some gene counting:
+        if (length(sigConsensusModules) > 0) {    
+          
+        ## Now, we need to loop through the significant modules and do the filtering:
+          for(i in 1:length(sigConsensusModules)) {
+              mod <- paste(sigConsensusModules[i], ".Reproductive.metaPval.MM", sep = "")
+              ## Filter minimal: just if the gene is significantly associated with the module(s) of focus:
+              sigGenes.list1[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05), "geneID"])
+              ## Store the gene counts:
+              geneCounts1 <- c(geneCounts1, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05), "geneID"])))
+              # print(geneCounts1)
+      
+              ## Filter slightly more stringent: just if the gene is significantly associated with the module(s) of focus AND significantly associated with the trait across all species:
+              sigGenes.list2[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])
+              geneCounts2 <- c(geneCounts2, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])))
+              # print(geneCounts2)
+        
+              ## Separate into R and NR:
+              ##### Reproductives first:
+              if(traitModuleDF[which(traitModuleDF$ME %in% sigConsensusModules[i]), "Reproductive.MetaZ"] > 0) {
+                sigGenes.listR[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])
+                geneCountsR <- c(geneCountsR, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])))
+                geneCountsNR <- c(geneCountsNR, NA)
+              }
+              ##### Non-Reproductives:
+              if(traitModuleDF[which(traitModuleDF$ME %in% sigConsensusModules[i]), "Reproductive.MetaZ"] < 0) {
+                sigGenes.listNR[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])
+                geneCountsNR <- c(geneCountsNR, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])))
+                geneCountsR <- c(geneCountsR, NA)
+              }  
+    
+            #   print(geneCountsR)
+            #   print(geneCountsNR)
+          } ## end of that for loop
+
+      ## Print the summary info (which can have overlapping genes in modules at this stage):
+      info <- data.frame(geneCounts1, 
+                         geneCounts2, 
+                         geneCountsR, 
+                         geneCountsNR)
+      names(info) <- c("Num.Genes.Sig.Module", 
+                       "Num.Genes.Sig.Module.Trait", 
+                       "R.Genes.Sig.Module.Trait", 
+                       "NR.Genes.Sig.Module.Trait")
+      newrow <- c("Total", 
+                  sum(info$Num.Genes.Sig.Module), 
+                  sum(info$Num.Genes.Sig.Module.Trait), 
+                  sum(info$R.Genes.Sig.Module.Trait, na.rm = T), 
+                  sum(info$NR.Genes.Sig.Module.Trait, na.rm = T))
+      info <- rbind(info, newrow)
+  
+      # write.table(info, 
+      #             file = paste(path, 
+      #                          "/resampling/Trait-Module-Gene_MetaAnalysis_GeneCounts_", 
+      #                          iter, ".txt", sep = ""), 
+      #             row.names = F,
+      #             col.names = T,
+      #             quote = F, 
+      #             sep = "\t")
+
+  
+    ## 13. Go through the lists of gene lists, take the unique ones:
+      ## Turn into a dataframe, then take the unique list:
+        sigGenes1 <- data.frame(unlist(sigGenes.list1))
+        sigGenesCount1 <- length(unique(sigGenes1[,1]))
+        # write.table(as.data.frame(unique(sigGenes1[,1])), 
+        #               file = paste(path, 
+        #                            "/resampling/orthogroupList_SigModuleAssociated_Only_",
+        #                            iter, ".txt", sep = ""), 
+        #               row.names = F,
+        #               col.names = F,
+        #               quote = F, 
+        #               sep = "\t")
+  
+        sigGenes2 <- data.frame(unlist(sigGenes.list2))
+        sigGenesCount2 <- length(unique(sigGenes2[,1]))
+        # write.table(as.data.frame(unique(sigGenes2[,1])), 
+        #               file = paste(path, 
+        #                            "/resampling/orthogroupList_SigModule-SigTraitAssociated_",
+        #                            iter, ".txt", sep = ""), 
+        #               row.names = F,
+        #               col.names = F,
+        #               quote = F, 
+        #               sep = "\t")
+  
+        ## Only creates files for R / NR if they exist:
+        sigGenesR <- data.frame(unlist(sigGenes.listR))
+        if(length(sigGenesR) > 0) {
+          sigGenesCountR <- length(unique(sigGenesR[,1]))
+          # write.table(as.data.frame(unique(sigGenesR[,1])), 
+          #       file = paste(path, "/resampling/orthogroupList_SigModule-SigTraitAssociated_R_",
+          #       iter, ".txt", sep = ""), 
+          #       row.names = F,
+          #       col.names = F,
+          #       quote = F, 
+          #       sep = "\t")
+        }
+        if(length(sigGenesR) == 0) {
+          sigGenesCountR <- 0
+        }
+  
+        sigGenesNR <- data.frame(unlist(sigGenes.listNR))
+          if(length(sigGenesNR) > 0) {
+            sigGenesCountNR <- length(unique(sigGenesNR[,1]))
+            # write.table(as.data.frame(unique(sigGenesNR[,1])), 
+            #           file = paste(path,"/resampling/orthogroupList_SigModule-SigTraitAssociated_NR_",
+            #           iter, ".txt", sep = ""), 
+            #           row.names = F,
+            #           col.names = F,
+            #           quote = F, 
+            #           sep = "\t")
+          }
+          if(length(sigGenesNR) == 0)  {
+            sigGenesCountNR <- 0
+          }
+  
+        ## Print the summary info:
+        info <- data.frame(sigGenesCount1, sigGenesCount2, sigGenesCountR, sigGenesCountNR)
+        names(info) <- c("Num.Uniq.Genes.Sig.Module", 
+                         "Num.Uniq.Genes.Sig.Module.Sig.Trait", 
+                         "R.Uniq.Genes.Sig.Module.Sig.Trait", 
+                         "NR.Uniq.Genes.Sig.Module.Sig.Trait")
+  
+      # write.table(info, 
+      #               file = paste(path, "/resampling/Trait-Module-Gene_MetaAnalysis_GeneCounts_Unique_", 
+      #               iter, ".txt", sep = ""), 
+      #               row.names = F,
+      #               col.names = T,
+      #               quote = F, 
+      #               sep = "\t")
+        } ## end of the conditional statement checking for sign. modules
+   
+        
+      ## 14. Now for the meat of this: comparing the current sigGenes2 contents to the original from the point estimate:
+        if (length(sigConsensusModules) > 0) {
+          ## The number of times that the point estimate gene list shows up in the randomly resampled list:
+          matchCt <- sum(ifelse((PEsigGenes2[,1] %in% sigGenes2$unlist.sigGenes.list2.) == TRUE, 1, 0))
+        
+          ## The proportion of the original gene list found in the randomly resampled list:
+          propPE <- matchCt/nrow(PEsigGenes2)
+        
+          ## The proportion of the randomly resampled list encompassed by the original gene list:
+          propResampled <- matchCt/nrow(sigGenes2)      
+        }
+        ## But if there were no signifant modules in the first place...
+        if (length(sigConsensusModules) == 0) {
+          
+          sigGenesCount2 <- 0
+          
+          ## The number of times that the point estimate gene list shows up in the randomly resampled list:
+          matchCt <- 0
+        
+          ## The proportion of the original gene list found in the randomly resampled list:
+          propPE <- 0
+        
+          ## The proportion of the randomly resampled list encompassed by the original gene list:
+          propResampled <- 0      
+        }
+        
+      ## Put it all in a final table:
+      dfResults[iter,] <- rbind(length(sigConsensusModules), sigGenesCount2, matchCt, propPE, propResampled)
+        
+} ## end going through resampling iterations
+
+write.table(dfResults, file = paste(path, "/resampling/RESULTS_comparison_PtEst genes2resampling.txt", sep = ""), sep = "\t", quote = F, row.names = F)
+```
+
+Now, analyze the results:
+```{r}
+dfResults <- read.table(file = paste(path, "/resampling/RESULTS_comparison_PtEst genes2resampling.txt", sep = ""), sep = "\t", header = T)
+print("The median proportion of consensus WGCNA genes that are found by random sampling:")
+hist(dfResults$prop_PE_genes_match, main = "Proportion Consensus Genes Found by Resampling")
+abline(v = 0.05, col = "red", lty = 2, lwd = 2)
+print(median(dfResults$prop_PE_genes_match))
+print(quantile(dfResults$prop_PE_genes_match, prob = c(0.025, 0.975)))
+print(max(dfResults$prop_PE_genes_match))
+print(min(dfResults$prop_PE_genes_match))
+
+## This is the null hypothesis - if our original result was due to random chance, we'd expect to not deviate significantly from a proportion = 0.5
+print("How many times we obtain 50% or greater of the consensus genes by resampling?")
+p.val <- sum(ifelse(dfResults$prop_PE_genes_match >= 0.5, 1, 0))/k
+p.val
+
+## Just out of curiosity:
+print("How many times we obtain ANY of the consensus genes by resampling?")
+p.val <- sum(ifelse(dfResults$prop_PE_genes_match > 0, 1, 0))/k
+p.val
+
+print("How many times we obtain 100% of the consensus genes by resampling?")
+p.val <- sum(ifelse(dfResults$prop_PE_genes_match == 1, 1, 0))/k
+p.val
+```
+

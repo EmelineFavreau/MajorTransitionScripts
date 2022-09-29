@@ -1,0 +1,927 @@
+---
+title: "Consensus WGCNA: Manual Network Construction"
+author: "K.S. Geist, Iowa State University"
+date: "23 Sept 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Install and load requisite libraries.
+```{r, warning=FALSE, include = FALSE}
+#install.packages("BiocManager")
+#BiocManager::install("WGCNA")
+## This may take a while, as there are a lot of dependencies. I suggest doing this in R rather than R Studio if you run into issues.
+## Note that if you are on a Mac, you may be missing pkg-config and/or zlib. If so, you will need to use Homebrew to get them.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+# Function that loads an RData file, and returns it with your custom name
+loadRData <- function(fileName){    
+    load(fileName)
+    get(ls()[ls() != "fileName"])
+}
+
+## Load libraries
+library(DESeq2)
+library(WGCNA)
+library(ggplot2)
+library(tidyverse)
+library(flashClust)
+```
+
+###### Read in the metadata:
+```{r}
+meta <- read.csv(file = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/Comparative_Transcriptomics_Metadata.csv", strip.white = T, header = T)
+```
+
+###### Set the switches:
+* 1 = all 6 species
+* 2 = bees only 
+* 3 = wasps only
+
+```{r}
+# spp.switch <- 1
+# spp.switch <- 2
+spp.switch <- 3
+```
+
+###### Set the species & path:
+```{r}
+## All 6 species:
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata")
+path <- "consensusNetwork_orthogroups3718"
+```
+
+###### Choose bees or wasps (or neither for all 6 species):
+```{r}
+if (spp.switch == 2) {
+  ## Just the bees:
+  species <- species[1:3]
+  path <- "consensusNetwork_orthogroups5787_BEES"
+}
+if (spp.switch == 3) {
+  ## Just the wasps:
+  species <- species[4:6]
+  path <- "consensusNetwork_orthogroups6983_WASPS"
+}
+```
+
+###### Set whether you're doing resampling (0 or 1):
+```{r}
+resample.switch <- 1  #yes
+# resample.switch <- 0  #no
+```
+
+###### Set the number of iterations (k):
+```{r}
+k = 1000
+```
+
+
+###### Load the VST for each species based on the species switch set above: 
+**Note:** for the consensus WGCNA to work, I need Non-(low expression) filtered VSTs for each species such that the same number of genes are present in each dataset.
+```{r}
+if(spp.switch == 1) {
+  Caus.vst <- loadRData(paste("../deg-deseq2/orthogroups3718_all6spp_together/", species[1], "/", species[1], "_orthogroups_all6spp_VST.Rdata", sep=""))
+  Ccal.vst <- loadRData(paste("../deg-deseq2/orthogroups3718_all6spp_together/", species[2], "/", species[2], "_orthogroups_all6spp_VST.Rdata", sep=""))
+  Mgen.vst <- loadRData(paste("../deg-deseq2/orthogroups3718_all6spp_together/", species[3], "/", species[3], "_orthogroups_all6spp_VST.Rdata", sep=""))
+  Pcan.vst <- loadRData(paste("../deg-deseq2/orthogroups3718_all6spp_together/", species[4], "/", species[4], "_orthogroups_all6spp_VST.Rdata", sep=""))
+  Pdom.vst <- loadRData(paste("../deg-deseq2/orthogroups3718_all6spp_together/", species[5], "/", species[5], "_orthogroups_all6spp_VST.Rdata", sep=""))
+  Lfla.vst <- loadRData(paste("../deg-deseq2/orthogroups3718_all6spp_together/", species[6], "/", species[6], "_orthogroups_all6spp_VST.Rdata", sep=""))
+  
+  ## Then, to access the data, use the assay() function:
+  vst.assays <- list(assay(Caus.vst), assay(Ccal.vst), assay(Mgen.vst), assay(Pcan.vst), assay(Pdom.vst), assay(Lfla.vst))
+}
+
+if(spp.switch == 2) {
+  Caus.vst <- loadRData(paste("../deg-deseq2/orthogroups5787_BEES/", species[1], "/", species[1], "_orthogroups_beesOnly_VST.Rdata", sep=""))
+  Ccal.vst <- loadRData(paste("../deg-deseq2/orthogroups5787_BEES/", species[2], "/", species[2], "_orthogroups_beesOnly_VST.Rdata", sep=""))
+  Mgen.vst <- loadRData(paste("../deg-deseq2/orthogroups5787_BEES/", species[3], "/", species[3], "_orthogroups_beesOnly_VST.Rdata", sep=""))
+
+  ## Then, to access the data, use the assay() function:
+  vst.assays <- list(assay(Caus.vst), assay(Ccal.vst), assay(Mgen.vst))
+  
+}
+
+if(spp.switch == 3) {
+  Pcan.vst <- loadRData(paste("../deg-deseq2/orthogroups6983_WASPS/", species[1], "/", species[1], "_orthogroups_waspsOnly_VST.Rdata", sep=""))
+  Pdom.vst <- loadRData(paste("../deg-deseq2/orthogroups6983_WASPS/", species[2], "/", species[2], "_orthogroups_waspsOnly_VST.Rdata", sep=""))
+  Lfla.vst <- loadRData(paste("../deg-deseq2/orthogroups6983_WASPS/", species[3], "/", species[3], "_orthogroups_waspsOnly_VST.Rdata", sep=""))
+  
+  ## Then, to access the data, use the assay() function:
+  vst.assays <- list(assay(Pcan.vst), assay(Pdom.vst), assay(Lfla.vst))
+  # colnames(Pcan.vst)
+  # colnames(Pdom.vst)
+}
+```
+
+##### Boxplots of the Raw Feature Counts:
+```{r}
+# str(vst.assays)
+
+if(spp.switch == 2) {
+  maxSamples <- ncol(assay(Mgen.vst))
+}
+if(spp.switch == 1 | spp.switch == 3) {
+  ## What's the largest number of samples I have?
+  maxSamples <- ncol(assay(Pdom.vst))
+}
+   
+for (i in 1:length(vst.assays)) {
+  temp <- stack(as.data.frame(vst.assays[[i]]))
+  boxplot(vst.assays[[i]], col = "light gray", )
+  # p <- ggplot(data = temp, aes(x = ind, y = values)) + geom_boxplot(outlier.colour = "orange",  width=10/maxSamples)
+  # p <- p + theme(axis.title.x = element_blank()) + labs(y = "Total Reads Mapped")
+  # print(p)
+  hist(temp$values, main = NULL, xlab = "VS-transformed Expression Values")
+  ## Add a normal curve
+  ## Do qqplots
+}
+
+```
+They are gorgeous (for RNAseq data)!
+
+#### Let's next transpose the dataframes and get the phenotype metadata created:
+Create the WGCNA dataframes:
+```{r}
+if(spp.switch == 1) {
+  Caus.wgcna <- t(assay(Caus.vst))
+  Ccal.wgcna <- t(assay(Ccal.vst))
+  Mgen.wgcna <- t(assay(Mgen.vst))
+  Pcan.wgcna <- t(assay(Pcan.vst))
+  Pdom.wgcna <- t(assay(Pdom.vst))
+  Lfla.wgcna <- t(assay(Lfla.vst))  
+}
+
+if(spp.switch == 2) {
+  Caus.wgcna <- t(assay(Caus.vst))
+  Ccal.wgcna <- t(assay(Ccal.vst))
+  Mgen.wgcna <- t(assay(Mgen.vst))
+}
+
+if(spp.switch == 3) {
+  Pcan.wgcna <- t(assay(Pcan.vst))
+  Pdom.wgcna <- t(assay(Pdom.vst))
+  Lfla.wgcna <- t(assay(Lfla.vst))  
+}
+
+# (Caus.wgcna[1:6,1:6])
+
+```
+
+##### Create multi-expression datasets:
+```{r}
+options(stringsAsFactors = FALSE)
+
+if(spp.switch == 1) {
+  # We work with six data sets:
+  nSets = 6
+}
+if(spp.switch > 1) {
+  # We work with three data sets:
+  nSets = 3
+}
+
+# For easier labeling of plots, create a vector holding descriptive names of the two sets.
+setLabels = species
+shortLabels = species
+# Form multi-set expression data: columns starting from 9 contain actual expression data.
+multiExpr = vector(mode = "list", length = nSets) ## here it is just empty
+
+if(spp.switch == 1) {
+  ## Column & row names are already provided:
+  multiExpr[[1]] = list(data = as.data.frame(Caus.wgcna))
+  multiExpr[[2]] = list(data = as.data.frame(Ccal.wgcna))
+  multiExpr[[3]] = list(data = as.data.frame(Mgen.wgcna))
+  multiExpr[[4]] = list(data = as.data.frame(Pcan.wgcna))
+  multiExpr[[5]] = list(data = as.data.frame(Pdom.wgcna))
+  multiExpr[[6]] = list(data = as.data.frame(Lfla.wgcna))
+}
+
+if(spp.switch == 2) {
+  ## Column & row names are already provided:
+  multiExpr[[1]] = list(data = as.data.frame(Caus.wgcna))
+  multiExpr[[2]] = list(data = as.data.frame(Ccal.wgcna))
+  multiExpr[[3]] = list(data = as.data.frame(Mgen.wgcna))
+}
+
+if(spp.switch == 3) {
+  ## Column & row names are already provided:
+  multiExpr[[1]] = list(data = as.data.frame(Pcan.wgcna))
+  multiExpr[[2]] = list(data = as.data.frame(Pdom.wgcna))
+  multiExpr[[3]] = list(data = as.data.frame(Lfla.wgcna))
+}
+# Check that the data has the correct format for many functions operating on multiple sets:
+exprSize <- checkSets(multiExpr)
+exprSize
+## For example, the C.australensis data could now be extracted here:
+# multiExpr[[1]]
+
+```
+
+#### Next, let's remove any genes due to "excessive" missing values or no variance across all datasets:
+*N.B.: This function iteratively identifies samples and genes with too many missing entries and genes with zero variance. If weights are given, entries with relative weight (weight divided by maximum weight in the column) below minRelativeWeight will be considered missing. The process is repeated until the lists of good samples and genes are stable. The constants ..minNSamples and ..minNGenes are both set to the value 4.*
+```{r}
+## Let's use WGCNA's built-in function goodSamplesGenes() to remove low-expression genes.
+gsg <- goodSamplesGenesMS(multiExpr, verbose = 3)
+## Let's store the sample size of genes remaining for each sample for future use:
+sampleSize <- sum(gsg$goodGenes == "TRUE")
+
+# Print information about the removed genes:
+if (gsg$allOK  == "TRUE") {
+  print(paste("No filtering was done.", sep = ""))
+}
+
+## Remove the offending genes and samples
+if (!gsg$allOK) {
+    for (set in 1:exprSize$nSets) {
+      if (sum(!gsg$goodSamples[[set]])) {
+        ## If we wanted to print which genes were removed:
+        # printFlush(paste("In set", setLabels[set], "removing samples", 
+                   # paste(rownames(multiExpr[[set]]$data)[!gsg$goodSamples[[set]]], collapse = ", ")))
+      }
+      ## Where the magic actually happens:
+      multiExpr[[set]]$data = multiExpr[[set]]$data[gsg$goodSamples[[set]], gsg$goodGenes]
+    }
+  # Update exprSize
+  exprSize <- checkSets(multiExpr)  
+}
+print(paste("The sample size is:   ", sampleSize, sep = ""))
+
+exprSize
+```
+
+Next, cluster the samples on their Euclidean distance, separately in each set and plot them in dendrograms:
+```{r}
+sampleTrees = list()
+for (set in 1:nSets) {
+  sampleTrees[[set]] = hclust(dist(multiExpr[[set]]$data), method = "average")
+}
+
+pdf(file = paste("../WGCNA/", path, "/SampleClustering.pdf", sep = ""), width = 12, height = 12)
+par(mfrow=c(2,1))
+par(mar = c(0, 4, 2, 0))
+for (set in 1:nSets)
+  plot(sampleTrees[[set]], main = paste("Sample clustering on all genes in", setLabels[set]),
+      xlab="", sub="", cex = 0.7)
+dev.off()
+
+```
+According to the WGCNA manual, we would consider samples *C. calcarata* SRR13281988 as an outlier because its cut height is ~50 whereas all other samples in all other sets are under ~30. We could manually adjust the cut height to account for this, but I am not going to do this at this stage. Note that this individual is a reproductive.
+
+#### Create the traits data. 
+##### Alternative Resampling Switch
+If we are going to generate the resampling data, we will do that first by shuffling the R/NR sample labels. 
+```{r}
+# for testing:
+  # spp = species[1]
+  # df = Caus.wgcna
+
+
+if(resample.switch == 1) {
+    ## Make a directory to save everything to:
+  dir.create(path=paste(getwd(), "/", path, "/resampling", sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  
+  for(iter in 480:k) {
+    # Form a multi-set structure that will hold the traits data:
+    traits = vector(mode="list", length = nSets)
+    
+    traitsDF.resample <- function(df, spp) {
+      id <- rownames(df)
+      true.phenotype <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR") & meta$Species == spp),"R.NR_Phenotype"]
+      count.R <-length(which(true.phenotype == "R"))
+      count.NR <- length(true.phenotype) - count.R
+      ## Then randomly assign the R and NR phenotype
+      R.id <- sample(x = id, size = count.R, replace = FALSE)
+      NR.id <- id[! id %in% R.id]   ## Just in case I need them
+      R01 <- id
+      R01 <- ifelse(id %in% R.id, 1, 0)
+      NR01 <- id
+      NR01 <- ifelse(id %in% R.id, 0, 1) 
+      traits <- as.data.frame(cbind(as.numeric(R01), as.numeric(NR01)))
+      newIDlist <- c(R.id, NR.id)
+      colnames(traits) <- c("R", "NR")
+      rownames(traits) <- c(R.id, NR.id)
+      return(traits)
+    }
+
+    if(spp.switch == 1) {
+      traits[[1]] <- traitsDF.resample(Caus.wgcna, species[1])
+      traits[[2]] <- traitsDF.resample(Ccal.wgcna, species[2])
+      traits[[3]] <- traitsDF.resample(Mgen.wgcna, species[3])
+      traits[[4]] <- traitsDF.resample(Pcan.wgcna, species[4])
+      traits[[5]] <- traitsDF.resample(Pdom.wgcna, species[5])
+      traits[[6]] <- traitsDF.resample(Lfla.wgcna, species[6])
+    }
+    
+    if(spp.switch == 2) {
+      traits[[1]] <- traitsDF.resample(Caus.wgcna, species[1])
+      traits[[2]] <- traitsDF.resample(Ccal.wgcna, species[2])
+      traits[[3]] <- traitsDF.resample(Mgen.wgcna, species[3])
+    }
+    
+    if(spp.switch == 3) {
+      traits[[1]] <- traitsDF.resample(Pcan.wgcna, species[1])
+      traits[[2]] <- traitsDF.resample(Pdom.wgcna, species[2])
+      traits[[3]] <- traitsDF.resample(Lfla.wgcna, species[3])
+    }
+    
+    # Define data set dimensions
+    nGenes = exprSize$nGenes
+    nSamples = exprSize$nSamples
+    nSets = checkSets(multiExpr)$nSets
+    
+    ## Also, save as RData for future use:
+    save(multiExpr, 
+         traits, 
+         nGenes, 
+         nSamples, 
+         setLabels, 
+         shortLabels, 
+         exprSize, 
+         file = paste(path, "/resampling/consensusNetwork_input_data_", iter, ".RData", sep = ""))
+  }
+}
+```
+
+##### True Data
+```{r}
+# Form a multi-set structure that will hold the traits data:
+traits = vector(mode="list", length = nSets)
+
+traitsDF <- function(df, spp) {
+  id <- rownames(df)
+  phenotype <- meta[which((meta$R.NR_Phenotype == "R" | meta$R.NR_Phenotype == "NR") & meta$Species == spp),"R.NR_Phenotype"]
+  R <- ifelse(phenotype == "R", 1, 0)
+  NR <- ifelse(phenotype == "NR", 1, 0)
+  traits <- as.data.frame(cbind(as.numeric(R), as.numeric(NR)))
+  rownames(traits) <- id
+  colnames(traits) <- c("R", "NR")
+  return(traits)
+}
+
+if(spp.switch == 1) {
+  traits[[1]] <- traitsDF(Caus.wgcna, species[1])
+  traits[[2]] <- traitsDF(Ccal.wgcna, species[2])
+  traits[[3]] <- traitsDF(Mgen.wgcna, species[3])
+  traits[[4]] <- traitsDF(Pcan.wgcna, species[4])
+  traits[[5]] <- traitsDF(Pdom.wgcna, species[5])
+  traits[[6]] <- traitsDF(Lfla.wgcna, species[6])
+}
+
+if(spp.switch == 2) {
+  traits[[1]] <- traitsDF(Caus.wgcna, species[1])
+  traits[[2]] <- traitsDF(Ccal.wgcna, species[2])
+  traits[[3]] <- traitsDF(Mgen.wgcna, species[3])
+}
+
+if(spp.switch == 3) {
+  traits[[1]] <- traitsDF(Pcan.wgcna, species[1])
+  traits[[2]] <- traitsDF(Pdom.wgcna, species[2])
+  traits[[3]] <- traitsDF(Lfla.wgcna, species[3])
+}
+
+# Define data set dimensions
+nGenes = exprSize$nGenes
+nSamples = exprSize$nSamples
+nSets = checkSets(multiExpr)$nSets
+
+## Also, save as RData for future use:
+save(multiExpr, 
+     traits, 
+     nGenes, 
+     nSamples, 
+     setLabels, 
+     shortLabels, 
+     exprSize, 
+     file = paste(path, "/consensusNetwork_input_data.RData", sep = ""))
+```
+
+## Manual Construction of the Gene Network and Modules
+
+*N.B.: We did not enable WGCNA threads to allow for multi-threading within WGCNA because we are running through RStudio/knitting. We may decide to do this else-wise for resampling? enableWGCNAThreads() -- see Vignette.*
+```{r, include = FALSE}
+# Allow multi-threading within WGCNA. This helps speed up certain calculations.
+# At present this call is necessary for the code to work.
+# Any error here may be ignored but you may want to update WGCNA if you see one. # Caution: skip this line if you run RStudio or other third-party R environments. # See note above.
+#enableWGCNAThreads()
+```
+
+#### Find the Soft-Thresholding Power Needed For Each Species: #from this plot, we would choose a power of 18 because it's the lowest power for which the scale free topology index reaches 0.80
+**Note**: this is different than the R^2 cutoff that I used for the full dataset, which was 0.90. *C. calcarata* could not achieve this high of power (max of 0.89) so I set it to 0.80 for all species. This decision was in part a heuristic one. Some of the species' power gets stretched way out if I set R^2 too high.
+
+This is the analysis of the network topology using various soft-thresholding powers. In the graphs generated, the left panel is shows the scale-free fit index as a function of the soft-thresholding power. The right panel displays the mean connectivity as a function of the soft-thresholding power. I explicitly state that the  \(R^2\) cutoff is 0.8.
+
+**Note that I verify this with my own code:**
+$powerEstimate is the estimate of an appropriate soft-thresholding power: the lowest power for which the scale free topology fit \(R^2\) exceeds RsquaredCut. If \(R^2\) is below RsquaredCut for all powers, NA is returned.
+This gives us a replicable way to grab the best soft-thresholding power for each species for network construction.
+```{r}
+## Make a directory to save everything to:
+dir.create(path=paste(getwd(), "/", path, sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+
+# Choose a set of soft-thresholding powers
+powers = c(c(1:10), seq(from =12, to=40, by=2)) ## Goes by 1 for 1:10, then by 2 for 12:40
+
+## Do for each of the species; and record below the soft threshold I choose
+# Call the network topology analysis function
+topology <- function(wgcna, spp, powerCutOff) {
+  
+  ## Make a directory to save everything to:
+  dir.create(path=paste(getwd(), "/", path, "/", spp, sep=""), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  
+  ################################################
+  ## Run the soft-thresholding:
+  soft = pickSoftThreshold(wgcna, powerVector = powers, verbose = 5, RsquaredCut = powerCutOff)
+  write.table(soft, file = paste("orthogroups3718/", spp, "/", spp, "_soft_threshold_results.txt", sep=""), sep = "\t", quote = F, append = F, col.names = T)
+  paste("Your power estimate is: ", soft$powerEstimate, sep = "")
+  ## Proof of concept that powerEstimate returns what I expect:
+  paste("The smaller power with the R-squared value of ", powerCutOff, " that you set is: ", min(subset(soft$fitIndices, SFT.R.sq >= powerCutOff)$Power), sep = "")
+  
+  ################################################
+  ## Plot the soft thresholding results:
+  par(mfrow = c(1,2))
+  cex1 = 0.9
+  
+  # Save the plots as a PDF
+  pdf(file = paste(path, "/", spp, "/", spp, "_Choose_Soft_Threshold_power.pdf", sep=""), width = 8, height = 6)
+  
+  # Scale-free topology fit index as a function of the soft-thresholding power 
+  plot(soft$fitIndices[,1], 
+       -sign(soft$fitIndices[,3])*soft$fitIndices[,2], 
+       xlab="Soft Threshold (power)", 
+       ylab="Scale Free Topology Model Fit,signed R^2", 
+       type="n",
+       main = paste(spp, "\nScale Independence", sep = ""), 
+       ylim = c(0,1))
+  text(soft$fitIndices[,1], 
+       -sign(soft$fitIndices[,3])*soft$fitIndices[,2], 
+       labels=powers,
+       cex=cex1,
+       col="red")
+  # this line corresponds to using an R^2 cut-off of h 
+  abline(h=powerCutOff,col="red")
+  
+  # Mean connectivity as a function of the soft-thresholding power 
+  plot(soft$fitIndices[,1], 
+       soft$fitIndices[,5], 
+       xlab="Soft Threshold (power)",
+       ylab="Mean Connectivity", 
+       type="n", 
+       main = paste(spp, "\nMean Connectivity", sep = ""))
+  text(soft$fitIndices[,1], 
+       soft$fitIndices[,5], 
+       labels=powers, 
+       cex=cex1,
+       col="red")
+  
+  dev.off()
+  
+  return(soft)
+}
+
+soft1 <- topology(multiExpr[[1]]$data, species[1], 0.8)
+## Let's store the soft thresholds as we go:
+soft.thresholds <- c(soft1$powerEstimate)
+
+soft2 <- topology(multiExpr[[2]]$data, species[2], 0.8)
+soft.thresholds <- c(soft.thresholds, soft2$powerEstimate)
+
+soft3 <- topology(multiExpr[[3]]$data, species[3], 0.8)
+soft.thresholds <- c(soft.thresholds, soft3$powerEstimate)
+
+## If doing all 6, do the remaining three species:
+if(spp.switch == 1) {
+
+  soft4 <- topology(multiExpr[[4]]$data, species[4], 0.8)
+  soft.thresholds <- c(soft.thresholds, soft4$powerEstimate)
+
+  soft5 <- topology(multiExpr[[5]]$data, species[5], 0.8)
+  soft.thresholds <- c(soft.thresholds, soft5$powerEstimate)
+
+  soft6 <- topology(multiExpr[[6]]$data, species[6], 0.8)
+  soft.thresholds <- c(soft.thresholds, soft6$powerEstimate)
+}
+
+soft.thresholds
+```
+
+#### Note: There is an automatic construction function for the consensus network, however, we are not going to use it with this project. We cannot use the automatic method here because each of our sub-networks requires a different soft-thresholding power.
+
+**From Peter Langfelder:** https://support.bioconductor.org/p/61135/
+There is a bug in the automatic construction that forces it to only take one soft thresholding power (this has not been fixed yet that I can tell as of Summer 2021)
+
+Thus, at this stage, we are proceeding with the manual construction of the consensus network.
+
+### Manual Construction of Consensus Network
+
+#### Calculate the Network Adjacencies
+```{r}
+# Initialize an appropriate array to hold the adjacencies
+adjacencies = array(0, dim = c(nSets, nGenes, nGenes))
+# Calculate adjacencies in each individual data set
+for (set in 1:nSets) {
+  adjacencies[set, , ] = abs(cor(multiExpr[[set]]$data, use = "p"))^soft.thresholds[set]
+}
+
+## So, note that the rows are the 6 data sets and the columns are the adjacencies in the individual sets 
+# dim(as.data.frame(adjacencies))
+# as.data.frame(adjacencies)[1:6, 1:6]
+
+```
+
+#### Calculate the TOM (Topological Overlap Matrix)
+```{r}
+# Initialize an appropriate array to hold the TOMs
+TOM = array(0, dim = c(nSets, nGenes, nGenes))
+# Calculate TOMs in each individual data set
+for (set in 1:nSets) {
+  TOM[set, , ] = TOMsimilarity(adjacencies[set, , ])
+}
+```
+
+#### Scaling of TOMs to make them comparable across sets:
+Scaling is done using the 95th percentile and can be visualized with QQ plots. However,BE CAREFUL because, for each individual network, original TOMs and scaled TOMs might generate different numbers of modules!
+```{r}
+# Define the reference percentile
+scaleP = 0.95
+# Set seed for reproducible sampling
+set.seed(50010)
+# Sample sufficiently large number of TOM entries
+scSamples = as.integer(1/(1-scaleP) * 1000)
+# Choose the sampled TOM entries
+scaleSample = sample(nGenes*(nGenes-1)/2, size = scSamples)
+TOMScalingSamples = list()
+# These are TOM values at reference percentile
+scaleQuant = rep(1, nSets)
+# Scaling powers to equalize reference TOM values
+scalePowers = rep(1, nSets)
+
+## Rather than rewriting the TOMs with the scaled TOMs, store into a new array:
+TOMscaled <-TOM
+
+# Loop over sets
+for (set in 1:nSets) {
+  # Select the sampled TOM entries
+  TOMScalingSamples[[set]] = as.dist(TOM[set, , ])[scaleSample]
+  # Calculate the 95th percentile
+  scaleQuant[set] = quantile(TOMScalingSamples[[set]],
+                          probs = scaleP, type = 8)
+  ## Scale any additional datasets:
+  if (set>1) {
+    scalePowers[set] = log(scaleQuant[1])/log(scaleQuant[set])
+    TOMscaled[set, ,] = TOM[set, ,]^scalePowers[set]
+  }
+}
+
+# For plotting, also scale the sampled TOM entries
+scaledTOMSamples = list()
+for (set in 1:nSets) {
+  scaledTOMSamples[[set]] = TOMScalingSamples[[set]]^scalePowers[set]
+}
+
+plotScaledTOMs <- function(a, b) {
+  ## Save the plot:
+  pdf(paste(path, "/TOMScaling-QQPlot_", species[a], "_vs_", species[b], ".pdf", sep=""), width = 6, height = 6)
+  # qq plot of the unscaled samples
+  qqUnscaled = qqplot(TOMScalingSamples[[a]], 
+                    TOMScalingSamples[[b]], 
+                    plot.it = TRUE, 
+                    cex = 0.6,
+                    xlab = paste("TOM in", species[a]), 
+                    ylab = paste("TOM in", species[b]),
+                    main = "Q-Q plot of Pairwise TOMs", 
+                    pch = 20,
+                    ylim = c(0,0.75),
+                    xlim = c(0,0.75))
+
+  # qq plot of the scaled samples
+  qqScaled = qqplot(scaledTOMSamples[[a]], 
+                    scaledTOMSamples[[b]], 
+                    plot.it = FALSE)
+  points(qqScaled$x, qqScaled$y, col = "red", cex = 0.6, pch = 20)
+  abline(a=0, b=1, col = "blue")
+  legend("topleft", legend = c("Unscaled TOM", "Scaled TOM"), pch = 20, col = c("black", "red"))
+
+  dev.off()
+}
+
+for(i in 1:nSets) {
+  for(j in 2:nSets) {
+    if(i < j) {
+      print(paste("Plotting Scaled ", i, " vs. ", j, ": ", sep = ""))
+      plotScaledTOMs(i,j)
+    }
+  }
+}  
+# print(scaleQuant)
+# print(scalePowers)
+```
+The most deviant from normality are the two Ceratina spp, interestingly. According to the WGCNA tutorial: *"The closer the points lie to the reference line shown in blues, the closer is the distribution of the TOM values in the two data sets."* So, does this imply that the two most **dissimilar** matrices are the two Ceratina spp.?
+
+#### Calculation of Consensus Topological Overlap Matrix (Consensus TOM)
+We now calculate the consensus Topological Overlap by taking the component-wise (“parallel”) minimum of the TOMs in individual sets:
+
+```{r}
+if(spp.switch == 1) {
+  consensusTOM = pmin(TOMscaled[1, , ], TOMscaled[2, , ], TOMscaled[3, , ], TOMscaled[4, , ], TOMscaled[5, , ], TOMscaled[6, , ])
+}
+if(spp.switch > 1) {
+  consensusTOM = pmin(TOMscaled[1, , ], TOMscaled[2, , ], TOMscaled[3, , ])
+}
+dim(consensusTOM)
+consensusTOM[1:6, 1:6]
+
+## Save the TOM:
+save(consensusTOM, 
+     file = paste(path, "/Consensus-NetworkConstruction-Manual_consensusTOM-Scaled.RData", sep = ""))
+```
+Thus, the consensus topological overlap of two genes is only large if the corresponding entries in the two sets are also large.
+
+#### Hierarchical Clustering using the Consensus TOM as input to Identify Modules + Visualizing the Consensus Modules (using the minModuleSize default of 30)
+```{r}
+# Clustering
+consTree = hclust(as.dist(1-consensusTOM), method = "average")
+# We like large modules, so we set the minimum module size relatively high:
+minModuleSize = 30
+# Module identification using dynamic tree cut:
+unmergedLabels = cutreeDynamic(dendro = consTree, 
+                               distM = as.matrix(1-consensusTOM), 
+                               deepSplit = 2, 
+                               cutHeight = 0.995, 
+                               minClusterSize = minModuleSize, 
+                               pamRespectsDendro = TRUE)  ## The tutorial sets this one to FA:SE?
+unmergedColors = labels2colors(unmergedLabels)
+## Let's take a look at the modules and the numbers of genes in them:
+table(unmergedLabels)
+nModules = length(table(unmergedColors)) - 1
+nModules
+
+print(paste("Before merging, there were ", nModules, " modules.",sep=""))
+
+## Save the plot:
+# pdf(paste(path, "/unmerged_Cluster_Dendrogram.pdf", sep=""), width = 8, height = 6)
+# plotDendroAndColors(consTree, unmergedColors, "Dynamic Tree Cut",
+#                   dendroLabels = FALSE, hang = 0.03,
+#                   addGuide = TRUE, guideHang = 0.05)
+# dev.off()
+```
+
+#### Merging any modules with similiar expression profiles
+```{r}
+# Calculate module eigengenes
+unmergedMEs = multiSetMEs(multiExpr, colors = NULL, universalColors = unmergedColors)
+# Calculate consensus dissimilarity of consensus module eigengenes
+consMEDiss = consensusMEDissimilarity(unmergedMEs)
+# Cluster consensus modules
+consMETree = hclust(as.dist(consMEDiss), method = "average")
+# Plot the result - are there any clusters that fall below the cutHeight of 0.25?
+plot(consMETree, 
+     main = "Consensus clustering of consensus module eigengenes",
+     xlab = "", 
+     sub = "", 
+     ylim = c(0,2))
+abline(h=0.25, col = "red")
+```
+
+## Merge modules
+```{r} 
+merge = mergeCloseModules(multiExpr, unmergedLabels, cutHeight = 0.25, verbose = 3)
+# ## Numeric module labels
+moduleLabels = merge$colors
+# ## Convert labels to colors
+moduleColors = labels2colors(moduleLabels)
+nModules = length(table(unmergedColors)) - 1
+nModules
+
+## Eigengenes of the new merged modules:
+consMEs = merge$newMEs
+## Calculate new module eigengenes
+mergedMEs = multiSetMEs(multiExpr, colors = NULL, universalColors = moduleLabels)
+# # ## Calculate consensus dissimilarity of consensus module eigengenes, Cluster consensus modules
+# # consMETree.merged = hclust(as.dist(consensusMEDissimilarity(mergedMEs) ), method = "average")
+# # # Plot the result - are there any clusters that fall below the cutHeight of 0.25?
+# sizeGrWindow(9,6)
+plotDendroAndColors(consTree, cbind(unmergedColors, moduleColors),
+                   c("Unmerged", "Merged"),
+                   dendroLabels = FALSE, hang = 0.03,
+                   addGuide = TRUE, guideHang = 0.05)
+```
+If there are no clusters that fall below the cutHeight of 0.25, merging will occur automatically.
+
+##### However, it is here that we could also justify making the module sizes smaller and looping through them to see if we can minimize how many genes are in the gray (unincorporated) module.
+```{r}
+## Make a vector to store the gray module sizes:
+grayModSizes <- c()
+moduleCounts <- c()
+minModSizes <- c()
+mergedModuleCounts <- c()
+
+# minModuleSize <- 30
+# minModuleSize <- 10
+
+for (i in 0:4) {
+  ## Decreases the module sizes by 5 each step
+  minModuleSize = 30-5*i
+  
+  # Module identification using dynamic tree cut:
+  unmergedLabels = cutreeDynamic(dendro = consTree, 
+                               distM = as.matrix(1-consensusTOM), 
+                               deepSplit = 2, 
+                               cutHeight = 0.995, 
+                               minClusterSize = minModuleSize, 
+                               pamRespectsDendro = TRUE)  ## The tutorial sets this one to FALSE?
+  unmergedColors = labels2colors(unmergedLabels)
+  
+  ## Let's take a look at the modules and the numbers of genes in them:
+  print(table(unmergedLabels))
+  
+  grayModSizes <- c(grayModSizes, table(unmergedLabels)[1])
+  nModules = length(table(unmergedColors)) - 1  ## But we don't want to count the 0 (gray/unassociated bin), so deduct 1
+  moduleCounts <- c(moduleCounts, nModules)
+  minModSizes <- c(minModSizes, minModuleSize)
+  
+  ## Save the plot:
+  pdf(paste(path, "/unmerged_Cluster_Dendrogram_minModuleSize", minModuleSize, ".pdf", sep=""), width = 8, height = 6)
+  plotDendroAndColors(consTree, unmergedColors, "Dynamic Tree Cut",
+                  dendroLabels = FALSE, hang = 0.03,
+                  addGuide = TRUE, guideHang = 0.05)
+  dev.off()
+  
+  ## Now, also make sure we wouldn't merge any of these and that they are "true" modules:
+  ## Calculate module eigengenes
+  unmergedMEs = multiSetMEs(multiExpr, colors = NULL, universalColors = unmergedColors)
+  ## Calculate consensus dissimilarity of consensus module eigengenes
+  consMEDiss = consensusMEDissimilarity(unmergedMEs)
+  ## Cluster consensus modules
+  consMETree = hclust(as.dist(consMEDiss), method = "average")
+
+  ## Merge modules:
+  merge = mergeCloseModules(multiExpr, unmergedLabels, cutHeight = 0.25, verbose = 3)
+  ## Numeric module labels
+  mergedColorNumbers = merge$colors
+  ## Let's take a look at the modules and the numbers of genes in them:
+  # print(table(mergedColorNumbers))
+  
+  ## Convert labels to colors
+  mergedColors = labels2colors(mergedColorNumbers)
+
+  nModulesMerged = length(table(mergedColors)) - 1  ## But we don't want to count the 0 (gray/unassociated bin), so deduct 1
+  mergedModuleCounts <- c(mergedModuleCounts, nModulesMerged)
+  
+  ## Eigengenes of the new merged modules:
+  consMEs = merge$newMEs
+  ## Calculate new module eigengenes
+  mergedMEs = multiSetMEs(multiExpr, colors = NULL, universalColors = moduleLabels)
+  
+  #### Save the consensus network for future use
+  save(consMEs, 
+       # mergedColors,
+       # mergedColorNumbers,
+       # consTree,
+       file = paste(path, "/Consensus-NetworkConstruction-Manual_consensusMEs_MinModuleSize_", minModuleSize, ".RData", sep = ""))
+}
+
+exploringModuleSizes <- as.data.frame(cbind(minModSizes, grayModSizes, moduleCounts, mergedModuleCounts))
+rownames(exploringModuleSizes) <- c(1:nrow(exploringModuleSizes))
+exploringModuleSizes
+write.table(exploringModuleSizes, file = paste(path, "/Iterative_MinModuleSize_Results.txt", sep = ""), append = F, quote = F, col.names = T, row.names = F, sep = "\t")
+
+
+
+```
+**N.B.:** If none of the modules are merged, then the modules we have are robust. However, note that we are able to find more modules by decreasing the minimum number of genes that go into a module.
+
+### Manual Construction of Consensus Network RESAMPLED DATASETS
+This is the iterative manual network construction for the resampled (R/NR shuffled) datasets. None of the below works unless resample.switch == 1
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+start_time <- Sys.time()
+
+if(resample.switch == 1) {
+  
+  for(iter in 480:k) {
+  ## 1. Load the multiexpression dataset:
+  load(paste(path, "/resampling/consensusNetwork_input_data_", iter, ".RData", sep = ""))
+  
+  ## 2. Calculate the Network Adjacencies
+    # Initialize an appropriate array to hold the adjacencies
+    adjacencies = array(0, dim = c(nSets, nGenes, nGenes))
+    # Calculate adjacencies in each individual data set
+      for (set in 1:nSets) {
+        adjacencies[set, , ] = abs(cor(multiExpr[[set]]$data, use = 
+                                         "p"))^soft.thresholds[set]
+      }
+  
+  ## 3. Calculate the TOM (Topological Overlap Matrix)
+    # Initialize an appropriate array to hold the TOMs
+    TOM = array(0, dim = c(nSets, nGenes, nGenes))
+    # Calculate TOMs in each individual data set
+      for (set in 1:nSets) {
+        TOM[set, , ] = TOMsimilarity(adjacencies[set, , ])
+      }
+
+  ## 4. Scaling of TOMs to make them comparable across sets:
+      TOMScalingSamples = list()
+      scaleQuant = rep(1, nSets)
+      scalePowers = rep(1, nSets)
+    # Store the scaled TOM in a new object:
+      TOMscaled <-TOM
+    # Loop over sets:
+      for (set in 1:nSets) {
+        # Select the sampled TOM entries
+        TOMScalingSamples[[set]] = as.dist(TOM[set, , ])[scaleSample]
+        # Calculate the 95th percentile
+        scaleQuant[set] = quantile(TOMScalingSamples[[set]],
+                          probs = scaleP, type = 8)
+        ## Scale any additional datasets:
+          if (set>1) {
+            scalePowers[set] = log(scaleQuant[1])/log(scaleQuant[set])
+            TOMscaled[set, ,] = TOM[set, ,]^scalePowers[set]
+          }
+      }
+  ## 5. Calculate Consensus Topological Overlap Matrix (Consensus TOM)
+      if(spp.switch == 1) {
+       consensusTOM = pmin(TOMscaled[1, , ], TOMscaled[2, , ], TOMscaled[3, , ], 
+                          TOMscaled[4, , ], TOMscaled[5, , ], TOMscaled[6, , ])
+      }
+      if(spp.switch > 1) {
+        consensusTOM = pmin(TOMscaled[1, , ], TOMscaled[2, , ], TOMscaled[3, , ])
+      }
+    # dim(consensusTOM)
+    # consensusTOM[1:6, 1:6]
+
+  ## 6. Save the TOM:
+    save(consensusTOM, 
+     file = paste(path, 
+                  "/resampling/Consensus-NetworkConstruction-Manual_consensusTOM-Scaled_",
+                  iter, ".RData", sep = ""))
+
+  ## 7. Hierarchical Clustering using the Consensus TOM as input to Identify Modules 
+    ## (using the minModuleSize default of 30)
+    # Clustering
+      consTree = hclust(as.dist(1-consensusTOM), method = "average")
+      minModuleSize = 30
+    # Module identification using dynamic tree cut:
+      unmergedLabels = cutreeDynamic(dendro = consTree, 
+                               distM = as.matrix(1-consensusTOM), 
+                               deepSplit = 2, 
+                               cutHeight = 0.995, 
+                               minClusterSize = minModuleSize, 
+                               pamRespectsDendro = TRUE)  
+      unmergedColors = labels2colors(unmergedLabels)
+  # Let's take a look at the modules and the numbers of genes in them:
+      table(unmergedLabels)
+      nModules = length(table(unmergedColors)) - 1
+      print(paste("Before merging, there were ", nModules, " modules.", sep=""))
+
+  ## 8. Merge any modules with similar expression profiles:
+    # Calculate module eigengenes
+      unmergedMEs = multiSetMEs(multiExpr, 
+                                colors = NULL, 
+                                universalColors = unmergedColors)
+    # Calculate consensus dissimilarity of consensus module eigengenes
+      consMEDiss = consensusMEDissimilarity(unmergedMEs)
+    # Cluster consensus modules
+      consMETree = hclust(as.dist(consMEDiss), method = "average")
+    # Merge modules
+      merge = mergeCloseModules(multiExpr, 
+                                unmergedLabels, 
+                                cutHeight = 0.25, 
+                                verbose = 3)
+    # Numeric module labels
+      moduleLabels = merge$colors
+    # Convert labels to colors
+      moduleColors = labels2colors(moduleLabels)
+      nMergedModules <- length(table(moduleColors)) - 1
+      print(paste("After merging, there were ", nMergedModules, " modules.", sep=""))
+    # Eigengenes of the new merged modules:
+      consMEs = merge$newMEs
+    # Calculate new module eigengenes
+      mergedMEs = multiSetMEs(multiExpr, 
+                              colors = NULL, 
+                              universalColors = moduleLabels)
+
+  ## 9. Save the consensus network for future use
+    save(consMEs, 
+       file = paste(path, 
+                    "/resampling/Consensus-NetworkConstruction-Manual_consensusMEs_MinModuleSize30_", iter, ".RData", sep = ""))
+  }}
+end_time <- Sys.time()
+end_time - start_time
+```
+
+
+
+
+
+
+
+
+

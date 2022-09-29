@@ -1,0 +1,1000 @@
+---
+title: "Consensus WGCNA: Trait Correlation + Figures"
+author: "K.S. Geist, Iowa State University"
+date: "13 October 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Install and load requisite libraries.
+```{r, warning=FALSE, include = FALSE}
+#install.packages("BiocManager")
+#BiocManager::install("WGCNA")
+## This may take a while, as there are a lot of dependencies. I suggest doing this in R rather than R Studio if you run into issues.
+## Note that if you are on a Mac, you may be missing pkg-config and/or zlib. If so, you will need to use Homebrew to get them.
+
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+# Function that loads an RData file, and returns it with your custom name
+loadRData <- function(fileName){    
+    load(fileName)
+    get(ls()[ls() != "fileName"])
+}
+
+## Load libraries
+library(WGCNA)
+library(ggplot2)
+library(flashClust)
+```
+
+Set the switches:
+```{r}
+## 1 = all 6; 2 = bees, 3 = wasps
+ spp.switch <- 1
+# spp.switch <- 2
+# spp.switch <- 3
+
+## Set it to equal the minimum module size you want
+net.switch <- 10
+# net.switch <- 30
+```
+
+Set the species:
+```{r}
+## All 6 species:
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata")
+path <- "consensusNetwork_orthogroups3718"
+```
+
+
+Choose bees or wasps (or neither for all 6 species):
+```{r}
+if (spp.switch == 2) {
+  ## Just the bees:
+  species <- species[1:3]
+  path <- "consensusNetwork_orthogroups5787_BEES"
+}
+if (spp.switch == 3) {
+  ## Just the wasps:
+  species <- species[4:6]
+  path <- "consensusNetwork_orthogroups6983_WASPS"
+}
+```
+
+Read in the multiExpression datasets:
+```{r}
+load(paste(path, "/consensusNetwork_input_data.RData", sep = ""))
+```
+
+Set up the minimum modules sizes that we are working with:
+```{r}
+minModSizes <- seq(30, 10, by = -5)
+# minModSizes
+```
+
+Load in the network & TOM:
+*Note:* To get the dataset to load correctly, you use the get() function; however, we want to return a list of MULTIPLE objects (the consMEs), so we need to return an mget() object
+```{r}
+loadNetworks <- function(minModSize) {
+  net <- load(file = paste(path, "/Consensus-NetworkConstruction-manual_MinModuleSize_", minModSize, ".RData", sep = ""))
+  
+  ## Make directories to store everything, if needed:
+  dir.create(path=paste(getwd(), "/", path, "/minModuleSize", minModSize, sep=""), 
+         showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  ## And for each of the species:
+  # for (i in 1:length(species)) {
+  #   dir.create(path=paste(getwd(), "/" path, "/", species[i], "/minModuleSize", minModSize, sep=""), 
+  #          showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  # }
+  return(mget(net))
+}
+net30 <- loadNetworks(minModSizes[1])
+net25 <- loadNetworks(minModSizes[2])
+net20 <- loadNetworks(minModSizes[3])
+net15 <- loadNetworks(minModSizes[4])
+net10 <- loadNetworks(minModSizes[5])
+```
+
+Set the network based on the switch:
+```{r}
+minModSize <- net.switch
+## And call that network as your only network henceforth
+net <- get(paste("net", net.switch, sep = ""))
+# net
+```
+
+```{r}
+## Some more setup:
+geneID <- colnames(multiExpr[[1]]$data)   ## Just use the first set as the default for all sets to get the geneIDs
+nGenes <- exprSize$nGenes
+nSamples <- exprSize$nSamples
+nSets <- exprSize$nSets
+
+## First, to help me better understand whether the valid colors are the same in the conserved MEs (they should be, yes?):
+  for(i in 1:nSets) {
+    for(j in 2:nSets-1) {
+        # print(paste("Comparing set ", i, "vs. ", j, ":", sep = ""))
+        # print(all(net$consMEs[[i]]$validColors == net30$consMEs[[j]]$validColors))
+    }
+  }
+
+## Perfect, so that justifies letting us use one subnet to represent all colors for all networks:
+moduleColors <- labels2colors(net$consMEs[[1]]$validColors)  ## Saves the module names as their colors for EACH GENE
+  
+## Also, extract the unordered consMEs excluding grey (for the trait-module associations)
+consMEs.unord <- multiSetMEs(multiExpr, universalColors = moduleColors, excludeGrey = TRUE)
+  
+## We also need to know how many modules there are and store their names:
+MEnames.NoGrey <- colnames(consMEs.unord[[1]]$data)
+nMEs.NoGrey <- checkSets(consMEs.unord)$nGenes
+
+## Lastly, get them INCLUDING grey (for some applications):
+consMEs.unord.withGrey <- multiSetMEs(multiExpr, universalColors = moduleColors, excludeGrey = FALSE)
+MEnames.WithGrey <- colnames(consMEs.unord.withGrey[[1]]$data)
+nMEs.WithGrey <- checkSets(consMEs.unord.withGrey)$nGenes
+```
+
+#### Basic Summary Statistics on the Networks Before We Do the Trait Correlations
+```{r}
+## Let's make a summary statistics table we can start to store valuable info into:
+modules.Summary <- function(net, minModSize) {
+  ## Need to extract the modules from each network:
+  modules <- (table(net$validColors))
+
+  ## Passed as a table; let's make a df version too:
+  df <- as.data.frame(modules)
+  df
+  ## First, remove the unassigned genes from bin 0
+  if(any(df$Var1 == 0) == FALSE) {     ## If there is no unassigned bin, df stays as is.
+    numUnassigned <- 0
+  }  
+  if(any(df$Var1 == 0) == TRUE) {     ## If there is an unassigned bin
+    numUnassigned <- subset(df, Var1 == 0)$Freq
+    df <- df[-1,]     ## Remove the unassigned row
+  }
+  
+  summaryStats.df <- c(sprintf("%1.0f", nrow(df)),   ## number of modules assigned
+                     sprintf("%1.2f", mean(df$Freq)), ## mean number of genes in the assigned modules
+                     sprintf("%1.0f", min(df$Freq)),  ## min number of genes in the assigned modules
+                     sprintf("%1.0f", max(df$Freq)),  ## max number of genes in the assigned modules
+                     sprintf("%1.0f", numUnassigned))   ## number of genes in the unassigned bin, 0
+  summaryStats.df <- as.data.frame(summaryStats.df)
+  rownames(summaryStats.df) <- c("NModules", "MeanGenesPerModule", "MinGenesPerModule", "MaxGenesPerModule", 
+                            "NumGenesUnassigned")
+  colnames(summaryStats.df) <- minModSize
+  return(summaryStats.df)
+}
+
+summaryStats.df <- cbind(modules.Summary(net30, minModSizes[1]),
+                         modules.Summary(net25, minModSizes[2]),
+                         modules.Summary(net20, minModSizes[3]),
+                         modules.Summary(net15, minModSizes[4]),
+                         modules.Summary(net10, minModSizes[5]))
+summaryStats.df
+
+write.table(summaryStats.df, file = "consensusNetwork_orthogroups3718/Iterative_MinModuleSize_Summary_Statistics.txt", append = F, quote = F, col.names = T, row.names = T, sep = "\t")
+```
+
+
+#### Visualize the Correlation Between the Consensus Network with the Trait Phenotype of Reproductive
+##### Plot the Trait-Correlation Heat Maps Species by Species
+```{r}
+## Set up variables to contain the module-trait correlations
+moduleTraitCor = list()
+moduleTraitPvalue = list()
+
+your <- 
+
+for (set in 1:nSets) {
+  print(set)
+
+  # subnet <- net$consMEs[[set]]
+  subnet <- consMEs.unord[[set]]
+  wgcna <- multiExpr[[set]]$data
+  spp <- species[set]
+  
+  ##### MODULE-TRAIT CORRELATION #####
+  ## Performs the module-trait correlation using the Pearson method
+  moduleTraitCor[[set]] = corAndPvalue(subnet$data, traits[[set]][,1:2], use = "p")
+  ## This gives you the correlation p-values for the two phenotypes
+  moduleTraitPvalue[[set]] = corPvalueFisher(moduleTraitCor[[set]]$cor, exprSize$nSamples[set])
+
+  pdf(file = paste(path, "/minModuleSize", minModSize, "/ModuleTraitRelationships_Heatmap_", spp, ".pdf", sep=""), 
+      wi = 8, he = 10)
+  ## Plot the module-trait relationship table for each species:
+  textMatrix = paste(signif(moduleTraitCor[[set]]$cor, 2), "\n(",
+                        signif(moduleTraitPvalue[[set]], 1), ")", sep = "") 
+
+  dim(textMatrix) = dim(moduleTraitCor[[set]]$cor)
+  par(mar = c(6, 8.8, 3, 2.2))
+  labeledHeatmap(Matrix = moduleTraitCor[[set]]$cor,
+                 xLabels = names(traits[[set]]),
+                 yLabels = MEnames.NoGrey,
+                 ySymbols = MEnames.NoGrey,
+                 colorLabels = FALSE,
+                 colors = hcl.colors(8, alpha=0.7, "Heat", rev = TRUE),
+                 textMatrix = textMatrix,
+                 setStdMargins = FALSE,
+                 cex.text = 1,
+                 zlim = c(-1,1), 
+                 horizontalSeparator.y = NULL,
+                 main = paste(setLabels[set]))
+  dev.off()
+}
+```
+
+
+I want to redo this using the meta-analysis method because the above is too conservative and we have to adjust the p-values:
+```{r}
+modTraitCorr.metaZsum <- 0
+## Next,  calculate a meta Z-score of correlations from each set with a corresponding p-value:
+   ## Loop through and get the sums:
+    for(i in 1:nSets) {
+        modTraitCorr.metaZsum <- modTraitCorr.metaZsum + moduleTraitCor[[i]]$Z
+   }
+## Next, get the meta Z scores and p-values:
+modTrait.metaZ <-  modTraitCorr.metaZsum/sqrt(nSets)
+modTrait.metaP <- 2*pnorm(abs(modTrait.metaZ), lower.tail = FALSE)
+## Now, these are matrices; need to turn into dfs
+modTrait.metaZ <- as.data.frame(modTrait.metaZ)
+modTrait.metaZ$ME <- rownames(modTrait.metaZ)
+modTrait.metaP <- as.data.frame(modTrait.metaP)
+modTrait.metaP$ME <- rownames(modTrait.metaP)
+
+sigConsensusModules <- modTrait.metaP[which(modTrait.metaP$R < 0.05), "ME"]
+print(paste("The consensus module is: ", sigConsensusModules, sep = "  "))
+print(paste("The consensus module is: ", modTrait.metaZ[which(modTrait.metaP$R < 0.05), "R"], sep = "  "))
+print("Positive Z is associated with reproductives; negative with non-reproductives.")
+## So, after doing this method, we can find which module is significantly associated with the traits of interest. 
+
+## combined table:
+traitModuleDF <- merge(modTrait.metaZ, modTrait.metaP, by = "ME")
+traitModuleDF <- traitModuleDF[-5]  ## Drop the extra p-value column
+colnames(traitModuleDF) <- c("ME", "Reproductive.MetaZ", "Non-Reproductive.MetaZ", "MetaPval")
+traitModuleDF
+write.table(traitModuleDF, 
+            file = paste(path, "/minModuleSize", 
+                   minModSize, "/Module-Trait_MetaAnalysis_Results.txt", sep = ""), 
+              row.names = F,
+              col.names = T,
+              quote = F, 
+              sep = "\t")
+```
+
+#### Meta-analyses of the gene-trait and module-trait correlations:
+```{r}
+## And create blank lists to store the Gene Significances and the kMEs:
+GS <- list()
+kME <- list()
+GS.metaZsum <- 0
+kME.metaZsum <- 0
+  
+  for (set in 1:nSets) {
+    GS[[set]] <- corAndPvalue(multiExpr[[set]]$data, traits[[set]])
+    kME[[set]] <- corAndPvalue(multiExpr[[set]]$data, consMEs.unord[[set]]$data)
+  }
+  # This returns a list of matrices of the correlations and their statistics
+      
+  ## Next,  calculate a meta Z-score of correlations from each set with a corresponding p-value:
+     ## Loop through and get the sums:
+      for(i in 1:nSets) {
+          GS.metaZsum <- GS.metaZsum + GS[[i]]$Z
+          kME.metaZsum <- kME.metaZsum + kME[[i]]$Z
+     }
+      ## Next, get the meta Z scores and p-values:
+      GS.metaZ <-  GS.metaZsum/sqrt(nSets)
+      GS.metaP <- 2*pnorm(abs(GS.metaZ), lower.tail = FALSE)
+      
+      ## Now, turn these into a df and merge (just the reproductives):
+      GS.metaZ <- data.frame(GS.metaZ[,1])
+      GS.metaZ$geneID <- geneID
+      GS.metaP <- data.frame(GS.metaP[,1])
+      GS.metaP$geneID <- geneID
+      GS.meta <- merge(GS.metaZ, GS.metaP, by = "geneID")  ## by = 0 indicates we are joining by row names
+      rownames(GS.meta) <- geneID
+      # head(GS.meta)
+      
+      kME.metaZ <- kME.metaZsum/sqrt(nSets)
+      kME.metaP <- 2*pnorm(abs(kME.metaZ), lower.tail = FALSE)
+      ## Now, turn these into a df and merge:
+      kME.metaZ <- as.data.frame(kME.metaZ)
+      kME.metaZ$geneID <- geneID
+      kME.metaP <- as.data.frame(kME.metaP)
+      kME.metaP$geneID <- geneID
+      kME.meta <- merge(kME.metaZ, kME.metaP, by = "geneID")
+      rownames(kME.meta) <- geneID
+
+      ## Identify as correlation coefficients and P-values in the column names:
+      colnames(kME.meta) <- gsub("\\.x", ".Reproductive.metaZ.MM", colnames(kME.meta))
+      colnames(kME.meta) <- gsub("\\.y", ".Reproductive.metaPval.MM", colnames(kME.meta))
+
+      ## Lastly, let's put the colors by each other:
+      sortedColumns <- order(colnames(kME.meta))
+      kME.meta <- kME.meta[, sortedColumns]
+```
+
+Next, let's make the gene-significance table for export:
+```{r}
+  ## I'm doing this in a more iterative way:
+  columnNames <- c("geneID", "Reproductive.GS.metaZ", "Reproductive.GS.metaPval")    ## Set the column names list here
+  ct <- ncol(GS.meta)  ## Set a counter so we know how many of these are in here; start at the number of columns in the df
+  
+  ## Now add on for however many sets are remaining:
+  for(i in 1:nSets) {
+    tempCor <- data.frame(GS[[i]]$cor[,1])
+    tempCor$geneID <- geneID   
+    tempP <- data.frame(GS[[i]]$p[,1])
+    tempP$geneID <- geneID
+    ## Now do the merges:
+    GS.meta = merge(GS.meta, tempCor, by = "geneID")
+    GS.meta = merge(GS.meta, tempP, by = "geneID")
+    
+    ct = ct + 2   ## Increment by the two columns we added
+    columnNames <- c(columnNames, paste("Reproductive.GS.cor.", species[i], sep = ""), 
+                     paste("Reproductive.GS.pval.", species[i], sep = ""))   ## Add to  column names
+    ## Then set the column names before we run again:
+    colnames(GS.meta) <- columnNames
+  }
+  dim(GS.meta)
+  head(GS.meta)
+
+  write.table(as.data.frame(GS.meta), 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/Gene-Trait_MetaAnalysis_Results.txt", sep = ""), 
+              row.names = F,
+              col.names = T,
+              quote = F, 
+              sep = "\t")
+```
+
+
+Now, do it again for kME:
+```{r}
+  ct <- ncol(kME.meta)  ## Set a counter so we know how many of these are in here; start at the number of columns in the df
+  
+  ## Now add on for however many sets are remaining:
+  for(i in 1:nSets) {
+    tempCor <- data.frame(kME[[i]]$cor)
+    tempCor$geneID <- geneID   
+    tempP <- data.frame(kME[[i]]$p)
+    tempP$geneID <- geneID
+    ## Now do the merges:
+    kME.meta = merge(kME.meta, tempCor, by = "geneID")
+    kME.meta = merge(kME.meta, tempP, by = "geneID")
+    
+    ## Identify as correlation coefficients and P-values in the column names (also where we are naming our column headers this time):
+    colnames(kME.meta) <- gsub("\\.x", paste(".Reproductive.MM.cor.", species[i], sep = ""), colnames(kME.meta))
+    colnames(kME.meta) <- gsub("\\.y", paste(".Reproductive.MM.Pval.", species[i], sep = ""), colnames(kME.meta))    
+    
+    ct = ct + 2*nMEs.NoGrey   ## Increment by the two columns we added
+  }
+  # dim(kME.meta)
+  # ct
+  # head(kME.meta)
+
+  ## Check we're getting the correct values for blue Lf:
+  # head(kME[[6]]$cor)
+  # head(kME.meta$MEblue.Reproductive.MM.cor.Liostenogaster_flavolineata)
+
+  ## Lastly, let's put the colors by each other:
+  sortedColumns <- order(colnames(kME.meta))
+  kME.meta <- kME.meta[, sortedColumns]
+  
+  write.table(as.data.frame(kME.meta), 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/Gene-Module_MetaAnalysis_Results.txt", sep = ""), 
+              row.names = F,
+              col.names = T,
+              quote = F, 
+              sep = "\t")
+
+ 
+```
+
+#### Export the genes for the consensus modules significantly associated the traits of interest:
+First, let's make a dataframe that contains just the modules that are significantly correlated with trait across all 6 species (results of our meta-analysis):
+```{r}
+## First, make a df that contains just the significant modules from the kME.meta df:
+length(sigConsensusModules)
+sigColumnNames <- c("geneID")
+for(i in 1:length(sigConsensusModules)) {
+  sigColumnNames <- c(sigColumnNames, paste(sigConsensusModules[i], ".Reproductive.metaZ.MM", sep = ""), paste(sigConsensusModules[i], ".Reproductive.metaPval.MM", sep = ""))
+}
+length(sigColumnNames)
+sigDF <- kME.meta[,sigColumnNames]
+
+# write.table(sigDF, 
+#               file = paste(path, "/minModuleSize", 
+#                            minModSize, "/Trait-Module-Gene_MetaAnalysis_All_Significant_Modules.txt", sep = ""), 
+#               row.names = F,
+#               col.names = F,
+#               quote = F, 
+#               sep = "\t")
+```
+
+
+**N.B.:** Throughout our study, we tend to focus on those genes that could be correlated in either phenotype of interest (but those are known to be differentially expressed). Thus, our focal gene list will be the one that does not care which trait the module is significantly-associated with. That said, we do want to record those as well.
+
+Let's do filtering based on the following criteria:
+* If the gene is significantly associated with the module(s) of focus
+* If the gene is significantly associated with the module AND significantly associated with the trait across all species (using the results of that meta-analysis too)
+* If the gene is significantly associated with the module AND the trait, AND divided into R and NR
+```{r}
+## DF of just the significant MEs for reference:
+# traitModuleDF[which(traitModuleDF$ME %in% sigConsensusModules), ]
+
+## Make an empty list to match the number of significant MEs:
+sigGenes.list1 <- vector("list", length = length(sigConsensusModules))
+sigGenes.list2 <- vector("list", length = length(sigConsensusModules))
+sigGenes.listR <- vector("list", length = length(sigConsensusModules))
+sigGenes.listNR <- vector("list", length = length(sigConsensusModules))
+
+## Name it with the ME colors
+names(sigGenes.list1) <- sigConsensusModules
+names(sigGenes.list2) <- sigConsensusModules
+names(sigGenes.listR) <- sigConsensusModules
+names(sigGenes.listNR) <- sigConsensusModules
+
+## Couple more empty storage containers:
+sigGenes1 <- c()
+sigGenes2 <- c()
+sigGenesR <- c()
+sigGenesNR <- c()
+
+geneCounts1 <- c()
+geneCounts2 <- c()
+geneCountsR <- c()
+geneCountsNR <- c()
+info <- data.frame()
+
+## Now, we need to loop through the significant modules and do the filtering:
+for(i in 1:length(sigConsensusModules)) {
+  mod <- paste(sigConsensusModules[i], ".Reproductive.metaPval.MM", sep = "")
+  ## Filter minimal: just if the gene is significantly associated with the module(s) of focus:
+  sigGenes.list1[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05), "geneID"])
+  ## Store the gene counts:
+  geneCounts1 <- c(geneCounts1, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05), "geneID"])))
+  # print(geneCounts1)
+
+  ## Filter slightly more stringent: just if the gene is significantly associated with the module(s) of focus AND significantly associated with the trait across all species:
+  sigGenes.list2[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])
+  geneCounts2 <- c(geneCounts2, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])))
+  # print(geneCounts2)
+  
+  ## Separate into R and NR:
+  ##### Reproductives first:
+  if(traitModuleDF[which(traitModuleDF$ME %in% sigConsensusModules[i]), "Reproductive.MetaZ"] > 0) {
+    sigGenes.listR[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])
+    geneCountsR <- c(geneCountsR, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])))
+    geneCountsNR <- c(geneCountsNR, NA)
+  }
+  ##### Non-Reproductives:
+  if(traitModuleDF[which(traitModuleDF$ME %in% sigConsensusModules[i]), "Reproductive.MetaZ"] < 0) {
+    sigGenes.listNR[i] <- data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])
+    geneCountsNR <- c(geneCountsNR, nrow(data.frame(sigDF[which(sigDF[,mod] < 0.05 & GS.meta$Reproductive.GS.metaPval < 0.05), "geneID"])))
+    geneCountsR <- c(geneCountsR, NA)
+  }  
+ 
+#   print(geneCountsR)
+#   print(geneCountsNR)
+}
+
+## Print the summary info:
+info <- data.frame(sigConsensusModules, geneCounts1, geneCounts2, geneCountsR, geneCountsNR)
+names(info) <- c("ME", "Num.Genes.Sig.Module", "Num.Genes.Sig.Module.Trait", "R.Genes.Sig.Module.Trait", "NR.Genes.Sig.Module.Trait")
+newrow <- c("Total", sum(info$Num.Genes.Sig.Module), 
+                              sum(info$Num.Genes.Sig.Module.Trait), 
+                              sum(info$R.Genes.Sig.Module.Trait, na.rm = T), 
+                              sum(info$NR.Genes.Sig.Module.Trait, na.rm = T))
+info <- rbind(info, newrow)
+
+write.table(info, 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/Trait-Module-Gene_MetaAnalysis_GeneCounts.txt", sep = ""), 
+              row.names = F,
+              col.names = T,
+              quote = F, 
+              sep = "\t")
+```
+
+Lastly, we need to go through the lists of gene lists, only take the unique ones, and print those:
+```{r}
+## Turn into a dataframe, then take the unique list:
+sigGenes1 <- data.frame(unlist(sigGenes.list1))
+sigGenesCount1 <- length(unique(sigGenes1[,1]))
+write.table(as.data.frame(unique(sigGenes1[,1])), 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/orthogroupList_SigModuleAssociated_Only.txt", sep = ""), 
+              row.names = F,
+              col.names = F,
+              quote = F, 
+              sep = "\t")
+
+sigGenes2 <- data.frame(unlist(sigGenes.list2))
+sigGenesCount2 <- length(unique(sigGenes2[,1]))
+write.table(as.data.frame(unique(sigGenes2[,1])), 
+              file = paste(path, "/minModuleSize",
+              minModSize, "/orthogroupList_SigModule-SigTraitAssociated.txt", sep = ""),
+              row.names = F,
+              col.names = F,
+              quote = F,
+              sep = "\t")
+
+## Only creates files for R / NR if they exist:
+sigGenesR <- data.frame(unlist(sigGenes.listR))
+  if(length(sigGenesR) > 0) {
+    sigGenesCountR <- length(unique(sigGenesR[,1]))
+    write.table(as.data.frame(unique(sigGenesR[,1])), 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/orthogroupList_SigModule-SigTraitAssociated_R.txt", sep = ""), 
+              row.names = F,
+              col.names = F,
+              quote = F, 
+              sep = "\t")
+  }
+  if(length(sigGenesR) == 0) {
+    sigGenesCountR <- 0
+  }
+
+sigGenesNR <- data.frame(unlist(sigGenes.listNR))
+  if(length(sigGenesNR) > 0) {
+    sigGenesCountNR <- length(unique(sigGenesNR[,1]))
+    write.table(as.data.frame(unique(sigGenesNR[,1])), 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/orthogroupList_SigModule-SigTraitAssociated_NR.txt", sep = ""), 
+              row.names = F,
+              col.names = F,
+              quote = F, 
+              sep = "\t")
+  }
+  if(length(sigGenesNR) == 0)  {
+    sigGenesCountNR <- 0
+  }
+
+## Print the summary info:
+info <- data.frame(sigGenesCount1, sigGenesCount2, sigGenesCountR, sigGenesCountNR)
+names(info) <- c("Num.Uniq.Genes.Sig.Module", "Num.Uniq.Genes.Sig.Module.Sig.Trait", "R.Uniq.Genes.Sig.Module.Sig.Trait", "NR.Uniq.Genes.Sig.Module.Sig.Trait")
+
+write.table(info, 
+              file = paste(path, "/minModuleSize", 
+                           minModSize, "/Trait-Module-Gene_MetaAnalysis_GeneCounts_Unique.txt", sep = ""), 
+              row.names = F,
+              col.names = T,
+              quote = F, 
+              sep = "\t")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### Plot the Trait-Module Correlation Heat Maps Based on Consensus
+This is the most conservative way of assessing trait-module correlation: for each module-trait pair we take the correlation that has the lower absolute value in the two sets if the two correlations have the same sign, and zero relationship if the two correlations have opposite signs
+```{r, eval = FALSE}
+
+## Remember that the trait-module correlations exist in moduleTraitCor[[set]] & moduleTraitPvalue[[set]]
+set1 = 1
+set2 = 2
+### WITHOUT ADJUSTMENT FIRST
+pairwiseConsensusCorrelation <- function(set1,set2) {
+    ## Initialize matrices to hold the consensus correlation and p-value
+    consensusCor <- matrix(NA, nrow(moduleTraitCor[[set1]]), ncol(moduleTraitCor[[set1]]))
+    consensusPvalue <- matrix(NA, nrow(moduleTraitCor[[set1]]), ncol(moduleTraitCor[[set1]]))
+
+    ## Find consensus negative correlations
+    negative <- moduleTraitCor[[set1]] < 0 & moduleTraitCor[[set2]] < 0
+    consensusCor[negative] <- pmax(moduleTraitCor[[set1]][negative], moduleTraitCor[[set2]][negative])
+    consensusPvalue[negative] <- pmax(moduleTraitPvalue[[set1]][negative], moduleTraitPvalue[[set2]][negative])
+    
+    ## Find consensus positive correlations
+    positive <- moduleTraitCor[[set1]] > 0 & moduleTraitCor[[set2]] > 0
+    consensusCor[positive] <- pmin(moduleTraitCor[[set1]][positive], moduleTraitCor[[set2]][positive])
+    consensusPvalue[positive] <- pmax(moduleTraitPvalue[[set1]][positive], moduleTraitPvalue[[set2]][positive])
+
+    textMatrix = paste(signif(consensusCor, 2), "\n(", signif(consensusPvalue, 1), ")", sep = "")
+    dim(textMatrix) = dim(moduleTraitCor[[set]])
+    pdf(file = paste(path, "/minModuleSize", minModSize, "/Pairwise_Consensus_Module-Trait_Correlations_", species[set1], "_", species[set2], ".pdf", sep=""), 
+      wi = 8, he = 10)
+    par(mar = c(6, 8.8, 3, 2.2))
+    labeledHeatmap(Matrix = consensusCor,
+             xLabels = names(traits[[set]]),
+             yLabels = MEnames.NoGrey,
+             ySymbols = MEnames.NoGrey,
+             colorLabels = FALSE,
+             colors = hcl.colors(8, alpha=0.7, "Heat", rev = TRUE),
+             textMatrix = textMatrix,
+             setStdMargins = FALSE,
+             cex.text = 0.5,
+             zlim = c(-1,1),
+             main = NULL)
+
+  dev.off()
+}
+
+## For all possible iterations of pairwise correlations:
+for(i in 1:length(species)) {
+  for (j in (i+1):length(species)) {
+      if(i < 6) {
+        # print(paste(i, j, sep="   "))
+        pairwiseConsensusCorrelation(i,j)
+      }
+}}
+
+
+### WITH ADJUSTMENT GIVEN N = 17 PAIRWISE CORRELATIONS PERFORMED
+pairwiseConsensusCorrelation <- function(set1,set2) {
+    ## Initialize matrices to hold the consensus correlation and p-value
+    consensusCor <- matrix(NA, nrow(moduleTraitCor[[set1]]), ncol(moduleTraitCor[[set1]]))
+    consensusPvalue <- matrix(NA, nrow(moduleTraitCor[[set1]]), ncol(moduleTraitCor[[set1]]))
+
+    ## Find consensus negative correlations
+    negative <- moduleTraitCor[[set1]] < 0 & moduleTraitCor[[set2]] < 0
+    consensusCor[negative] <- pmax(moduleTraitCor[[set1]][negative], moduleTraitCor[[set2]][negative])
+    consensusPvalue[negative] <- pmax(moduleTraitPvalue[[set1]][negative], moduleTraitPvalue[[set2]][negative])
+    
+    ## Find consensus positive correlations
+    positive <- moduleTraitCor[[set1]] > 0 & moduleTraitCor[[set2]] > 0
+    consensusCor[positive] <- pmin(moduleTraitCor[[set1]][positive], moduleTraitCor[[set2]][positive])
+    consensusPvalue[positive] <- pmax(moduleTraitPvalue[[set1]][positive], moduleTraitPvalue[[set2]][positive])
+
+    ## Make a vector of all p-values so that I can do a BH adjustment on them:
+    # all.Pvalues <- c(consensusPvalue[positive], consensusPvalue[negative])
+    adjustedConsensusPvalue <- p.adjust(consensusPvalue[,1], method = "hochberg", n = length(consensusPvalue))
+
+    textMatrix = paste(signif(consensusCor, 2), "\n(", signif(adjustedConsensusPvalue, 1), ")", sep = "")
+    dim(textMatrix) = dim(moduleTraitCor[[set]])
+    pdf(file = paste(path, "/minModuleSize", minModSize, "/ADJUSTED_Pairwise_Consensus_Module-Trait_Correlations_", species[set1], "_", species[set2], ".pdf", sep=""), 
+      wi = 8, he = 10)
+    par(mar = c(6, 8.8, 3, 2.2))
+    labeledHeatmap(Matrix = consensusCor,
+             xLabels = names(traits[[set]]),
+             yLabels = MEnames.NoGrey,
+             ySymbols = MEnames.NoGrey,
+             colorLabels = FALSE,
+             colors = hcl.colors(8, alpha=0.7, "Heat", rev = TRUE),
+             textMatrix = textMatrix,
+             setStdMargins = FALSE,
+             cex.text = 0.5,
+             zlim = c(-1,1),
+             main = NULL)
+
+  dev.off()
+}
+
+## For all possible iterations of pairwise correlations:
+for(i in 1:length(species)) {
+  for (j in (i+1):length(species)) {
+      if(i < 6) {
+        # print(paste(i, j, sep="   "))
+        pairwiseConsensusCorrelation(i,j)
+      }
+}}
+
+
+```
+Before p-value adjustment, there is pairwise correlation for trait modules with C. australensis, M. genalis, and L. flavolineata... blue and green modules, kind of. Ha. Also grey modules for  
+
+
+
+
+#### Plot the Dendrogram for the Whole Network with Gene Signifiance and Expression for each species:
+```{r, eval =FALSE}
+## To get the dendrogram and the other matrices to line up, we will need the orthogroups to match the order in consTree:
+# consTree[["order"]]             ## Gives me the order from the dendrogram with row numbers that match to the original input
+# colnames(multiExpr[[1]]$data)   ## Gives me the original order of the orthogroups, which should have been least to greatest
+# 
+# Caus.TraitCorr[[2]]   ## Contains the Gene Significance (with the trait of Reproductive) Correlation Coefficients
+# Caus.TraitCorr[[3]]$p.GS.Reproductives    ## Contains the p-value associated with the Correlation Coefficients
+
+## Set the colors:
+## WGCNA gene-trait significance:
+col1 <- "palevioletred2"
+col2 <- "orange1"
+col3 <- "blue"
+
+
+## Make Gene Significance with Reproductives Status a Variable For Each Species
+## But we only want to show the genes with correlation above/below 50%
+# Caus.GSrepro <- ifelse(abs(Caus.TraitCorr[[2]]$GS.Reproductives) >= 0.5, Caus.TraitCorr[[2]]$GS.Reproductives, 0) 
+# Ccal.GSrepro <- ifelse(abs(Ccal.TraitCorr[[2]]$GS.Reproductives) >= 0.5, Ccal.TraitCorr[[2]]$GS.Reproductives, 0) 
+# Mgen.GSrepro <- ifelse(abs(Mgen.TraitCorr[[2]]$GS.Reproductives) >= 0.5, Mgen.TraitCorr[[2]]$GS.Reproductives, 0) 
+# Pcan.GSrepro <- ifelse(abs(Pcan.TraitCorr[[2]]$GS.Reproductives) >= 0.5, Pcan.TraitCorr[[2]]$GS.Reproductives, 0) 
+# Pdom.GSrepro <- ifelse(abs(Pdom.TraitCorr[[2]]$GS.Reproductives) >= 0.5, Pdom.TraitCorr[[2]]$GS.Reproductives, 0) 
+# Lfla.GSrepro <- ifelse(abs(Lfla.TraitCorr[[2]]$GS.Reproductives) >= 0.5, Lfla.TraitCorr[[2]]$GS.Reproductives, 0) 
+
+## Actually let's only show positive correlations. No need to adjust their order because they will be in the correct order based on the original input to WGCNA.
+# Caus.GSrepro <- ifelse(Caus.TraitCorr[[2]]$GS.Reproductives > 0, Caus.TraitCorr[[2]]$GS.Reproductives, NA)
+# Ccal.GSrepro <- ifelse(Ccal.TraitCorr[[2]]$GS.Reproductives > 0, Ccal.TraitCorr[[2]]$GS.Reproductives, NA) 
+# Mgen.GSrepro <- ifelse(Mgen.TraitCorr[[2]]$GS.Reproductives > 0, Mgen.TraitCorr[[2]]$GS.Reproductives, NA) 
+# Pcan.GSrepro <- ifelse(Pcan.TraitCorr[[2]]$GS.Reproductives > 0, Pcan.TraitCorr[[2]]$GS.Reproductives, NA) 
+# Pdom.GSrepro <- ifelse(Pdom.TraitCorr[[2]]$GS.Reproductives > 0, Pdom.TraitCorr[[2]]$GS.Reproductives, NA) 
+# Lfla.GSrepro <- ifelse(Lfla.TraitCorr[[2]]$GS.Reproductives > 0, Lfla.TraitCorr[[2]]$GS.Reproductives, NA) 
+
+## Actually actually, let's only show the significant & POSITIVE correlations:
+Caus.GSrepro <- ifelse(Caus.TraitCorr[[3]]$p.GS.Reproductives < 0.05 & Caus.TraitCorr[[2]]$GS.Reproductives > 0, Caus.TraitCorr[[3]]$p.GS.Reproductives, NA)
+Ccal.GSrepro <- ifelse(Ccal.TraitCorr[[3]]$p.GS.Reproductives < 0.05 & Ccal.TraitCorr[[2]]$GS.Reproductives > 0, Ccal.TraitCorr[[3]]$p.GS.Reproductives, NA)
+Mgen.GSrepro <- ifelse(Mgen.TraitCorr[[3]]$p.GS.Reproductives < 0.05 & Mgen.TraitCorr[[2]]$GS.Reproductives > 0, Mgen.TraitCorr[[3]]$p.GS.Reproductives, NA)
+Pcan.GSrepro <- ifelse(Pcan.TraitCorr[[3]]$p.GS.Reproductives < 0.05 & Pcan.TraitCorr[[2]]$GS.Reproductives > 0, Pcan.TraitCorr[[3]]$p.GS.Reproductives, NA)
+Pdom.GSrepro <- ifelse(Pdom.TraitCorr[[3]]$p.GS.Reproductives < 0.05 & Pdom.TraitCorr[[2]]$GS.Reproductives > 0, Pdom.TraitCorr[[3]]$p.GS.Reproductives, NA)
+Lfla.GSrepro <- ifelse(Lfla.TraitCorr[[3]]$p.GS.Reproductives < 0.05 & Lfla.TraitCorr[[2]]$GS.Reproductives > 0, Lfla.TraitCorr[[3]]$p.GS.Reproductives, NA)
+
+
+# This translates the numeric values into colors
+GSweight.Caus <- numbers2colors(Caus.GSrepro, signed = F, colors = col1, naColor = "white")
+GSweight.Ccal <- numbers2colors(Ccal.GSrepro, signed = F, colors = col1, naColor = "white")
+GSweight.Mgen <- numbers2colors(Mgen.GSrepro, signed = F, colors = col1, naColor = "white")
+GSweight.Pcan <- numbers2colors(Pcan.GSrepro, signed = F, colors = col1, naColor = "white")
+GSweight.Pdom <- numbers2colors(Pdom.GSrepro, signed = F, colors = col1, naColor = "white")
+GSweight.Lfla <- numbers2colors(Lfla.GSrepro, signed = F, colors = col1, naColor = "white")
+
+## To get a gradation of color:
+# GSweight.Lfla <- numbers2colors(Lfla.GSrepro, signed = T)
+# ?numbers2colors
+
+## Now get the Expression p-values:
+load(file = "../deg-deseq2/orthogroups3718/hymenopetera_orthogroups_list_3718.Rdata")
+
+sigDE2colors <- function(i) {
+  ## Step 0: Load the R data
+  DE <- loadRData(paste("../deg-deseq2/orthogroups3718/", species[i], "/", species[i], "_DESeq2_results.Rdata", sep=""))
+  ## Step 1: Add the orthogroups to the DE data
+  DE$gene <- rownames(DE)
+  DE <- as.data.frame(DE)
+  DE <- merge(DE, hymnOrthoData, by.x = "gene", by.y = species[i])
+  ## Step 2: Filter to the 1507 genes used in WGCNA
+  DE <- DE[DE$Orthogroup %in% colnames(multiExpr[[i]]$data),]
+  ## Step 3: Check that the orthgroups are in the correct order of colnames(multiExpr[[i]]$data)
+  if (print(all(colnames(multiExpr[[i]]$data) == DE$Orthogroup)) == FALSE) {
+    DE <- DE[order(DE$Orthogroup),]
+  }
+  if (print(all(colnames(multiExpr[[i]]$data) == DE$Orthogroup)) == TRUE) {
+    print("We have the orthogroups in the correct order.")
+  }
+  ## Step 4: Convert the significant p-values to colors
+  DEsig <- ifelse(DE$padj < 0.05, DE$padj, NA) 
+  DEsigWeight <- numbers2colors(DEsig, signed = T, colors = col2, naColor = "white")
+} 
+
+DEweight.Caus <- sigDE2colors(1)
+DEweight.Ccal <- sigDE2colors(2)
+DEweight.Mgen <- sigDE2colors(3)
+DEweight.Pcan <- sigDE2colors(4)
+DEweight.Pdom <- sigDE2colors(5)
+DEweight.Lfla <- sigDE2colors(6)
+
+## Lastly, is it an SVM common predictor gene?
+svm125 <- read.table(file = "~/Dropbox/0.GitHub.Local/MajorTransitionScripts/comparative-transcriptomics/svm/result/20-iterations/125_common_predictor_genes", header = T)
+wgcnaGenes <- colnames(multiExpr[[i]]$data)
+svm01 <- ifelse(wgcnaGenes %in% svm125, 1, 0)
+svmWeight <- numbers2colors(svm01, signed = T, colors = col3, naColor = "white")
+
+pdf(file = paste(path, "/minModuleSize", minModSize, "/Final_Dendrogram_GS_DE_SVM.pdf", sep=""), 
+      wi = 8, he = 10)
+
+plotDendroAndColors(consTree, 
+                    colors = data.frame(labels2colors(net$validColors),
+                                        GSweight.Caus, 
+                                        GSweight.Ccal,
+                                        GSweight.Mgen,
+                                        GSweight.Pcan,
+                                        GSweight.Pdom,
+                                        GSweight.Lfla, 
+                                        DEweight.Caus, 
+                                        DEweight.Ccal,
+                                        DEweight.Mgen,
+                                        DEweight.Pcan,
+                                        DEweight.Pdom,
+                                        DEweight.Lfla, 
+                                        svmWeight),
+                    groupLabels = c("Consensus Modules", 
+                                    "Caus_sigTrait", 
+                                    "Ccal_sigTrait", 
+                                    "Mgen_sigTrait", 
+                                    "Pcan_sigTrait",
+                                    "Pdom_sigTrait",
+                                    "Lfla_sigTrait",
+                                    "Caus_DEsig", 
+                                    "Ccal_DEsig", 
+                                    "Mgen_DEsig", 
+                                    "Pcan_DEsig", 
+                                    "Pdom_DEsig",
+                                    "Lfla_DEsig", 
+                                    "svm125genes"),
+                    dendroLabels = FALSE, 
+                    hang = 0.03,
+                    addGuide = FALSE, 
+                    guideHang = 0.05,
+                    autoColorHeight = F,
+                    colorHeight = c(0.35))
+
+dev.off()
+
+
+pdf(file = paste(path, "/Final_Dendrogram_GS_DE_SVM_minModules302010.pdf", sep=""), 
+      wi = 8, he = 10)
+
+plotDendroAndColors(consTree, 
+                    colors = data.frame(labels2colors(net30$validColors),
+                                        labels2colors(net20$validColors), 
+                                        labels2colors(net10$validColors), 
+                                        GSweight.Caus, 
+                                        GSweight.Ccal,
+                                        GSweight.Mgen,
+                                        GSweight.Pcan,
+                                        GSweight.Pdom,
+                                        GSweight.Lfla, 
+                                        DEweight.Caus, 
+                                        DEweight.Ccal,
+                                        DEweight.Mgen,
+                                        DEweight.Pcan,
+                                        DEweight.Pdom,
+                                        DEweight.Lfla, 
+                                        svmWeight),
+                    groupLabels = c("ConsensusMin30",
+                                    "ConsensusMin20",
+                                    "ConsensusMin10",
+                                    "Caus_sigTrait", 
+                                    "Ccal_sigTrait", 
+                                    "Mgen_sigTrait", 
+                                    "Pcan_sigTrait",
+                                    "Pdom_sigTrait",
+                                    "Lfla_sigTrait",
+                                    "Caus_DEsig", 
+                                    "Ccal_DEsig", 
+                                    "Mgen_DEsig", 
+                                    "Pcan_DEsig", 
+                                    "Pdom_DEsig",
+                                    "Lfla_DEsig", 
+                                    "svm125genes"),
+                    dendroLabels = FALSE, 
+                    hang = 0.03,
+                    addGuide = FALSE, 
+                    guideHang = 0.05,
+                    autoColorHeight = F,
+                    colorHeight = c(0.35))
+
+dev.off()
+
+## Just the plain dendrogram for a sanity check that the modules aren't getting shuffled:
+# plotDendroAndColors(consTree, 
+#                     colors = data.frame(labels2colors(net$validColors)),
+#                     groupLabels = c("Consensus Modules"),
+#                     dendroLabels = FALSE, 
+#                     hang = 0.03,
+#                     addGuide = TRUE, 
+#                     guideHang = 0.05,
+#                     autoColorHeight = F,
+#                     colorHeight = c(0.25))
+```
+
+# Consensus Modules - Differential Analysis Between Reproductives and Non-reproductives
+In this section we compare the consensus eigengene networks in the female and male data sets (such comparison is often called differential analysis). Consensus eigengene networks capture the relationships among consensus modules; the relationships are quantified by eigengene correlations. We first extend the consensus eigengenes by adding the body weight clinical trait as an additional “eigengene”:
+```{r, eval =FALSE}
+# Create a variable weight that will hold just the body weight of mice in both sets
+# weight = vector(mode = "list", length = nSets)
+# for (set in 1:nSets)
+# {
+#   weight[[set]] = list(data = as.data.frame(Traits[[set]]$data$weight_g))
+#   names(weight[[set]]$data) = "weight"
+# }
+
+
+# Recalculate consMEs to give them color names
+consMEsC = multiSetMEs(multiExpr, universalColors = moduleColors)
+# We add the weight trait to the eigengenes and order them by consesus hierarchical clustering:
+MET = consensusOrderMEs(addTraitToMEs(consMEsC, weight))
+
+```
+
+
+THIS IS HOW WE DID IT FOR THE SINGLE SPECIES... we basically do this again with the Meta Z and P values
+### Quantifying module–trait associations
+##### Writing the module-trait, module-gene, and gene-trait correlations to out files.
+```{r, eval = FALSE}
+getModuleMembership <- function(set) {
+  subnet <- net$consMEs[[set]]
+  wgcna <- multiExpr[[set]]$data
+  spp <- species[set]
+  
+  nGenes <- ncol(wgcna)
+  nSamples <- nrow(wgcna)
+
+  ## Recalculate module eigengenes (MEs) with color labels
+  MEs0 <- moduleEigengenes(wgcna, subnet$validColors)$eigengenes
+  ## Puts close eigenvectors next to each other
+  MEs <- orderMEs(MEs0)
+  ## Names (colors) of the modules
+  moduleNames <- labels2colors(as.numeric(substring(names(MEs), 3)))  ## Saves the module names as their colors
+  
+  ##### GENE MODULE MEMBERSHIP #####
+  ## Correlation between all genes with their module memberships regardless of trait
+  geneModuleMembership <- as.data.frame(cor(wgcna, MEs, use = "p"))
+  ## Store the Module Membership (MM) p-values in a dataframe with the modules and the traits: 
+  MMPvalue <- as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership), nSamples))
+  ## Modify the names to indicate that these are the module memberships:
+  names(geneModuleMembership) <- paste("MM", moduleNames, sep = "")
+  ## And the module membership p-values:
+  names(MMPvalue) <- paste("p.MM", labels2colors(moduleNames), sep = "")
+
+  ##### GENE-TRAIT CORRELATION (via correlation with modules) #####
+  #### Make a traits table to correlate the genes & traits  together:
+  trait <- as.data.frame(traits[[set]][,1])
+  names(trait) <- "Reproductives"
+  
+  ## Also record the gene-trait significance (GS), by correlating each gene with the traits:
+  geneTraitCorr <- as.data.frame(cor(wgcna, trait, use = "p"))
+  # geneTraitCorr   ## Correlation coefficients
+  ## Rename the columns appropriately to indicate they are the gene-trait significance (GS)
+  names(geneTraitCorr) <- c("GS.Reproductives")
+  ## Let's also make a column for the Nonreproductives
+  # geneTraitCorr2 <- -geneTraitCorr    ## This is the negative of the gene-trait correlations for the other trait, NonReproductives
+  # names(geneTraitCorr2) <- c("GS.NonReproductives")
+  ## Save the p-value associated with the gene-trait significance correlations
+  GSPvalue <- as.data.frame(corPvalueStudent(as.matrix(geneTraitCorr), nSamples))
+  ## And the associated p-value (No need to give two)
+  names(GSPvalue) <- c("p.GS.Reproductives")
+  
+  ## Next, build a dataframe to report:
+  geneInfo0 <- data.frame(geneID = colnames(wgcna),
+                    moduleColor =  labels2colors(subnet$validColors),
+                    geneTraitCorr, GSPvalue)
+  geneInfo1 <- geneInfo0
+  # Add module membership information in trait-module correlation order:
+  for (mod in 1:ncol(geneModuleMembership)) {
+      oldNames <- names(geneInfo1)
+      geneInfo1 <- data.frame(geneInfo1, geneModuleMembership[, mod], MMPvalue[, mod])
+      names(geneInfo1) <- c(oldNames, paste("MM.", moduleNames[mod], sep = ""),
+                                      paste("p.MM.", moduleNames[mod], sep = ""))
+  
+  }
+
+  # Lastly, order the genes in the geneInfo variable first by module color, then by geneTraitSignificance
+  geneOrder <- order(geneInfo1$moduleColor, -abs(geneInfo0[,"GS.Reproductives"]))
+  geneInfo <- geneInfo1[geneOrder, ]
+
+  write.table(geneInfo, file = paste(path, "/", spp, "/minModuleSize", minModSize, "/", spp, "_Genes_Module_Correlations.txt", sep = ""), 
+              quote = F, append = F, row.names = F, col.names = T, sep = "\t")
+
+  return(list(geneModuleMembership, geneTraitCorr, GSPvalue, geneInfo))
+}
+
+minModSize <- 30
+## Returns as a list: the module-traite Correlation P-values, the module-trait correlation Coefficient, gene Module Membership, 
+Caus.TraitCorr <- getModuleMembership(1)
+Ccal.TraitCorr <- getModuleMembership(2)
+Mgen.TraitCorr <- getModuleMembership(3)
+Pcan.TraitCorr <- getModuleMembership(4)
+Pdom.TraitCorr <- getModuleMembership(5)
+Lfla.TraitCorr <- getModuleMembership(6)
+
+## Gene-module membership
+Caus.TraitCorr[[1]]
+## Just the gene-trait correlations
+Caus.TraitCorr[[2]]
+## Just the gene-trait correlation p-values
+Caus.TraitCorr[[3]]
+## Full table: gene-module membership, gene-trait correlation & significance; what gets saved
+Caus.TraitCorr[[4]]
+
+## Create a list of all trait correlations for downstream:
+# traitCorr <- list(Caus.TraitCorr, Ccal.TraitCorr, Mgen.TraitCorr, Pcan.TraitCorr, Pdom.TraitCorr, Lfla.TraitCorr)
+```
+In the resulting table that is saved, MM indicates the gene's correlation with the module membership (MM.color == correlation coefficient), and the p-value for that particular gene's correlation with the module (MM.p). Recall that Module Membership refers to the correlation between all genes with their module memberships regardless of trait correlation. GS stands for gene-trait significance. These abbreviations are standard to WGCNA and are not my own.
+
