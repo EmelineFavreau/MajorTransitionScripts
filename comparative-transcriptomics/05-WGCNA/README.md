@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 # Analysing results with TopGO
 scripts/2021-10-11-topgo-on-consensus-wgcna.Rmd
 scripts/2021-10-25-go-terms-analysis-consensus-wgcna.Rmd
 
+=======
+>>>>>>> 1e90311813fee371f5b419537d1e864b5f57e93d
 # Consensus
 
 ## 1. code

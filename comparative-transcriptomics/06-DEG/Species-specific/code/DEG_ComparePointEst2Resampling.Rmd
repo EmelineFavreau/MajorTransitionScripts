@@ -1,0 +1,1019 @@
+---
+title: "DEG_Comparisons"
+author: "KS Geist"
+date: "2 May 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Clear workspace
+rm(list=ls())
+
+## Set options
+options(scipen=999)
+
+## Load libraries
+library(ggplot2)
+```
+
+
+## Set the species:
+```{r}
+species <- c("Ceratina_australensis", "Ceratina_calcarata", "Megalopta_genalis", "Polistes_canadensis", "Polistes_dominula", "Liostenogaster_flavolineata") 
+wasps <- species[4:6]
+bees <- species[1:3]
+```
+
+# Orthology-dependent approach
+
+## Bring in the resampled DEG counts
+```{r}
+Mgen.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[3], "/", species[3],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+
+Pcan.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[4], "/", species[4],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+
+Pdom.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[5], "/", species[5],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+
+Lfla.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[6], "/", species[6],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+```
+
+Make and format the species labels:
+```{r}
+spp.labels <- c("C.australensis", "C.calcarata", "M.genalis", 
+                "P.canadensis", "P.dominula", "L.flavolineata")
+
+spp.labels <- factor(spp.labels, levels = c("C.australensis", "C.calcarata", "M.genalis", "P.canadensis", "P.dominula", "L.flavolineata"))
+```
+
+Now we need the expression and full set data:
+```{r}
+expression.summary <- read.table(file = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/Raw_Read_Counts_Summary_Statistics.txt", header = T, sep = "\t")
+expression.summary
+
+GenesWithoutZeroExpr <- c(expression.summary$Ceratina_australensis[2], expression.summary$Ceratina_calcarata[2], expression.summary$Megalopta_genalis[2], expression.summary$Polistes_canadensis[2], expression.summary$Polistes_dominula[2], expression.summary$Liostenogaster_flavolineata[2])
+GenesWithoutZeroExpr
+
+DEG.summary <- read.table(file = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/DEGs_Summary_All_Species.txt", header = T, sep = "\t")
+DEG.summary
+
+## Proportion of Expressed Orthologs that are Total DEGs
+propTotalDEG <- c(DEG.summary$Ceratina_australensis[1]/GenesWithoutZeroExpr[1], DEG.summary$Ceratina_calcarata[1]/GenesWithoutZeroExpr[2], DEG.summary$Megalopta_genalis[1]/GenesWithoutZeroExpr[3], DEG.summary$Polistes_canadensis[1]/GenesWithoutZeroExpr[4], DEG.summary$Polistes_dominula[1]/GenesWithoutZeroExpr[5], DEG.summary$Liostenogaster_flavolineata[1]/GenesWithoutZeroExpr[6])
+## Make a df
+props <- cbind.data.frame(spp.labels, propTotalDEG)
+props
+# plot(propTotalDEG, pch = 18, col = "blue", cex = 2, ylim = c(0,0.5))
+```
+Also need to calculate the proportion of the DEGs for the resampled datasets:
+```{r}
+Mgen.resampled$propDEG <- Mgen.resampled$totalCount/GenesWithoutZeroExpr[3]
+Pcan.resampled$propDEG <- Pcan.resampled$totalCount/GenesWithoutZeroExpr[4]
+Pdom.resampled$propDEG <- Pdom.resampled$totalCount/GenesWithoutZeroExpr[5]
+Lfla.resampled$propDEG <- Lfla.resampled$totalCount/GenesWithoutZeroExpr[6]
+```
+
+
+### Proportion of Total Expressed Genes that are DEGs after Resampling:
+```{r}
+tempDF <- data.frame(c(propTotalDEG[1], ## Use just the point est for C. australensis
+                       propTotalDEG[2], ## Use just the point est for C. calcarata
+                       Mgen.resampled$propDEG, ## Est proportions from resampling
+                       Pcan.resampled$propDEG, 
+                       Pdom.resampled$propDEG,
+                       Lfla.resampled$propDEG))
+colnames(tempDF) <- "propDEG"
+# nrow(tempDF)  ## We expect 4002; 4 species resamples 1000x and one point est for each Ceratina spp 
+tempDF$spp <- c(rep(spp.labels[1], 1), rep(spp.labels[2], 1), rep(spp.labels[3], 1000), rep(spp.labels[4], 1000), rep(spp.labels[5], 1000), rep(spp.labels[6], 1000))
+# head(tempDF)
+
+plotProportions <- function(tempDF, flag) {
+  boxColors <- c(rep("white", 3), rep("white", 3))
+  medianColors <- c(rep("white", 2), rep("grey41", 4))
+  borderColors <- c(rep("white", 2), rep("dark gray", 4))
+  pointColors <- c(rep("cadet blue", 3), rep("goldenrod2", 3))
+
+  ## Set the file parameters
+    if(flag == "jpg") {
+      jpeg(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/resampled_DEGs_proportion_boxplot.jpg", 
+         units="in", width=8, height=8, res=400)
+    }
+  
+    if(flag == "tiff") {
+      tiff(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/resampled_DEGs_proportion_boxplot.tiff", units="in", 
+           width=8, height=8, res=400)
+    }
+  
+  ## Make the plot itself
+    par(lwd = 1.5, bty="l", oma=c(2,4,4,6), xaxt = "n")
+    boxplot(tempDF$propDEG~tempDF$spp, 
+            ylim = c(0,0.3), 
+            ylab = NULL, 
+            xlab = NULL, 
+            col = boxColors, 
+            medcol = medianColors, 
+            border = borderColors, 
+            boxwex = 0.6,  
+            staplewex = 0.3, 
+            las = 1, 
+            cex.axis = 1.25)
+
+      points(propTotalDEG, 
+             pch = 23, 
+             bg = pointColors, 
+             cex = 2, 
+             ylim = c(0,0.5))
+      
+      legend(0.75,0.3, 
+             cex = 1.25, 
+             legend = c("Bees", "Wasps"), 
+             pch = c(23,23), 
+             pt.cex = 1.5, 
+             pt.bg = c("cadet blue", "goldenrod2"), 
+             bg = "light yellow", 
+             box.lwd = 2)
+
+      mtext("Proportion of Expressed Orthologs that is DEGs", side=2, line=4, cex=1.5)
+
+    dev.off()
+}
+
+plotProportions(tempDF, "jpg")
+plotProportions(tempDF, "tiff")
+
+```
+
+### How often are the proportion of DEGs obtained by resampling different from the original proportion obtained?
+```{r}
+Mgen.pval <- (sum(Mgen.resampled$propDEG > propTotalDEG[3])/1000)*2
+Mgen.pval
+
+Pcan.pval <- (sum(Pcan.resampled$propDEG < propTotalDEG[4])/1000)*2
+Pcan.pval
+
+Pdom.pval <- (sum(Pdom.resampled$propDEG > propTotalDEG[5])/1000)*2
+Pdom.pval
+
+Lfla.pval <- (sum(Lfla.resampled$propDEG > propTotalDEG[6])/1000)*2
+Lfla.pval
+```
+These are the p-values; only *P. dominula* has a point estimate significantly greater than what can be obtained with N = 3.
+
+
+## We also want to know the deviation from the "full dataset" DEGs:
+```{r}
+tempDF <- data.frame(c(Mgen.resampled$propDEG-propTotalDEG[3],
+                       Pcan.resampled$propDEG-propTotalDEG[4],
+                       Pdom.resampled$propDEG-propTotalDEG[5],
+                       Lfla.resampled$propDEG-propTotalDEG[6]))
+colnames(tempDF) <- "DeviationfromPtEst"
+tempDF$spp <- c(rep(spp.labels[3], 1000), rep(spp.labels[4], 1000), rep(spp.labels[5], 1000), rep(spp.labels[6], 1000))
+# head(tempDF)
+
+
+# Mgen.pval <- (sum(Mgen.resampled$propDEG-propTotalDEG[3] > 0)/1000)*2
+# Mgen.pval
+# 
+# Pcan.pval <- (sum(Pcan.resampled$propDEG-propTotalDEG[4] < 0 )/1000)*2
+# Pcan.pval
+# 
+# Pdom.pval <- (sum(Pdom.resampled$propDEG-propTotalDEG[5] > 0 )/1000)*2
+# Pdom.pval
+# 
+# Lfla.pval <- (sum(Lfla.resampled$propDEG-propTotalDEG[6] > 0)/1000)*2
+# Lfla.pval
+
+plotProportions <- function(tempDF, flag) {
+  boxColors <- c(rep("white", 4))
+  medianColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  borderColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  pointColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+
+  ## Set the file parameters
+    if(flag == "jpg") {
+      jpeg(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/resampled_DEGs_proportion_deviation_from_point_estimate_boxplot.jpg", 
+         units="in", width=6.5, height=8, res=400)
+    }
+  
+    if(flag == "tiff") {
+      tiff(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/resampled_DEGs_proportion_deviation_from_point_estimate_boxplot.tiff", units="in", 
+           width=6.5, height=8, res=400)
+    }
+  
+  ## Make the plot itself
+    par(lwd = 1.5, bty="l", oma=c(2,4,4,6), xaxt = "n")
+    boxplot(tempDF$DeviationfromPtEst~tempDF$spp, 
+            ylim = c(-0.25,0.25), 
+            ylab = NULL, 
+            xlab = NULL, 
+            col = boxColors, 
+            medcol = medianColors, 
+            border = borderColors, 
+            boxwex = 0.6,  
+            staplewex = 0.3, 
+            las = 1, 
+            cex.axis = 1.25)
+      
+      legend(1,-0.15, 
+             cex = 1.25, 
+             legend = c("Bees", "Wasps"), 
+             pch = c(15,15),
+             pt.cex = 1.5, 
+             col = c("cadet blue", "goldenrod2"), 
+             bg = "light yellow", 
+             box.lwd = 2)
+
+      mtext("Deviation from Point Estimate after Resampling", side=2, line=4, cex=1.5)
+      abline(h=0, col ="red", lty = 2, lwd = 1)
+      
+    dev.off()
+}
+
+plotProportions(tempDF, "jpg")
+plotProportions(tempDF, "tiff")
+```
+
+### How often do we see the same genes in the resampling approach, and is this similar across the species?
+```{r}
+Mgen.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[3], "/", species[3],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+
+Pcan.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[4], "/", species[4],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+
+Pdom.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[5], "/", species[5],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+
+Lfla.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling_orthogroups3718/", species[6], "/", species[6],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+```
+
+```{r}
+## How many genes are seen every single time?
+nrow(subset(Mgen.genecounts, prop_seen == 1))
+nrow(subset(Pcan.genecounts, prop_seen == 1))
+nrow(subset(Pdom.genecounts, prop_seen == 1))
+nrow(subset(Lfla.genecounts, prop_seen == 1))
+
+
+## How many total genes came up as significant?
+nrow(Mgen.genecounts)
+nrow(Pcan.genecounts)
+nrow(Pdom.genecounts)
+nrow(Lfla.genecounts)
+```
+## How often are the full set of DEGs seen in the resampling?
+```{r}
+Caus.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/", species[1], "/", species[1],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Caus.fullDEG) <- c("GeneID")
+
+Ccal.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/", species[2], "/", species[2],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Ccal.fullDEG) <- c("GeneID")
+
+Mgen.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/", species[3], "/", species[3],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Mgen.fullDEG) <- c("GeneID")
+
+Pcan.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/", species[4], "/", species[4],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Pcan.fullDEG) <- c("GeneID")
+
+Pdom.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/", species[5], "/", species[5],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Pdom.fullDEG) <- c("GeneID")
+
+Lfla.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/", species[6], "/", species[6],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Lfla.fullDEG) <- c("GeneID")
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[3])
+Mgen.core <- Mgen.genecounts[ which(Mgen.fullDEG$GeneID %in% Mgen.genecounts$geneID), ]
+## That proportion
+nrow(Mgen.core) / nrow(Mgen.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Mgen.core$prop_seen)
+sd(Mgen.core$prop_seen)
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[4])
+Pcan.core <- Pcan.genecounts[ which(Pcan.fullDEG$GeneID %in% Pcan.genecounts$geneID), ]
+## That proportion
+nrow(Pcan.core) / nrow(Pcan.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Pcan.core$prop_seen)
+sd(Pcan.core$prop_seen)
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[5])
+Pdom.core <- Pdom.genecounts[ which(Pdom.fullDEG$GeneID %in% Pdom.genecounts$geneID), ]
+## That proportion
+nrow(Pdom.core) / nrow(Pdom.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Pdom.core$prop_seen)
+sd(Pdom.core$prop_seen)
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[6])
+Lfla.core <- Lfla.genecounts[ which(Lfla.fullDEG$GeneID %in% Lfla.genecounts$geneID), ]
+## That proportion
+nrow(Lfla.core) / nrow(Lfla.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Lfla.core$prop_seen)
+sd(Lfla.core$prop_seen)
+```
+Let's also plot the proportion of times seen in a boxplot:
+```{r}
+tempDF <- data.frame(c(Mgen.core$prop_seen, 
+                       Pcan.core$prop_seen,
+                       Pdom.core$prop_seen,
+                       Lfla.core$prop_seen))
+colnames(tempDF) <- "ProportionSeen"
+tempDF$spp <- c(rep(spp.labels[3], nrow(Mgen.core)), rep(spp.labels[4], nrow(Pcan.core)), rep(spp.labels[5], nrow(Pdom.core)), rep(spp.labels[6], nrow(Lfla.core)))
+# head(tempDF)
+# View(tempDF)
+
+plotProportions <- function(tempDF, flag) {
+  boxColors <- c(rep("white", 4))
+  medianColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  borderColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  pointColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+
+  ## Set the file parameters
+    if(flag == "jpg") {
+      jpeg(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/proportion_times_core_genes_seen.jpg", 
+         units="in", width=6.5, height=8, res=400)
+    }
+  
+    if(flag == "tiff") {
+      tiff(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/orthogroups3718_each/proportion_times_core_genes_seen.tiff", units="in", 
+           width=6.5, height=8, res=400)
+    }
+  
+  ## Make the plot itself
+    par(lwd = 1.5, bty="l", oma=c(2,4,4,6), xaxt = "n")
+    boxplot(tempDF$ProportionSeen~tempDF$spp, 
+            ylim = c(0,0.75), 
+            ylab = NULL, 
+            xlab = NULL, 
+            col = boxColors, 
+            medcol = medianColors, 
+            border = borderColors, 
+            boxwex = 0.6,  
+            staplewex = 0.3, 
+            las = 1, 
+            cex.axis = 1.25)
+      
+      legend(1,0.75, 
+             cex = 1.25, 
+             legend = c("Bees", "Wasps"), 
+             pch = c(15,15),
+             pt.cex = 1.5, 
+             col = c("cadet blue", "goldenrod2"), 
+             bg = "light yellow", 
+             box.lwd = 2)
+
+      mtext("Proportion of Times a Core DEG was Seen", side=2, line=4, cex=1.5)
+
+    dev.off()
+}
+
+plotProportions(tempDF, "jpg")
+plotProportions(tempDF, "tiff")
+```
+
+### Lastly, pairwise comparisons to test whether the proportion of DEGs are the same or different between lineages:
+```{r}
+print("Can't compare the two Ceratina spp. to each other.")
+
+################################################################################
+print("Comparing C. australensis to M. genalis:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("P-value testing whether C. australensis is same as M. genalis:")
+p <- (sum(propTotalDEG[1] < Mgen.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. australensis to P. canadensis:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("P-value testing whether C. australensis is same as P. canadensis:")
+p <- (sum(propTotalDEG[1] < Pcan.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. australensis to P. dominula:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether C. australensis is same as P. dominula:")
+p <- (sum(propTotalDEG[1] < Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. australensis to L. flavolineata:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether C. australensis is same as L. flavolineata:")
+p <- (sum(propTotalDEG[1] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+print("Comparing C. calcarata to M. genalis:")
+print("Point estimate for C. calcarata:")
+propTotalDEG[2]
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("P-value testing whether C. australensis is same as M. genalis:")
+p <- (sum(propTotalDEG[2] < Mgen.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. calcarata to P. canadensis:")
+print("Point estimate for C. calcarata:")
+propTotalDEG[2]
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("P-value testing whether C. calcarata is same as P. canadensis:")
+p <- (sum(propTotalDEG[2] < Pcan.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. calcarata to P. dominula:")
+print("Point estimate for C. australensis:")
+propTotalDEG[2]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether C. calcarata is same as P. dominula:")
+p <- (sum(propTotalDEG[2] < Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. calcarata to L. flavolineata:")
+print("Point estimate for C. calcarata:")
+propTotalDEG[2]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether C. calcarata is same as L. flavolineata:")
+p <- (sum(propTotalDEG[2] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+
+print("Comparing M. genalis to P. canadensis:")
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("P-value testing whether M. genalis is same as P. canadensis:")
+p <- (sum(propTotalDEG[3] < Pcan.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing M. genalis to P. dominula:")
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether M. genalis is same as P. dominula:")
+p <- (sum(propTotalDEG[3] < Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing M. genalis to L. flavolineata:")
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether M. genalis is same as L. flavolineata:")
+p <- (sum(propTotalDEG[3] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+
+print("Comparing P. canadensis to P. dominula:")
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether P. canadensis  is same as P. dominula:")
+p <- (sum(propTotalDEG[4] > Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing P. canadensis to L. flavolineata:")
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether P. candensis is same as L. flavolineata:")
+p <- (sum(propTotalDEG[4] > Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+
+print("Comparing P. dominula to L. flavolineata:")
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether P. dominula is same as L. flavolineata:")
+p <- (sum(propTotalDEG[5] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+```
+
+
+
+# Orthology-independent Approach
+
+## Bring in the resampled DEG counts
+```{r}
+Mgen.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[3], "/", species[3],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+
+Pcan.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[4], "/", species[4],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+
+Pdom.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[5], "/", species[5],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+
+Lfla.resampled <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[6], "/", species[6],"_N3_DEG_counts.txt", sep = ""), strip.white = T, header = T)
+```
+
+Make and format the species labels:
+```{r}
+spp.labels <- c("C.australensis", "C.calcarata", "M.genalis", 
+                "P.canadensis", "P.dominula", "L.flavolineata")
+
+spp.labels <- factor(spp.labels, levels = c("C.australensis", "C.calcarata", "M.genalis", 
+                "P.canadensis", "P.dominula", "L.flavolineata"))
+```
+
+Now we need the expression and full set data:
+```{r}
+expression.summary <- read.table(file = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/Raw_Read_Counts_Summary_Statistics.txt", header = T, sep = "\t")
+# expression.summary
+
+GenesWithoutZeroExpr <- c(expression.summary$Ceratina_australensis[2], expression.summary$Ceratina_calcarata[2], expression.summary$Megalopta_genalis[2], expression.summary$Polistes_canadensis[2], expression.summary$Polistes_dominula[2], expression.summary$Liostenogaster_flavolineata[2])
+# GenesWithoutZeroExpr
+
+DEG.summary <- read.table(file = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/DEGs_Summary_All_Species.txt", header = T, sep = "\t")
+# DEG.summary
+
+## Proportion of Transcriptome that are Total DEGs
+propTotalDEG <- c(DEG.summary$Ceratina_australensis[1]/GenesWithoutZeroExpr[1], DEG.summary$Ceratina_calcarata[1]/GenesWithoutZeroExpr[2], DEG.summary$Megalopta_genalis[1]/GenesWithoutZeroExpr[3], DEG.summary$Polistes_canadensis[1]/GenesWithoutZeroExpr[4], DEG.summary$Polistes_dominula[1]/GenesWithoutZeroExpr[5], DEG.summary$Liostenogaster_flavolineata[1]/GenesWithoutZeroExpr[6])
+## Make a df
+props <- cbind.data.frame(spp.labels, propTotalDEG)
+props
+# plot(propTotalDEG, pch = 18, col = "blue", cex = 2, ylim = c(0,0.5))
+```
+
+Also need to calculate the proportion of the DEGs for the resampled datasets:
+```{r}
+Mgen.resampled$propDEG <- Mgen.resampled$totalCount/GenesWithoutZeroExpr[3]
+Pcan.resampled$propDEG <- Pcan.resampled$totalCount/GenesWithoutZeroExpr[4]
+Pdom.resampled$propDEG <- Pdom.resampled$totalCount/GenesWithoutZeroExpr[5]
+Lfla.resampled$propDEG <- Lfla.resampled$totalCount/GenesWithoutZeroExpr[6]
+```
+
+### Proportion of Total Expressed Genes that are DEGs after Resampling:
+```{r}
+tempDF <- data.frame(c(propTotalDEG[1], ## Use just the point est for C. australensis
+                       propTotalDEG[2], ## Use just the point est for C. calcarata
+                       Mgen.resampled$propDEG, ## Est proportions from resampling
+                       Pcan.resampled$propDEG, 
+                       Pdom.resampled$propDEG,
+                       Lfla.resampled$propDEG))
+colnames(tempDF) <- "propDEG"
+nrow(tempDF)  ## We expect 4002; 4 species resamples 1000x and one point est for each Ceratina spp 
+tempDF$spp <- c(rep(spp.labels[1], 1), rep(spp.labels[2], 1), rep(spp.labels[3], 1000), rep(spp.labels[4], 1000), rep(spp.labels[5], 1000), rep(spp.labels[6], 1000))
+head(tempDF)
+
+plotProportions <- function(tempDF, flag) {
+  boxColors <- c(rep("white", 3), rep("white", 3))
+  medianColors <- c(rep("white", 2), rep("grey41", 4))
+  borderColors <- c(rep("white", 2), rep("dark gray", 4))
+  pointColors <- c(rep("cadet blue", 3), rep("goldenrod2", 3))
+
+  ## Set the file parameters
+    if(flag == "jpg") {
+      jpeg(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/resampled_DEGs_proportion_boxplot.jpg", 
+         units="in", width=8, height=8, res=400)
+    }
+  
+    if(flag == "tiff") {
+      tiff(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/resampled_DEGs_proportion_boxplot.tiff", units="in", 
+           width=8, height=8, res=400)
+    }
+  
+  ## Make the plot itself
+    par(lwd = 1.5, bty="l", oma=c(2,4,4,6), xaxt = "n")
+    boxplot(tempDF$propDEG~tempDF$spp, 
+            ylim = c(0,0.3), 
+            ylab = NULL, 
+            xlab = NULL, 
+            col = boxColors, 
+            medcol = medianColors, 
+            border = borderColors, 
+            boxwex = 0.6,  
+            staplewex = 0.3, 
+            las = 1, 
+            cex.axis = 1.25)
+
+      points(propTotalDEG, 
+             pch = 23, 
+             bg = pointColors, 
+             cex = 2, 
+             ylim = c(0,0.5))
+      
+      legend(0.75,0.3, 
+             cex = 1.25, 
+             legend = c("Bees", "Wasps"), 
+             pch = c(23,23), 
+             pt.cex = 1.5, 
+             pt.bg = c("cadet blue", "goldenrod2"), 
+             bg = "light yellow", 
+             box.lwd = 2)
+
+      mtext("Proportion of Transcriptome that is DEGs", side=2, line=4, cex=1.5)
+
+    dev.off()
+}
+
+plotProportions(tempDF, "jpg")
+plotProportions(tempDF, "tiff")
+
+```
+
+### How often are the proportion of DEGs obtained by resampling different from the original proportion obtained?
+```{r}
+Mgen.pval <- (sum(Mgen.resampled$propDEG > propTotalDEG[3])/1000)*2
+Mgen.pval
+
+Pcan.pval <- (sum(Pcan.resampled$propDEG < propTotalDEG[4])/1000)*2
+Pcan.pval
+
+Pdom.pval <- (sum(Pdom.resampled$propDEG > propTotalDEG[5])/1000)*2
+Pdom.pval
+
+Lfla.pval <- (sum(Lfla.resampled$propDEG > propTotalDEG[6])/1000)*2
+Lfla.pval
+```
+These are the p-values; only *P. dominula* has a point estimate significantly greater than what can be obtained with N = 3.
+
+
+## We also want to know the deviation from the "full dataset" DEGs:
+```{r}
+tempDF <- data.frame(c(Mgen.resampled$propDEG-propTotalDEG[3],
+                       Pcan.resampled$propDEG-propTotalDEG[4],
+                       Pdom.resampled$propDEG-propTotalDEG[5],
+                       Lfla.resampled$propDEG-propTotalDEG[6]))
+colnames(tempDF) <- "DeviationfromPtEst"
+tempDF$spp <- c(rep(spp.labels[3], 1000), rep(spp.labels[4], 1000), rep(spp.labels[5], 1000), rep(spp.labels[6], 1000))
+# head(tempDF)
+
+
+# Mgen.pval <- (sum(Mgen.resampled$propDEG-propTotalDEG[3] > 0)/1000)*2
+# Mgen.pval
+# 
+# Pcan.pval <- (sum(Pcan.resampled$propDEG-propTotalDEG[4] < 0 )/1000)*2
+# Pcan.pval
+# 
+# Pdom.pval <- (sum(Pdom.resampled$propDEG-propTotalDEG[5] > 0 )/1000)*2
+# Pdom.pval
+# 
+# Lfla.pval <- (sum(Lfla.resampled$propDEG-propTotalDEG[6] > 0)/1000)*2
+# Lfla.pval
+
+plotProportions <- function(tempDF, flag) {
+  boxColors <- c(rep("white", 4))
+  medianColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  borderColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  pointColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+
+  ## Set the file parameters
+    if(flag == "jpg") {
+      jpeg(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/resampled_DEGs_proportion_deviation_from_point_estimate_boxplot.jpg", 
+         units="in", width=6.5, height=8, res=400)
+    }
+  
+    if(flag == "tiff") {
+      tiff(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/resampled_DEGs_proportion_deviation_from_point_estimate_boxplot.tiff", units="in", 
+           width=6.5, height=8, res=400)
+    }
+  
+  ## Make the plot itself
+    par(lwd = 1.5, bty="l", oma=c(2,4,4,6), xaxt = "n")
+    boxplot(tempDF$DeviationfromPtEst~tempDF$spp, 
+            ylim = c(-0.25,0.25), 
+            ylab = NULL, 
+            xlab = NULL, 
+            col = boxColors, 
+            medcol = medianColors, 
+            border = borderColors, 
+            boxwex = 0.6,  
+            staplewex = 0.3, 
+            las = 1, 
+            cex.axis = 1.25)
+      
+      legend(1,0.25, 
+             cex = 1.25, 
+             legend = c("Bees", "Wasps"), 
+             pch = c(15,15),
+             pt.cex = 1.5, 
+             col = c("cadet blue", "goldenrod2"), 
+             bg = "light yellow", 
+             box.lwd = 2)
+
+      mtext("Deviation from Point Estimate after Resampling", side=2, line=4, cex=1.5)
+      abline(h=0, col ="red", lty = 2, lwd = 1)
+      
+    dev.off()
+}
+
+plotProportions(tempDF, "jpg")
+plotProportions(tempDF, "tiff")
+```
+
+
+### How often do we see the same genes in the resampling approach, and is this similar across the species?
+
+```{r}
+Mgen.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[3], "/", species[3],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+
+Pcan.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[4], "/", species[4],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+
+Pdom.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[5], "/", species[5],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+
+Lfla.genecounts <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/N3_resampling/", species[6], "/", species[6],"_deseq_gene_identities_counted.txt", sep = ""), strip.white = T, header = T)
+```
+
+```{r}
+## How many genes are seen every single time?
+print("How many genes are seen every single time?")
+nrow(subset(Mgen.genecounts, prop_seen == 1))
+nrow(subset(Pcan.genecounts, prop_seen == 1))
+nrow(subset(Pdom.genecounts, prop_seen == 1))
+nrow(subset(Lfla.genecounts, prop_seen == 1))
+
+
+## How many total genes came up as significant?
+print("How many total genes came up as significant?")
+nrow(Mgen.genecounts)
+nrow(Pcan.genecounts)
+nrow(Pdom.genecounts)
+nrow(Lfla.genecounts)
+
+```
+
+## How often are the full set of DEGs seen in the resampling?
+```{r}
+Caus.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/", species[1], "/", species[1],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Caus.fullDEG) <- c("GeneID")
+
+Ccal.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/", species[2], "/", species[2],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Ccal.fullDEG) <- c("GeneID")
+
+Mgen.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/", species[3], "/", species[3],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Mgen.fullDEG) <- c("GeneID")
+
+Pcan.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/", species[4], "/", species[4],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Pcan.fullDEG) <- c("GeneID")
+
+Pdom.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/", species[5], "/", species[5],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Pdom.fullDEG) <- c("GeneID")
+
+Lfla.fullDEG <- read.table(file = paste("~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/", species[6], "/", species[6],"_all_DEGs.txt", sep = ""), strip.white = T, header = F)
+colnames(Lfla.fullDEG) <- c("GeneID")
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[3])
+Mgen.core <- Mgen.genecounts[ which(Mgen.fullDEG$GeneID %in% Mgen.genecounts$geneID), ]
+## That proportion
+nrow(Mgen.core) / nrow(Mgen.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Mgen.core$prop_seen)
+sd(Mgen.core$prop_seen)
+?t.test
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[4])
+Pcan.core <- Pcan.genecounts[ which(Pcan.fullDEG$GeneID %in% Pcan.genecounts$geneID), ]
+## That proportion
+nrow(Pcan.core) / nrow(Pcan.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Pcan.core$prop_seen)
+sd(Pcan.core$prop_seen)
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[5])
+Pdom.core <- Pdom.genecounts[ which(Pdom.fullDEG$GeneID %in% Pdom.genecounts$geneID), ]
+## That proportion
+nrow(Pdom.core) / nrow(Pdom.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Pdom.core$prop_seen)
+sd(Pdom.core$prop_seen)
+
+## Which genes as identified by the full set were identified at least once by the resampling method?
+print(species[6])
+Lfla.core <- Lfla.genecounts[ which(Lfla.fullDEG$GeneID %in% Lfla.genecounts$geneID), ]
+## That proportion
+nrow(Lfla.core) / nrow(Lfla.fullDEG)
+## The mean and standard deviation of the proportion of times it showed up:
+mean(Lfla.core$prop_seen)
+sd(Lfla.core$prop_seen)
+```
+
+Let's also plot the proportion of times seen in a boxplot:
+```{r}
+tempDF <- data.frame(c(Mgen.core$prop_seen, 
+                       Pcan.core$prop_seen,
+                       Pdom.core$prop_seen,
+                       Lfla.core$prop_seen))
+colnames(tempDF) <- "ProportionSeen"
+tempDF$spp <- c(rep(spp.labels[3], nrow(Mgen.core)), rep(spp.labels[4], nrow(Pcan.core)), rep(spp.labels[5], nrow(Pdom.core)), rep(spp.labels[6], nrow(Lfla.core)))
+# head(tempDF)
+# View(tempDF)
+
+plotProportions <- function(tempDF, flag) {
+  boxColors <- c(rep("white", 4))
+  medianColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  borderColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+  pointColors <- c(rep("cadet blue", 1), rep("goldenrod2", 3))
+
+  ## Set the file parameters
+    if(flag == "jpg") {
+      jpeg(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/proportion_times_core_genes_seen.jpg", 
+         units="in", width=6.5, height=8, res=400)
+    }
+  
+    if(flag == "tiff") {
+      tiff(filename = "~/Dropbox/0.ISU/0.network_analyses/deg-DESeq2/full_set/proportion_times_core_genes_seen.tiff", units="in", 
+           width=6.5, height=8, res=400)
+    }
+  
+  ## Make the plot itself
+    par(lwd = 1.5, bty="l", oma=c(2,4,4,6), xaxt = "n")
+    boxplot(tempDF$ProportionSeen~tempDF$spp, 
+            ylim = c(0,1), 
+            ylab = NULL, 
+            xlab = NULL, 
+            col = boxColors, 
+            medcol = medianColors, 
+            border = borderColors, 
+            boxwex = 0.6,  
+            staplewex = 0.3, 
+            las = 1, 
+            cex.axis = 1.25)
+      
+      legend(1,1, 
+             cex = 1.25, 
+             legend = c("Bees", "Wasps"), 
+             pch = c(15,15),
+             pt.cex = 1.5, 
+             col = c("cadet blue", "goldenrod2"), 
+             bg = "light yellow", 
+             box.lwd = 2)
+
+      mtext("Proportion of Times a Core DEG was Seen", side=2, line=4, cex=1.5)
+
+    dev.off()
+}
+
+plotProportions(tempDF, "jpg")
+plotProportions(tempDF, "tiff")
+```
+
+
+### Lastly, pairwise comparisons to test whether the proportion of DEGs are the same or different between lineages:
+```{r}
+print("Can't compare the two Ceratina spp. to each other.")
+
+################################################################################
+print("Comparing C. australensis to M. genalis:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("P-value testing whether C. australensis is same as M. genalis:")
+p <- (sum(propTotalDEG[1] < Mgen.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+
+print("Comparing C. australensis to P. canadensis:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("P-value testing whether C. australensis is same as P. canadensis:")
+p <- (sum(propTotalDEG[1] < Pcan.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. australensis to P. dominula:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether C. australensis is same as P. dominula:")
+p <- (sum(propTotalDEG[1] < Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. australensis to L. flavolineata:")
+print("Point estimate for C. australensis:")
+propTotalDEG[1]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether C. australensis is same as L. flavolineata:")
+p <- (sum(propTotalDEG[1] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+print("Comparing C. calcarata to M. genalis:")
+print("Point estimate for C. calcarata:")
+propTotalDEG[2]
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("P-value testing whether C. australensis is same as M. genalis:")
+p <- (sum(propTotalDEG[2] < Mgen.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. calcarata to P. canadensis:")
+print("Point estimate for C. calcarata:")
+propTotalDEG[2]
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("P-value testing whether C. calcarata is same as P. canadensis:")
+p <- (sum(propTotalDEG[2] < Pcan.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. calcarata to P. dominula:")
+print("Point estimate for C. australensis:")
+propTotalDEG[2]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether C. calcarata is same as P. dominula:")
+p <- (sum(propTotalDEG[2] < Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing C. calcarata to L. flavolineata:")
+print("Point estimate for C. calcarata:")
+propTotalDEG[2]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether C. calcarata is same as L. flavolineata:")
+p <- (sum(propTotalDEG[2] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+
+print("Comparing M. genalis to P. canadensis:")
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("P-value testing whether M. genalis is same as P. canadensis:")
+p <- (sum(propTotalDEG[3] < Pcan.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing M. genalis to P. dominula:")
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether M. genalis is same as P. dominula:")
+p <- (sum(propTotalDEG[3] < Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing M. genalis to L. flavolineata:")
+print("Point estimate for M. genalis:")
+propTotalDEG[3]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether M. genalis is same as L. flavolineata:")
+p <- (sum(propTotalDEG[3] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+
+print("Comparing P. canadensis to P. dominula:")
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("P-value testing whether P. canadensis  is same as P. dominula:")
+p <- (sum(propTotalDEG[4] > Pdom.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+print("Comparing P. canadensis to L. flavolineata:")
+print("Point estimate for P. canadensis:")
+propTotalDEG[4]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether P. candensis is same as L. flavolineata:")
+p <- (sum(propTotalDEG[4] > Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+
+print("Comparing P. dominula to L. flavolineata:")
+print("Point estimate for P. dominula:")
+propTotalDEG[5]
+print("Point estimate for L. flavolineata:")
+propTotalDEG[6]
+print("P-value testing whether P. dominula is same as L. flavolineata:")
+p <- (sum(propTotalDEG[5] < Lfla.resampled$propDEG)/1000)*2
+p.adjust(p, method = "BH", n = 5)
+
+################################################################################
+```

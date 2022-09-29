@@ -1,8 +1,0 @@
-Polistes_canadensis	Polistes_dominula	Liostenogaster_flavolineata
-Total DEGs	17	725	308
-Up-Reg in R	12	420	89
-Up-Reg in NR	5	305	219
-meanAbsLFC	1.954	0.519	0.413
-stdevAbsLFC	1.689	0.502	0.221
-Reproductives N	4	12	9
-Non-Repros N	6	12	10
